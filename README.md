@@ -82,6 +82,27 @@ cp backend/.env.example backend/.env
 - Desenvolvimento: `npm run dev` (requer nodemon)
 - Produção: `npm start`
 - Documentação API: Acesse `http://localhost:3001/api-docs` para ver a documentação Swagger
+- Gerar ERD: `npm run erd:generate` - Gera diagrama ERD do banco de dados
+- Visualizar ERD: Acesse `http://localhost:3001/api/erd` para ver o diagrama ERD
+
+### Banco de Dados
+
+#### Migrations
+- Criar migration: `npm run migration:generate -- nome-da-migration`
+- Executar migrations: `npm run db:migrate`
+- Reverter última migration: `npm run db:migrate:undo`
+- Reverter todas migrations: `npm run db:migrate:undo:all`
+- Status das migrations: `npm run db:migrate:status`
+
+#### Seeders
+- Criar seeder: `npm run seed:generate -- nome-do-seeder`
+- Executar seeders: `npm run db:seed`
+- Reverter último seeder: `npm run db:seed:undo`
+- Reverter todos seeders: `npm run db:seed:undo:all`
+
+#### Banco de Dados
+- Criar banco: `npm run db:create`
+- Deletar banco: `npm run db:drop`
 
 ### Frontend
 - Desenvolvimento: `npm run dev`
