@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: grupo-goold-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: grupo_goold
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - grupo-goold-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: grupo-goold-backend
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: grupo_goold
+      DB_USER: root
+      DB_PASSWORD: password
+      PORT: 3001
+      NODE_ENV: development
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    command: npm run dev
+    depends_on:
+      - mysql
+    networks:
+      - grupo-goold-network
+
+volumes:
+  mysql_data:
+
+networks:
+  grupo-goold-network:
+    driver: bridge
+

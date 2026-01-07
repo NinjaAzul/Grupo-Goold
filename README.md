@@ -1,0 +1,88 @@
+# Grupo Goold - Projeto Full-Stack
+
+Projeto Goold Schedule com backend (Express + Sequelize + MySQL) e frontend (Next.js + Tailwind CSS).
+
+## Estrutura do Projeto
+
+```
+Grupo-Goold/
+├── backend/              # Backend Express + Sequelize
+│   └── docker-compose.yml # Configuração Docker
+└── frontend/             # Frontend Next.js + Tailwind CSS
+```
+
+## Tecnologias
+
+### Backend
+- Node.js
+- Express
+- Sequelize
+- MySQL
+
+### Frontend
+- Next.js
+- React
+- Tailwind CSS
+
+## Como Executar
+
+### Backend e MySQL com Docker
+
+1. Entre no diretório do backend:
+```bash
+cd backend
+```
+
+2. Suba os serviços com Docker Compose:
+```bash
+docker-compose up -d
+```
+
+3. O backend estará disponível em: `http://localhost:3001`
+4. O MySQL estará disponível na porta: `3306`
+
+### Frontend
+
+1. Entre no diretório do frontend:
+```bash
+cd frontend
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
+3. Execute o servidor de desenvolvimento:
+```bash
+npm run dev
+```
+
+4. Acesse: `http://localhost:3000`
+
+## Variáveis de Ambiente
+
+Copie o arquivo `.env.example` para `.env` no diretório backend e ajuste as variáveis conforme necessário:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+## Comandos Úteis
+
+### Docker
+- Subir serviços: `cd backend && docker-compose up -d`
+- Parar serviços: `cd backend && docker-compose down`
+- Ver logs: `cd backend && docker-compose logs -f backend`
+- Rebuild: `cd backend && docker-compose up -d --build`
+- **Nota**: O backend está configurado com hot-reload. Mudanças no código são detectadas automaticamente.
+
+### Backend
+- Desenvolvimento: `npm run dev` (requer nodemon)
+- Produção: `npm start`
+
+### Frontend
+- Desenvolvimento: `npm run dev`
+- Build: `npm run build`
+- Produção: `npm start`
+
