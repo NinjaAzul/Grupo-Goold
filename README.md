@@ -40,6 +40,7 @@ docker-compose up -d
 
 3. O backend estará disponível em: `http://localhost:3001`
 4. O MySQL estará disponível na porta: `3306`
+5. A documentação Swagger estará disponível em: `http://localhost:3001/api-docs`
 
 ### Frontend
 
@@ -80,6 +81,7 @@ cp backend/.env.example backend/.env
 ### Backend
 - Desenvolvimento: `npm run dev` (requer nodemon)
 - Produção: `npm start`
+- Documentação API: Acesse `http://localhost:3001/api-docs` para ver a documentação Swagger
 
 ### Frontend
 - Desenvolvimento: `npm run dev`
