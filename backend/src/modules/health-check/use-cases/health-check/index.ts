@@ -1,4 +1,4 @@
 export { CheckHealthController } from './health-check.controller';
 export { CheckHealthService } from './health-check.service';
-export { CheckHealthRepository } from './health-check.repository';
+export { healthCheckRoutes } from './health-check.routes';
 export * from './health-check.interface';

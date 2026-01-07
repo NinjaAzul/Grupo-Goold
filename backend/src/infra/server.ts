@@ -1,6 +1,10 @@
 import 'dotenv/config';
 import { app } from './app';
-import { sequelize, logger } from '../@shared';
+import { sequelize } from '@shared/config';
+import { logger } from '@shared/utils';
+
+// Importar models para registrar relacionamentos
+import './database/models';
 
 const PORT = process.env.PORT || 3001;
 

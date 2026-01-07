@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-const healthCheckRoutes = Router();
+const router = Router();
 
 /**
  * @swagger
@@ -28,7 +28,7 @@ const healthCheckRoutes = Router();
  *                   format: date-time
  *                   example: 2024-01-01T00:00:00.000Z
  */
-healthCheckRoutes.get('/', (_req, res) => {
+router.get('/', (_req, res) => {
   res.json({
     status: 'ok',
     message: 'All systems operational',
@@ -36,4 +36,4 @@ healthCheckRoutes.get('/', (_req, res) => {
   });
 });
 
-export { healthCheckRoutes };
+export { router as healthCheckRoutes };
