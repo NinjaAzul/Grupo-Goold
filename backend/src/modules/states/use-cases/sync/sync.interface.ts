@@ -3,4 +3,3 @@ export interface ISyncStatesResponse {
   citiesCount: number;
   message: string;
 }
-

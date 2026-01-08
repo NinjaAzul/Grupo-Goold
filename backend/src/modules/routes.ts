@@ -6,6 +6,10 @@ export { healthCheckRoutes } from './health-check/use-cases/health-check/health-
 //USERS
 export { createUserRoutes } from './users/use-cases/create/create.routes';
 export { loginRoutes } from './users/use-cases/login/login.routes';
+export { listUsersRoutes } from './users/use-cases/list/list.routes';
+export { updateUserRoutes } from './users/use-cases/update/update.routes';
+export { deleteUserRoutes } from './users/use-cases/delete/delete.routes';
+export { getProfileRoutes } from './users/use-cases/get/profile.routes';
 
 //STATES
 export { syncStatesRoutes } from './states/use-cases/sync/sync.routes';
@@ -14,3 +18,7 @@ export { listStatesRoutes } from './states/use-cases/list/list.routes';
 //CITIES
 export { listCitiesRoutes } from './cities/use-cases/list/list.routes';
 export { searchByCEPRoutes } from './cities/use-cases/search-by-cep/search-by-cep.routes';
+
+//LOGS
+export { listLogsRoutes } from './logs/use-cases/list/list.routes';
+export { myLogsRoutes } from './logs/use-cases/my-logs/my-logs.routes';

@@ -3,6 +3,7 @@ import { ICreateUserResponse } from './create.interface';
 import { NotFoundError } from '@shared/errors';
 import { CityModel } from '@modules/cities';
 import { CreateUserDto } from './create.dto';
+import { LoggerService } from '@shared/utils/logger.service';
 
 export class CreateUserService {
   private createUserRepository: CreateUserRepository;
@@ -20,6 +21,14 @@ export class CreateUserService {
     }
 
     const user = await this.createUserRepository.create(request);
+
+    // Registrar log de criação de usuário
+    await LoggerService.log(
+      'Criação de usuário',
+      'Minha Conta',
+      user.id,
+      `Usuário ${user.email} foi criado`
+    );
 
     return { user };
   }

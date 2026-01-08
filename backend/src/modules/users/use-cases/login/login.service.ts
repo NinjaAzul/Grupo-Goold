@@ -3,6 +3,7 @@ import { sign } from 'jsonwebtoken';
 import { LoginRepository } from './login.repository';
 import { ILoginRequest, ILoginResponse } from './login.interface';
 import { UnauthorizedError } from '@shared/errors';
+import { LoggerService } from '@shared/utils/logger.service';
 
 export class LoginService {
   private loginRepository: LoginRepository;
@@ -35,6 +36,14 @@ export class LoginService {
       user: userWithoutPassword,
       token,
     };
+
+    // Registrar log de login
+    await LoggerService.log(
+      'Login',
+      'Minha Conta',
+      user.id,
+      `Usuário ${user.email} realizou login`
+    );
 
     return tokenReturn;
   }

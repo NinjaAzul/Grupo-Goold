@@ -12,6 +12,7 @@ module.exports = {
 
     if (!existingRoleNames.includes('ADMIN')) {
       rolesToInsert.push({
+        id: 1, // ID fixo para ADMIN
         name: 'ADMIN',
         created_at: new Date(),
         updated_at: new Date(),
@@ -20,6 +21,7 @@ module.exports = {
 
     if (!existingRoleNames.includes('USER')) {
       rolesToInsert.push({
+        id: 2, // ID fixo para USER
         name: 'USER',
         created_at: new Date(),
         updated_at: new Date(),

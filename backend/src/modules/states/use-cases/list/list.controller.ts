@@ -10,9 +10,9 @@ export class ListStatesController {
   }
 
   handle = async (_req: Request, res: Response): Promise<Response> => {
-    const response: IListStatesResponse = await this.listStatesService.execute();
+    const response: IListStatesResponse =
+      await this.listStatesService.execute();
 
     return res.status(200).json(response);
   };
 }
-

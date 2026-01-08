@@ -14,4 +14,3 @@ export class LoginRepository {
     return user.toJSON() as IUser;
   }
 }
-

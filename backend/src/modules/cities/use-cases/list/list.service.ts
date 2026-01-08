@@ -9,7 +9,10 @@ export class ListCitiesService {
   }
 
   async execute(query: IListCitiesQuery): Promise<IListCitiesResponse> {
-    const cities = await this.listCitiesRepository.findAll(query.stateId, query.uf);
+    const cities = await this.listCitiesRepository.findAll(
+      query.stateId,
+      query.uf
+    );
 
     return {
       cities,
