@@ -1,0 +1,6 @@
+orval.config.ts
+node_modules
+.next
+dist
+build
+
