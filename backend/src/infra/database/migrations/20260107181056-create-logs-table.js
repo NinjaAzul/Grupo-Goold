@@ -46,7 +46,6 @@ module.exports = {
         },
       });
 
-      // Adiciona índices para melhor performance
       const [indexesUserId] = await queryInterface.sequelize.query(
         `SHOW INDEX FROM logs WHERE Key_name = 'logs_user_id_index'`
       );

@@ -1,5 +1,5 @@
 export interface ICity {
-  id: number; // IBGE code
+  id: number;
   name: string;
   stateId: number;
   readonly createdAt?: Date;

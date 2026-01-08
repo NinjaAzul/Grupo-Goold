@@ -11,17 +11,17 @@ import {
 
 const routes = Router();
 
-//HEALTH CHECK
+//HEALTH CHECK ROUTES
 routes.use('/health', healthCheckRoutes);
 
-//USERS
+//USERS ROUTES
 routes.use('/users', createUserRoutes);
 
-//STATES
+//STATES ROUTES
 routes.use('/states', syncStatesRoutes);
 routes.use('/states', listStatesRoutes);
 
-//CITIES
+//CITIES ROUTES
 routes.use('/cities', listCitiesRoutes);
 routes.use('/cities', searchByCEPRoutes);
 

@@ -9,9 +9,7 @@ module.exports = {
     if (tableExists && citiesTableExists) {
       const tableDescription = await queryInterface.describeTable('users');
       
-      // Verifica se a coluna city_id existe mas não tem foreign key
       if (tableDescription.city_id) {
-        // Verifica se já existe a foreign key
         const [constraints] = await queryInterface.sequelize.query(
           `SELECT CONSTRAINT_NAME 
            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
@@ -42,7 +40,6 @@ module.exports = {
     const tableExists = await queryInterface.tableExists('users');
     
     if (tableExists) {
-      // Verifica se a constraint existe antes de remover
       const [constraints] = await queryInterface.sequelize.query(
         `SELECT CONSTRAINT_NAME 
          FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 

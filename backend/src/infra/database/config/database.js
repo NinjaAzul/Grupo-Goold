@@ -1,9 +1,9 @@
 require('dotenv').config();
 const fs = require('fs');
 
-// Detecta se está rodando no Docker ou localmente
+
 const isInsideDocker = fs.existsSync('/.dockerenv');
-// Se executado localmente e DB_HOST for 'mysql', força 'localhost'
+
 let dbHost = process.env.DB_HOST;
 if (!isInsideDocker && dbHost === 'mysql') {
   dbHost = 'localhost';

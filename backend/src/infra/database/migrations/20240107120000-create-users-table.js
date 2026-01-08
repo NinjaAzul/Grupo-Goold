@@ -48,7 +48,6 @@ module.exports = {
       city_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        // Foreign key será adicionada em migration posterior (depois que cities for criada)
       },
       created_at: {
         type: Sequelize.DATE,

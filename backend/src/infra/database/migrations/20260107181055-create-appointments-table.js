@@ -51,7 +51,6 @@ module.exports = {
         },
       });
 
-      // Adiciona índices para melhor performance
       const [indexesUserId] = await queryInterface.sequelize.query(
         `SHOW INDEX FROM appointments WHERE Key_name = 'appointments_user_id_index'`
       );
