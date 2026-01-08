@@ -1,5 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '@shared/config';
+import { ROLES } from '@shared/constants';
 
 export class UserModel extends Model {
   public id!: number;
@@ -12,8 +13,7 @@ export class UserModel extends Model {
   public number?: string | null;
   public complement?: string | null;
   public neighborhood?: string | null;
-  public city?: string | null;
-  public state?: string | null;
+  public cityId?: number | null;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -65,20 +65,15 @@ UserModel.init(
       allowNull: true,
       field: 'neighborhood',
     },
-    city: {
-      type: DataTypes.STRING(100),
+    cityId: {
+      type: DataTypes.INTEGER,
       allowNull: true,
-      field: 'city',
-    },
-    state: {
-      type: DataTypes.STRING(2),
-      allowNull: true,
-      field: 'state',
+      field: 'city_id',
     },
     roleId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 2, // Default para USER
+      defaultValue: ROLES.USER,
       field: 'role_id',
     },
   },

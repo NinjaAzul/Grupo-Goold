@@ -1,2 +1,2 @@
-export * from './role.interface';
-export { RoleModel } from './role.model';
+export * from './model/role.interface';
+export { RoleModel } from './model/role.model';

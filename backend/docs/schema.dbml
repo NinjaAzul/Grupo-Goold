@@ -1,0 +1,73 @@
+// Generated DBML from database schema
+// Database: grupo_goold
+// Generated at: 2026-01-08T03:49:25.031Z
+
+Table SequelizeMeta {
+  name varchar(255) [pk, not null]
+}
+
+Table appointments {
+  id int(10) [pk, not null]
+  user_id int(10) [not null]
+  appointment_date datetime [not null]
+  room varchar(50) [not null]
+  status varchar(50) [not null, default: 'pending']
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table cities {
+  id int(10) [pk, not null]
+  name varchar(100) [not null]
+  state_id int(10) [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table logs {
+  id int(10) [pk, not null]
+  user_id int(10)
+  activity_type varchar(100) [not null]
+  module varchar(50) [not null]
+  description text(65535)
+  created_at datetime [not null]
+}
+
+Table roles {
+  id int(10) [pk, not null]
+  name varchar(50) [unique, not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table states {
+  id int(10) [pk, not null]
+  name varchar(100) [not null]
+  uf varchar(2) [unique, not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
+}
+
+Table users {
+  id int(10) [pk, not null]
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  password varchar(255) [not null]
+  zip_code varchar(10)
+  street varchar(255)
+  number varchar(20)
+  complement varchar(255)
+  neighborhood varchar(100)
+  city_id int(10)
+  created_at datetime [not null]
+  updated_at datetime [not null]
+  role_id int(10) [not null, default: 2]
+}
+
+// Relationships
+
+Ref: appointments.user_id > users.id
+Ref: cities.state_id > states.id
+Ref: logs.user_id > users.id
+Ref: users.city_id > cities.id
+Ref: users.role_id > roles.id

@@ -52,12 +52,10 @@ const createUserController = new CreateUserController();
  *               neighborhood:
  *                 type: string
  *                 example: Downtown
- *               city:
- *                 type: string
- *                 example: São Paulo
- *               state:
- *                 type: string
- *                 example: SP
+ *               cityId:
+ *                 type: integer
+ *                 example: 3550308
+ *                 description: ID da cidade (IBGE code). O estado será obtido automaticamente através da cidade
  *     responses:
  *       201:
  *         description: Usuário criado com sucesso

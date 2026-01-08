@@ -3,7 +3,10 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    const tableExists = await queryInterface.tableExists('users');
+    
+    if (!tableExists) {
+      await queryInterface.createTable('users', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -42,13 +45,10 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: true,
       },
-      city: {
-        type: Sequelize.STRING(100),
+      city_id: {
+        type: Sequelize.INTEGER,
         allowNull: true,
-      },
-      state: {
-        type: Sequelize.STRING(2),
-        allowNull: true,
+        // Foreign key será adicionada em migration posterior (depois que cities for criada)
       },
       created_at: {
         type: Sequelize.DATE,
@@ -61,10 +61,15 @@ module.exports = {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
       },
     });
+    }
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+    const tableExists = await queryInterface.tableExists('users');
+    
+    if (tableExists) {
+      await queryInterface.dropTable('users');
+    }
   },
 };
 

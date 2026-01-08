@@ -1,4 +1,6 @@
 import { IRole } from '@modules/roles';
+import { ICity } from '@modules/cities';
+import { IState } from '@modules/states';
 
 export interface IUser {
   id: number;
@@ -11,9 +13,9 @@ export interface IUser {
   number?: string | null;
   complement?: string | null;
   neighborhood?: string | null;
-  city?: string | null;
-  state?: string | null;
+  cityId?: number | null;
   role?: IRole;
+  city?: ICity;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 }

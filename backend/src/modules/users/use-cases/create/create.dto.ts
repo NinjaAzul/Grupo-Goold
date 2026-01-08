@@ -4,7 +4,6 @@ import {
   MinLength,
   IsOptional,
   Matches,
-  Length,
   IsInt,
   Min,
 } from 'class-validator';
@@ -52,11 +51,7 @@ export class CreateUserDto {
   neighborhood?: string;
 
   @IsOptional()
-  @IsString()
-  city?: string;
-
-  @IsOptional()
-  @IsString()
-  @Length(2, 2, { message: 'State must be 2 characters (UF)' })
-  state?: string;
+  @IsInt()
+  @Min(1)
+  cityId?: number;
 }

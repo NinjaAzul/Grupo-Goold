@@ -14,8 +14,7 @@ export class CreateUserRepository {
       number: data.number || null,
       complement: data.complement || null,
       neighborhood: data.neighborhood || null,
-      city: data.city || null,
-      state: data.state || null,
+      cityId: data.cityId || null,
     });
 
     return user.toJSON() as IUser;
