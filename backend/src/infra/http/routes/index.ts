@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   healthCheckRoutes,
   createUserRoutes,
+  loginRoutes,
   syncStatesRoutes,
   listStatesRoutes,
   listCitiesRoutes,
@@ -16,6 +17,7 @@ routes.use('/health', healthCheckRoutes);
 
 //USERS ROUTES
 routes.use('/users', createUserRoutes);
+routes.use('/users/login', loginRoutes);
 
 //STATES ROUTES
 routes.use('/states', syncStatesRoutes);

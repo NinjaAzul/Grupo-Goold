@@ -6,6 +6,7 @@ export class UserModel extends Model {
   public id!: number;
   public firstName!: string;
   public lastName!: string;
+  public email!: string;
   public password!: string;
   public roleId!: number;
   public zipCode?: string | null;
@@ -34,6 +35,12 @@ UserModel.init(
       type: DataTypes.STRING(100),
       allowNull: false,
       field: 'last_name',
+    },
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true,
+      field: 'email',
     },
     password: {
       type: DataTypes.STRING(255),

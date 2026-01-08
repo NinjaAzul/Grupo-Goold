@@ -1,9 +1,12 @@
 FROM node:18-alpine
 
+# Instalar dependências necessárias para compilar módulos nativos (bcrypt)
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm install && npm rebuild bcrypt --build-from-source
 
 COPY . .
 

@@ -1,11 +1,11 @@
 import { IRole } from '@modules/roles';
 import { ICity } from '@modules/cities';
-import { IState } from '@modules/states';
 
 export interface IUser {
   id: number;
   firstName: string;
   lastName: string;
+  email: string;
   password: string;
   roleId: number;
   zipCode?: string | null;

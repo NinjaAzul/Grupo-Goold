@@ -10,6 +10,7 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { logger } from '../utils';
+import { Secret, type SignOptions } from 'jsonwebtoken';
 
 export enum NODE_ENV_ENUM {
   DEVELOPMENT = 'development',
@@ -51,6 +52,17 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsString()
   DB_NAME_TEST?: string;
+
+  @IsString()
+  @IsOptional()
+  ADMIN_DEFAULT_PASSWORD?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_SECRET!: Secret | string;
+
+  @IsNotEmpty()
+  JWT_EXPIRES_IN!: SignOptions['expiresIn'];
 }
 
 export async function validateEnvironment(): Promise<void> {
@@ -63,7 +75,10 @@ export async function validateEnvironment(): Promise<void> {
     DB_USER: process.env.DB_USER,
     DB_PASSWORD: process.env.DB_PASSWORD,
     DB_NAME_TEST: process.env.DB_NAME_TEST,
-  });
+    ADMIN_DEFAULT_PASSWORD: process.env.ADMIN_DEFAULT_PASSWORD,
+    JWT_SECRET: process.env.JWT_SECRET,
+    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  }) as EnvironmentVariables;
 
   const errors = await validate(env);
 

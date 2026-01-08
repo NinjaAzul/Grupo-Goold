@@ -5,6 +5,7 @@ export { healthCheckRoutes } from './health-check/use-cases/health-check/health-
 
 //USERS
 export { createUserRoutes } from './users/use-cases/create/create.routes';
+export { loginRoutes } from './users/use-cases/login/login.routes';
 
 //STATES
 export { syncStatesRoutes } from './states/use-cases/sync/sync.routes';
