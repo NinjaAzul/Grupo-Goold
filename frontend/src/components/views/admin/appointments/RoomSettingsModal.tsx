@@ -110,9 +110,7 @@ export function RoomSettingsModal({ isOpen, onClose }: RoomSettingsModalProps) {
   };
 
   const handleDelete = (room: Room) => {
-    if (window.confirm(`Tem certeza que deseja deletar a sala "${room.name}"?`)) {
-      deleteRoom.mutate({ id: room.id });
-    }
+    deleteRoom.mutate({ id: room.id });
   };
 
   const isLoading = createRoom.isPending || updateRoom.isPending || deleteRoom.isPending;

@@ -58,17 +58,23 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
         </button>
 
         <div className="flex items-center gap-[10px]">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageClick(page)}
-              className={cn(paginationButtonVariants({ variant: 'page' }))}
-              aria-label={`Página ${page}`}
-              aria-current={currentPage === page ? 'page' : undefined}
-            >
-              {page}
-            </button>
-          ))}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+            const isActive = currentPage === page;
+            return (
+              <button
+                key={page}
+                onClick={() => handlePageClick(page)}
+                className={cn(
+                  paginationButtonVariants({ variant: 'page' }),
+                  !isActive && 'opacity-50'
+                )}
+                aria-label={`Página ${page}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {page}
+              </button>
+            );
+          })}
         </div>
 
         <button

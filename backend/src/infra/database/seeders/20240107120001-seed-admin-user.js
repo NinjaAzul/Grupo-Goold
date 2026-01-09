@@ -7,7 +7,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
  
     const [data] = await queryInterface.sequelize.query(
-      `SELECT id FROM users WHERE email = 'admin@grupo-goold.com' LIMIT 1`
+      `SELECT id FROM users WHERE email = 'admin@example.com' LIMIT 1`
     );
 
     const [existingAdmin] = data;

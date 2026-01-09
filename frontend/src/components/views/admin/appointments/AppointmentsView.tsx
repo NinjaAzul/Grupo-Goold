@@ -1,22 +1,61 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/components/ui/Divider';
 import { Pagination } from '@/components/ui/pagination';
 import { usePage } from '@/contexts/PageContext';
 import { AppointmentsFilters } from './AppointmentsFilters';
 import { AppointmentsTable } from './AppointmentsTable';
-import { mockData } from './mockData';
-import {  SortField, SortDirection } from './types';
+import {
+  useGetAdminAppointments,
+  usePatchAdminAppointmentsIdStatus,
+} from '@/api/generated/admin-appointments/admin-appointments';
+import { getGetAdminAppointmentsQueryKey } from '@/api/generated/admin-appointments/admin-appointments';
+import { useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import {
+  Agendamento,
+  SortField,
+  SortDirection,
+  ApiAppointmentsResponse,
+} from './types';
+
+// Função para mapear dados da API para o formato do componente
+const mapApiAppointmentToAgendamento = (
+  appointment: any
+): Agendamento => {
+  const appointmentDate = new Date(appointment.appointmentDate);
+  const userName = appointment.user
+    ? `${appointment.user.firstName} ${appointment.user.lastName}`.trim()
+    : 'Usuário não encontrado';
+  const userEmail = appointment.user?.email || '';
+
+  // Mapear status do backend para o formato do frontend
+  const statusMap: Record<string, 'agendado' | 'cancelado' | 'em_analise'> = {
+    scheduled: 'agendado',
+    cancelled: 'cancelado',
+    pending: 'em_analise',
+  };
+
+  return {
+    id: String(appointment.id),
+    data: format(appointmentDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+    nome: userName,
+    tipo: userEmail,
+    sala: appointment.room,
+    status: statusMap[appointment.status] || 'em_analise',
+  };
+};
 
 export function AppointmentsView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const totalPages = 3;
+  const queryClient = useQueryClient();
   const { setPageInfo } = usePage();
 
   useEffect(() => {
@@ -26,33 +65,53 @@ export function AppointmentsView() {
     );
   }, [setPageInfo]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Preparar parâmetros da query
+  const queryParams = useMemo(() => {
+    const params: any = {
+      page: currentPage,
+      limit: 10,
+    };
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      if (sortDirection === 'asc') {
-        setSortDirection('desc');
-      } else if (sortDirection === 'desc') {
-        setSortField(null);
-        setSortDirection(null);
-      } else {
-        setSortDirection('asc');
-      }
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
+    if (searchTerm) {
+      params.name = searchTerm;
     }
-  };
 
+    if (selectedDate) {
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(selectedDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      params.startDate = startOfDay.toISOString().split('T')[0];
+      params.endDate = endOfDay.toISOString().split('T')[0];
+    }
+
+    // Se houver ordenação, aplicar (o backend ordena por appointmentDate DESC por padrão)
+    // Por enquanto, vamos manter a ordenação do backend e adicionar ordenação client-side se necessário
+
+    return params;
+  }, [currentPage, searchTerm, selectedDate]);
+
+  const { data: rawData, isLoading } = useGetAdminAppointments(
+    queryParams,
+    {}
+  );
+
+  // Cast do tipo void para ApiAppointmentsResponse
+  const appointmentsResponse = rawData as unknown as
+    | ApiAppointmentsResponse
+    | undefined;
+
+  // Mapear dados da API para o formato do componente
+  const appointments: Agendamento[] = useMemo(() => {
+    if (!appointmentsResponse?.data) return [];
+    return appointmentsResponse.data.map(mapApiAppointmentToAgendamento);
+  }, [appointmentsResponse]);
+
+  // Aplicar ordenação client-side se necessário
   const sortedData = useMemo(() => {
-    if (!sortField || !sortDirection) return mockData;
+    if (!sortField || !sortDirection) return appointments;
 
-    return [...mockData].sort((a, b) => {
+    return [...appointments].sort((a, b) => {
       let aValue: string;
       let bValue: string;
 
@@ -70,14 +129,57 @@ export function AppointmentsView() {
         return bValue.localeCompare(aValue);
       }
     });
-  }, [sortField, sortDirection]);
+  }, [appointments, sortField, sortDirection]);
 
-  const handleApprove = (_id: string) => {
-    // TODO: Implementar lógica de aprovação
+  const totalPages =
+    appointmentsResponse?.pagination?.totalPages || 1;
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortField(null);
+        setSortDirection(null);
+      } else {
+        setSortDirection('asc');
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
   };
 
-  const handleCancel = (_id: string) => {
-    // TODO: Implementar lógica de cancelamento
+  const updateStatus = usePatchAdminAppointmentsIdStatus({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: getGetAdminAppointmentsQueryKey(queryParams),
+        });
+        toast.success('Status do agendamento atualizado com sucesso!');
+      },
+      onError: (error: unknown) => {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Erro ao atualizar status. Tente novamente.';
+        toast.error(errorMessage);
+      },
+    },
+  });
+
+  const handleApprove = (id: string) => {
+    updateStatus.mutate({
+      id: Number(id),
+      data: { status: 'scheduled' },
+    });
+  };
+
+  const handleCancel = (id: string) => {
+    updateStatus.mutate({
+      id: Number(id),
+      data: { status: 'cancelled' },
+    });
   };
 
   return (
@@ -102,11 +204,13 @@ export function AppointmentsView() {
         />
       </div>
       
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      <div className="flex justify-center">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 }

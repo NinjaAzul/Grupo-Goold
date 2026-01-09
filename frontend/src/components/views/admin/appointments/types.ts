@@ -10,6 +10,34 @@ export interface Agendamento {
 export type SortField = 'data' | 'nome' | null;
 export type SortDirection = 'asc' | 'desc' | null;
 
+// Tipos da API
+export interface ApiAppointment {
+  id: number;
+  userId: number;
+  appointmentDate: string;
+  room: string;
+  status: 'pending' | 'scheduled' | 'cancelled';
+  user?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ApiAppointmentsResponse {
+  success: boolean;
+  data: ApiAppointment[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export interface Room {
   id: number;
   name: string;

@@ -20,4 +20,5 @@ export { Skeleton } from './Skeleton';
 export { Modal } from './Modal';
 export { TimeInput } from './TimeInput';
 export { TimeRangeInput } from './TimeRangeInput';
+export { Tooltip } from './Tooltip';
 

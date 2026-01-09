@@ -33,8 +33,8 @@ export function AppointmentsTable({
   onCancel,
 }: AppointmentsTableProps) {
   return (
-    <div className="bg-background-white overflow-hidden mt-4">
-      <div className="overflow-x-auto">
+    <div className="bg-background-white mt-4">
+      <div className="overflow-x-auto -mx-4 lg:-mx-8 px-4 lg:px-8">
         <Table>
           <TableHeader>
             <TableRow>
@@ -124,7 +124,7 @@ export function AppointmentsTable({
                     </Badge>
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm font-medium text-right">
-                    {agendamento.status !== 'cancelado' && (
+                    {agendamento.status === 'em_analise' && (
                       <div className="flex items-center justify-end gap-2">
                         <ActionButton
                           variant="check"
@@ -138,6 +138,16 @@ export function AppointmentsTable({
                         />
                       </div>
                     )}
+                    {agendamento.status === 'agendado' && (
+                      <div className="flex items-center justify-end gap-2">
+                        <ActionButton
+                          variant="close"
+                          onClick={() => onCancel?.(agendamento.id)}
+                          aria-label="Cancelar agendamento"
+                        />
+                      </div>
+                    )}
+                    {agendamento.status === 'cancelado' && null}
                   </TableCell>
                 </TableRow>
               ))

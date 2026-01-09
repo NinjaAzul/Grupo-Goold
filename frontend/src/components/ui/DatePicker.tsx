@@ -6,7 +6,7 @@ import DatePickerLib from 'react-datepicker';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { registerLocale } from 'react-datepicker';
-import { CalendarIcon } from '@/components/icons';
+import { CalendarIcon, XIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -63,31 +63,50 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     setIsOpen(false);
   };
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange?.(undefined);
+  };
+
   const CustomInput = React.forwardRef<HTMLButtonElement>((props, ref) => {
     return (
-      <button
-        type="button"
-        ref={ref}
-        onClick={() => {
-          if (!disabled) {
-            setIsOpen(!isOpen);
-          }
-          // @ts-ignore
-          props.onClick?.();
-        }}
-        disabled={disabled}
-        className={cn(
-          datePickerButtonVariants({
-            hasError: !!error,
-            disabled: disabled,
-          })
-        )}
-      >
-        <span className={cn(displayValue ? 'text-primary' : 'text-gray-400', 'flex-1')}>
-          {displayValue || placeholder}
-        </span>
-        <CalendarIcon className="w-5 h-5 text-black flex-shrink-0 ml-3" />
-      </button>
+      <div className="relative w-full">
+        <button
+          type="button"
+          ref={ref}
+          onClick={() => {
+            if (!disabled) {
+              setIsOpen(!isOpen);
+            }
+            // @ts-ignore
+            props.onClick?.();
+          }}
+          disabled={disabled}
+          className={cn(
+            datePickerButtonVariants({
+              hasError: !!error,
+              disabled: disabled,
+            })
+          )}
+        >
+          <span className={cn(displayValue ? 'text-primary' : 'text-gray-400', 'flex-1 text-left')}>
+            {displayValue || placeholder}
+          </span>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {value && !disabled && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="p-1 hover:bg-gray-100 rounded transition-colors flex items-center justify-center"
+                aria-label="Limpar data"
+              >
+                <XIcon className="w-2 h-2 text-gray-500" strokeWidth={0.5} />
+              </button>
+            )}
+            <CalendarIcon className="w-6 h-6 text-black" />
+          </div>
+        </button>
+      </div>
     );
   });
 

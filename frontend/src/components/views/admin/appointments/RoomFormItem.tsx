@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { TimeRangeInput } from '@/components/ui/TimeRangeInput';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { Room, RoomFormData } from './types';
 
 const roomSchema = z
@@ -147,15 +148,17 @@ export function RoomFormItem({
         <div className="flex gap-4 pt-4">
           {onDelete && room ? (
             <>
-              <Button
-                type="button"
-                variant="error"
-                onClick={onDelete}
-                disabled={isLoading}
-                className="flex-1"
-              >
-                Deletar
-              </Button>
+              <Tooltip content={`Deletar a sala "${room.name}"`}>
+                <Button
+                  type="button"
+                  variant="error"
+                  onClick={onDelete}
+                  disabled={isLoading}
+                  className="flex-1"
+                >
+                  Deletar
+                </Button>
+              </Tooltip>
               <Button
                 type="submit"
                 variant="primary"
