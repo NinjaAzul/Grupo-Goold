@@ -33,7 +33,7 @@ AXIOS_INSTANCE.interceptors.response.use(
       localStorage.removeItem('token');
       // Redirecionar apenas se não estiver na página de login
       if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/admin/login';
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

@@ -15,7 +15,7 @@ export function withAuth<P extends object>(
   Component: React.ComponentType<P>,
   options: WithAuthOptions = {}
 ) {
-  const { redirectTo = '/admin/login', requireRole } = options;
+  const { redirectTo = '/login', requireRole } = options;
 
   return function AuthenticatedComponent(props: P) {
     const { isAuthenticated, isLoading, user } = useAuth();
@@ -23,7 +23,7 @@ export function withAuth<P extends object>(
     const pathname = usePathname();
     
     // Permitir acesso à rota de login sem autenticação
-    const isLoginRoute = pathname === '/admin/login' || pathname === redirectTo;
+    const isLoginRoute = pathname === '/login' || pathname === redirectTo;
 
     useEffect(() => {
       // Não redirecionar se estiver na rota de login

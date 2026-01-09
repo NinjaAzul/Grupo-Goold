@@ -6,7 +6,7 @@ export function withAdminAuth<P extends object>(
   Component: React.ComponentType<P>
 ) {
   return withAuth(Component, {
-    redirectTo: '/admin/login',
+    redirectTo: '/login',
     requireRole: 'admin',
   });
 }
