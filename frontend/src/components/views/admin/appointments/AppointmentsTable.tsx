@@ -59,7 +59,6 @@ export function AppointmentsTable({
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              // Skeleton loading
               Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
                   <TableCell className="whitespace-nowrap">
@@ -86,7 +85,6 @@ export function AppointmentsTable({
                 </TableRow>
               ))
             ) : (
-              // Data rows
               data.map((agendamento) => (
                 <TableRow key={agendamento.id} variant={agendamento.status}>
                   <TableCell className="whitespace-nowrap text-sm text-primary">

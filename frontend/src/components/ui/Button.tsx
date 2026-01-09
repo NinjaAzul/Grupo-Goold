@@ -10,8 +10,9 @@ const buttonVariants = cva(
       variant: {
         primary: 'bg-primary text-white hover:bg-gray-800 focus:ring-primary',
         secondary: 'bg-gray-200 text-primary hover:bg-gray-300 focus:ring-gray-400',
-        error: 'bg-error text-white hover:bg-red-600 focus:ring-error',
+        error: 'bg-error/80 text-white hover:bg-red-600 focus:ring-error',
         success: 'bg-success text-white hover:bg-teal-600 focus:ring-success',
+        link: 'bg-transparent text-black hover:bg-transparent hover:text-black p-0 focus:ring-transparent shadow-none font-medium text-base leading-[165%] tracking-[0.5%]',
       },
     },
     defaultVariants: {

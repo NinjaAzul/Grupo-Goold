@@ -7,7 +7,7 @@ import { usePage } from '@/contexts/PageContext';
 import { AppointmentsFilters } from './AppointmentsFilters';
 import { AppointmentsTable } from './AppointmentsTable';
 import { mockData } from './mockData';
-import { Agendamento, SortField, SortDirection } from './types';
+import {  SortField, SortDirection } from './types';
 
 export function AppointmentsView() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +27,6 @@ export function AppointmentsView() {
   }, [setPageInfo]);
 
   useEffect(() => {
-    // Simular loading
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -73,21 +72,17 @@ export function AppointmentsView() {
     });
   }, [sortField, sortDirection]);
 
-  const handleApprove = (id: string) => {
+  const handleApprove = (_id: string) => {
     // TODO: Implementar lógica de aprovação
-    console.log('Aprovar agendamento:', id);
   };
 
-  const handleCancel = (id: string) => {
+  const handleCancel = (_id: string) => {
     // TODO: Implementar lógica de cancelamento
-    console.log('Cancelar agendamento:', id);
   };
 
   return (
     <div className="space-y-6">
-      {/* Container principal com borda */}
       <div className="bg-background-white rounded-[5px] border border-[#D7D7D7] p-4 lg:p-8">
-        {/* Filters */}
         <AppointmentsFilters
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -96,7 +91,6 @@ export function AppointmentsView() {
         />
         <Divider className="mb-4" />
 
-        {/* Table */}
         <AppointmentsTable
           data={sortedData}
           isLoading={isLoading}
@@ -107,8 +101,7 @@ export function AppointmentsView() {
           onCancel={handleCancel}
         />
       </div>
-
-      {/* Pagination */}
+      
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

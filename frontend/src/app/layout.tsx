@@ -2,6 +2,7 @@ import './globals.css'
 import { QueryProvider } from '../providers/QueryProvider'
 import { AuthProvider } from '../contexts/AuthContext'
 import { PageProvider } from '../contexts/PageContext'
+import { ToasterProvider } from '../providers/ToasterProvider'
 
 export const metadata = {
   title: 'Grupo Goold',
@@ -24,6 +25,7 @@ export default function RootLayout({
             <PageProvider>{children}</PageProvider>
           </AuthProvider>
         </QueryProvider>
+        <ToasterProvider />
       </body>
     </html>
   )
