@@ -42,6 +42,7 @@ export interface DatePickerProps
   error?: string;
   disabled?: boolean;
   className?: string;
+  minDate?: Date;
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -53,6 +54,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   error,
   disabled = false,
   className,
+  minDate,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -134,6 +136,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           customInput={<CustomInput />}
           popperClassName="!z-[100]"
           popperPlacement="bottom-start"
+          minDate={minDate}
         />
       </div>
       {error && <p className="mt-1 text-sm text-error">{error}</p>}

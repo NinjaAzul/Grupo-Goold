@@ -16,6 +16,10 @@ import {
   myLogsRoutes,
 } from '@modules/routes';
 import { adminRoutes } from '@modules/appointments/use-cases/admin/admin.routes';
+import { createAppointmentRoutes } from '@modules/appointments/use-cases/create/create.routes';
+import { listAppointmentsRoutes } from '@modules/appointments/use-cases/list/list.routes';
+import { availableSlotsRoutes } from '@modules/appointments/use-cases/available-slots/available-slots.routes';
+import { cancelAppointmentRoutes } from '@modules/appointments/use-cases/cancel/cancel.routes';
 import { roomsRoutes } from '@modules/rooms/use-cases/rooms.routes';
 import { updateUserPermissionRoutes } from '@modules/users/use-cases/update-permission/update-permission.routes';
 
@@ -40,6 +44,12 @@ routes.use('/states', listStatesRoutes);
 //CITIES ROUTES
 routes.use('/cities', listCitiesRoutes);
 routes.use('/cities', searchByCEPRoutes);
+
+//APPOINTMENTS ROUTES
+routes.use('/appointments', createAppointmentRoutes);
+routes.use('/appointments', listAppointmentsRoutes);
+routes.use('/appointments', availableSlotsRoutes);
+routes.use('/appointments', cancelAppointmentRoutes);
 
 //ADMIN ROUTES
 routes.use('/admin', adminRoutes);
