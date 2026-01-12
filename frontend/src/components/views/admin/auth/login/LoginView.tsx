@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { LoginHeader } from './LoginHeader';
 import { LoginForm } from './LoginForm';
 import { type LoginFormData } from './types';
+import { ROLES, ROLE_DEFAULT_REDIRECTS } from '@/constants/roles';
 
 interface LoginViewProps {
   title?: string;
@@ -18,18 +19,31 @@ interface LoginViewProps {
 export function LoginView({
   title = 'Login',
   redirectTo,
-  defaultRedirect = '/admin/agendamentos',
+  defaultRedirect,
 }: LoginViewProps) {
   const router = useRouter();
-  const { login: setAuthToken, isAuthenticated, isLoading } = useAuth();
+  const { login: setAuthToken, isAuthenticated, isLoading, user } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      // Se tiver redirectTo, usa ele, senão usa defaultRedirect
-      const redirect = redirectTo || defaultRedirect;
-      router.replace(redirect);
+    if (!isLoading && isAuthenticated && user) {
+      // Se tiver redirectTo, usa ele
+      if (redirectTo) {
+        router.replace(redirectTo);
+        return;
+      }
+
+      // Senão, redireciona baseado no perfil do usuário
+      const roleId = user.roleId;
+      if (roleId === ROLES.ADMIN) {
+        router.replace(ROLE_DEFAULT_REDIRECTS[ROLES.ADMIN]);
+      } else if (roleId === ROLES.USER) {
+        router.replace(ROLE_DEFAULT_REDIRECTS[ROLES.USER]);
+      } else {
+        // Fallback para defaultRedirect se fornecido, senão usa admin
+        router.replace(defaultRedirect || ROLE_DEFAULT_REDIRECTS[ROLES.ADMIN]);
+      }
     }
-  }, [isAuthenticated, isLoading, router, redirectTo, defaultRedirect]);
+  }, [isAuthenticated, isLoading, router, redirectTo, defaultRedirect, user]);
 
   const { mutate: login, isPending, error } = usePostUsersLogin({
     mutation: {

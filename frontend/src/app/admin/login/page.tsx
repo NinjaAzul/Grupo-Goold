@@ -43,21 +43,31 @@ export default function AdminLoginPage() {
   });
 
  
+  const { user } = useAuth();
+
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace('/admin/agendamentos');
+    if (!isLoading && isAuthenticated && user) {
+      // Redireciona baseado no perfil do usuário
+      const roleId = user.roleId;
+      if (roleId === 1) {
+        // ADMIN
+        router.replace('/admin/agendamentos');
+      } else if (roleId === 2) {
+        // USER
+        router.replace('/user/agendamentos');
+      } else {
+        router.replace('/admin/agendamentos');
+      }
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, user]);
 
   const { mutate: login, isPending } = usePostUsersLogin({
     mutation: {
       onSuccess: (response) => {
         if (response.token) {
           setAuthToken(response.token);
+          // O redirect será feito pelo useEffect quando o profile carregar
         }
-
-     
-        router.replace('/admin/agendamentos');
       },
       onError: (error) => {
         // Tratar erro de autenticação
