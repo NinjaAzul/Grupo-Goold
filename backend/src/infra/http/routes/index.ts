@@ -17,6 +17,7 @@ import {
 } from '@modules/routes';
 import { adminRoutes } from '@modules/appointments/use-cases/admin/admin.routes';
 import { roomsRoutes } from '@modules/rooms/use-cases/rooms.routes';
+import { updateUserPermissionRoutes } from '@modules/users/use-cases/update-permission/update-permission.routes';
 
 const routes = Router();
 
@@ -28,6 +29,7 @@ routes.use('/users', createUserRoutes);
 routes.use('/users', listUsersRoutes);
 routes.use('/users', updateUserRoutes);
 routes.use('/users', deleteUserRoutes);
+routes.use('/users', updateUserPermissionRoutes);
 routes.use('/users', getProfileRoutes);
 routes.use('/users/login', loginRoutes);
 

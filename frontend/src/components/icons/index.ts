@@ -13,5 +13,6 @@ export { ChevronRightIcon } from './ChevronRightIcon';
 export { ChevronDownIcon } from './ChevronDownIcon';
 export { SortIcon } from './SortIcon';
 export { CheckIcon } from './CheckIcon';
-export { ClockIcon } from './ClockIcon';      
+export { ClockIcon } from './ClockIcon';
+export { UserIcon } from './UserIcon';
 

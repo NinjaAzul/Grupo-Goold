@@ -22,9 +22,13 @@ export class UpdateStatusController {
       });
     }
 
+    // Obter o ID do admin autenticado
+    const adminUserId = req.user?.id;
+
     const result = await this.service.execute({
       appointmentId,
       status: status as AppointmentStatus,
+      adminUserId,
     });
 
     return res.json(result);

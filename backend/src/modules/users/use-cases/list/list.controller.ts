@@ -17,6 +17,12 @@ export class ListUsersController {
       email: req.query.email as string,
       roleId: req.query.roleId ? Number(req.query.roleId) : undefined,
       cityId: req.query.cityId ? Number(req.query.cityId) : undefined,
+      active:
+        typeof req.query.active === 'string'
+          ? req.query.active.toLowerCase() === 'true'
+          : undefined,
+      startDate: req.query.startDate as string,
+      endDate: req.query.endDate as string,
     };
 
     const result = await this.service.execute(filters);

@@ -46,6 +46,23 @@ const listUsersController = new ListUsersController();
  *         schema:
  *           type: integer
  *         description: Filtrar por cidade ID
+ *       - in: query
+ *         name: active
+ *         schema:
+ *           type: boolean
+ *         description: Filtrar por status ativo/inativo
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data inicial para filtrar por data de criação (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data final para filtrar por data de criação (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Lista de usuários

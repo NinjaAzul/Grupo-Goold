@@ -5,6 +5,7 @@ import {
   MinLength,
   IsInt,
   Min,
+  IsBoolean,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -30,6 +31,10 @@ export class UpdateUserDto {
   @Min(1)
   @IsOptional()
   roleId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
 
   @IsString()
   @IsOptional()

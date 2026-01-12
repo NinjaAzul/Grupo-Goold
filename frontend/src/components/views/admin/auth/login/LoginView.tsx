@@ -21,7 +21,7 @@ export function LoginView({
   defaultRedirect = '/admin/agendamentos',
 }: LoginViewProps) {
   const router = useRouter();
-  const { login: setAuthToken, isAuthenticated, isLoading, user } = useAuth();
+  const { login: setAuthToken, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -36,9 +36,9 @@ export function LoginView({
       onSuccess: (response) => {
         if (response.token) {
           setAuthToken(response.token);
+          // Não redirecionar aqui - deixar o useEffect fazer o redirecionamento
+          // quando isAuthenticated for true (após o profile carregar)
         }
-        const redirect = redirectTo || defaultRedirect;
-        router.replace(redirect);
       },
       onError: () => {
         // Error handling is done in the form component via error prop

@@ -23,17 +23,31 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof badgeVariants> {
   children: React.ReactNode;
+  textColor?: string;
+  backgroundColor?: string;
 }
 
 export const Badge: React.FC<BadgeProps> = ({
   children,
   variant,
   className,
+  textColor,
+  backgroundColor,
+  style,
   ...props
 }) => {
+  const customStyles: React.CSSProperties = {
+    ...(textColor && { color: textColor }),
+    ...(backgroundColor && { backgroundColor }),
+    ...style,
+  };
+
+  const badgeClassName = cn(badgeVariants({ variant }), className);
+
   return (
     <span
-      className={cn(badgeVariants({ variant }), className)}
+      className={badgeClassName}
+      style={customStyles}
       {...props}
     >
       {children}

@@ -1,5 +1,11 @@
 import { IRole } from '@modules/roles';
 import { ICity } from '@modules/cities';
+import { IPermission } from '@modules/permissions/model/permission.interface';
+
+export interface IUserPermission {
+  permission: IPermission;
+  granted: boolean;
+}
 
 export interface IUser {
   id: number;
@@ -8,6 +14,7 @@ export interface IUser {
   email: string;
   password: string;
   roleId: number;
+  active: boolean;
   zipCode?: string | null;
   street?: string | null;
   number?: string | null;
@@ -16,6 +23,7 @@ export interface IUser {
   cityId?: number | null;
   role?: IRole;
   city?: ICity;
+  permissions?: IUserPermission[];
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 }

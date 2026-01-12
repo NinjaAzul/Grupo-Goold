@@ -58,6 +58,7 @@ export class UpdateUserRepository {
       updateData.password = await bcrypt.hash(data.password, 10);
     }
     if (data.roleId !== undefined) updateData.roleId = data.roleId;
+    if (data.active !== undefined) updateData.active = data.active;
     if (data.zipCode !== undefined) updateData.zipCode = data.zipCode || null;
     if (data.street !== undefined) updateData.street = data.street || null;
     if (data.number !== undefined) updateData.number = data.number || null;

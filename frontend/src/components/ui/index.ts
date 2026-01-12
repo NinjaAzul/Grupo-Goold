@@ -15,10 +15,12 @@ export {
 } from './table';
 export { Pagination } from './pagination';
 export { Badge } from './Badge';
+export { NotFound } from './NotFound';
 export { ActionButton } from './ActionButton';
 export { Skeleton } from './Skeleton';
 export { Modal } from './Modal';
 export { TimeInput } from './TimeInput';
 export { TimeRangeInput } from './TimeRangeInput';
 export { Tooltip } from './Tooltip';
+export { Switch } from './Switch';
 

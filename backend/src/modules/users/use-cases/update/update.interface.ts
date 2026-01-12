@@ -7,6 +7,7 @@ export interface IUpdateUserRequest {
   email?: string;
   password?: string;
   roleId?: number;
+  active?: boolean;
   zipCode?: string;
   street?: string;
   number?: string;

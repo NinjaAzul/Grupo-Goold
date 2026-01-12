@@ -9,6 +9,7 @@ export class UserModel extends Model {
   public email!: string;
   public password!: string;
   public roleId!: number;
+  public active!: boolean;
   public zipCode?: string | null;
   public street?: string | null;
   public number?: string | null;
@@ -82,6 +83,12 @@ UserModel.init(
       allowNull: false,
       defaultValue: ROLES.USER,
       field: 'role_id',
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+      field: 'active',
     },
   },
   {

@@ -28,11 +28,13 @@ export class UpdateStatusService {
     }
 
     // Registrar log
+    // Quando um admin realiza a ação, usar o ID do admin, senão usar o ID do dono do agendamento
+    const logUserId = request.adminUserId ?? appointment.userId;
     await LoggerService.log(
       activityType,
       'Agendamento',
-      appointment.userId,
-      `Agendamento ${appointment.id} - Status: ${request.status}`
+      logUserId,
+      `Agendamento ${appointment.id} - Status: ${request.status}${request.adminUserId ? ` (Ação realizada por admin)` : ''}`
     );
 
     return { appointment };

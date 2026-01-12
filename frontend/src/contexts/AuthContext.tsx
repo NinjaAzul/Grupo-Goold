@@ -22,15 +22,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Buscar perfil do usuário apenas se houver token
+  // Buscar perfil do usuário apenas se houver token e estiver inicializado
   const {
     data: profile,
     isLoading: isLoadingProfile,
     refetch: refetchProfile,
   } = useGetUsersProfile({
     query: {
-      enabled: !!token,
+      enabled: !!token && isInitialized,
       retry: false,
+      refetchOnMount: true,
     },
   });
 
@@ -45,10 +46,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Forçar refetch do profile quando o token mudar (após inicialização)
+  useEffect(() => {
+    if (token && isInitialized) {
+      // O React Query deve fazer a query automaticamente devido ao enabled: !!token && isInitialized
+      // Mas vamos forçar um refetch para garantir
+      const timer = setTimeout(() => {
+        refetchProfile();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, isInitialized]);
+
   const login = (newToken: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('token', newToken);
       setToken(newToken);
+      // O React Query vai automaticamente fazer a query quando token mudar
+      // devido ao enabled: !!token
     }
   };
 

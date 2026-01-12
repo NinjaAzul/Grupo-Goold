@@ -11,6 +11,7 @@ import {
 import { Badge } from '@/components/ui/Badge';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { NotFound } from '@/components/ui/NotFound';
 import { Agendamento, SortField, SortDirection } from './types';
 
 interface AppointmentsTableProps {
@@ -84,6 +85,12 @@ export function AppointmentsTable({
                   </TableCell>
                 </TableRow>
               ))
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <NotFound />
+                </TableCell>
+              </TableRow>
             ) : (
               data.map((agendamento) => (
                 <TableRow key={agendamento.id} variant={agendamento.status}>
