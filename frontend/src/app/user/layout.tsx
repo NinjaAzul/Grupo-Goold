@@ -1,6 +1,6 @@
 'use client';
 
-import { UserLayout } from '@/components/layout/UserLayout';
+import { UserLayout } from '@/@components/layout/user/UserLayout';
 import { withUserAuth } from '@/hocs/withUserAuth';
 
 function UserLayoutWrapper({ children }: { children: React.ReactNode }) {

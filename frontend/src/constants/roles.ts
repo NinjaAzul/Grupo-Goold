@@ -8,9 +8,4 @@ export const ROLE_NAMES = {
   [ROLES.USER]: 'Usuário',
 } as const;
 
-export const ROLE_DEFAULT_REDIRECTS = {
-  [ROLES.ADMIN]: '/admin/agendamentos',
-  [ROLES.USER]: '/user/agendamentos',
-} as const;
-
 export type RoleId = typeof ROLES[keyof typeof ROLES];

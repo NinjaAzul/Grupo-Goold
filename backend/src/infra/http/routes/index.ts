@@ -4,6 +4,7 @@ import {
   healthCheckRoutes,
   createUserRoutes,
   loginRoutes,
+  checkEmailRoutes,
   listUsersRoutes,
   updateUserRoutes,
   deleteUserRoutes,
@@ -35,6 +36,7 @@ routes.use('/users', updateUserRoutes);
 routes.use('/users', deleteUserRoutes);
 routes.use('/users', updateUserPermissionRoutes);
 routes.use('/users', getProfileRoutes);
+routes.use('/users', checkEmailRoutes);
 routes.use('/users/login', loginRoutes);
 
 //STATES ROUTES

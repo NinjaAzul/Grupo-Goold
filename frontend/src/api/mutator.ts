@@ -32,8 +32,8 @@ AXIOS_INSTANCE.interceptors.response.use(
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       localStorage.removeItem('token');
       // Redirecionar apenas se não estiver na página de login
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+      if (!window.location.pathname.includes('/auth/login')) {
+        window.location.href = '/auth/login';
       }
     }
     return Promise.reject(error);

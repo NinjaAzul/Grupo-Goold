@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { withUserAuth } from '@/hocs/withUserAuth';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/@components/ui/Button';
 
 function UserPage() {
   const { user, logout } = useAuth();

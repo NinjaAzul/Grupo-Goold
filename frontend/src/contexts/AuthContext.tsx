@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetUsersProfile } from '@/api/generated/users/users';
 import type { GetUsersProfile200User } from '@/api/generated/models';
+import { ROLES, LOGIN_ROUTES, TOKEN_KEY } from '@/constants';
 
 interface AuthContextType {
   user: GetUsersProfile200User | null;
@@ -17,12 +18,31 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const PROFILE_REFETCH_DELAY = 50;
+
+const isBrowser = () => typeof window !== 'undefined';
+
+const getStoredToken = (): string | null => {
+  return isBrowser() ? localStorage.getItem(TOKEN_KEY) : null;
+};
+
+const setStoredToken = (token: string): void => {
+  if (isBrowser()) {
+    localStorage.setItem(TOKEN_KEY, token);
+  }
+};
+
+const removeStoredToken = (): void => {
+  if (isBrowser()) {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Buscar perfil do usuário apenas se houver token e estiver inicializado
   const {
     data: profile,
     isLoading: isLoadingProfile,
@@ -35,45 +55,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  // Inicializar token do localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        setToken(storedToken);
-      }
-      setIsInitialized(true);
+    const storedToken = getStoredToken();
+    if (storedToken) {
+      setToken(storedToken);
     }
+    setIsInitialized(true);
   }, []);
 
-  // Forçar refetch do profile quando o token mudar (após inicialização)
   useEffect(() => {
-    if (token && isInitialized) {
-      // O React Query deve fazer a query automaticamente devido ao enabled: !!token && isInitialized
-      // Mas vamos forçar um refetch para garantir
-      const timer = setTimeout(() => {
-        refetchProfile();
-      }, 50);
-      return () => clearTimeout(timer);
-    }
+    if (!token || !isInitialized) return;
+
+    const timer = setTimeout(() => {
+      refetchProfile();
+    }, PROFILE_REFETCH_DELAY);
+
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isInitialized]);
 
   const login = (newToken: string) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      // O React Query vai automaticamente fazer a query quando token mudar
-      // devido ao enabled: !!token
-    }
+    setStoredToken(newToken);
+    setToken(newToken);
   };
 
   const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      setToken(null);
-      router.push('/login');
-    }
+    const userRoleId = profile?.user?.roleId;
+    const redirectPath = userRoleId && userRoleId in LOGIN_ROUTES 
+      ? LOGIN_ROUTES[userRoleId as keyof typeof LOGIN_ROUTES]
+      : LOGIN_ROUTES[ROLES.USER]; 
+
+    removeStoredToken();
+    setToken(null);
+    router.push(redirectPath);
   };
 
   const refreshUser = () => {

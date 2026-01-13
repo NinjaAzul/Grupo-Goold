@@ -6,6 +6,7 @@ export { healthCheckRoutes } from './health-check/use-cases/health-check/health-
 //USERS
 export { createUserRoutes } from './users/use-cases/create/create.routes';
 export { loginRoutes } from './users/use-cases/login/login.routes';
+export { checkEmailRoutes } from './users/use-cases/check-email/check-email.routes';
 export { listUsersRoutes } from './users/use-cases/list/list.routes';
 export { updateUserRoutes } from './users/use-cases/update/update.routes';
 export { deleteUserRoutes } from './users/use-cases/delete/delete.routes';
