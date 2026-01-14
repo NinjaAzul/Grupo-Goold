@@ -1,28 +1,46 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/@components/ui/Input';
 import { PasswordInput } from '@/@components/ui/PasswordInput';
 import { Button } from '@/@components/ui/Button';
+import { Form } from '@/@components/ui/Form';
 import { emailSchema, loginSchema, type EmailFormData, type LoginFormData } from './schemas';
-import { usePostUsersCheckEmail } from '@/api/generated/users/users';
+import { usePostUsersCheckEmail, usePostUsersLogin } from '@/api/generated/users/users';
+import { useAuth } from '@/contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => void;
-  isLoading?: boolean;
   defaultValues?: Partial<LoginFormData>;
   error?: string;
 }
 
+enum LoginStep {
+  EMAIL = 'check-email',
+  PASSWORD = 'authorization',
+}
+
+const STEP_ORDER: LoginStep[] = [LoginStep.EMAIL, LoginStep.PASSWORD];
+
+const STEP_CONFIG = {
+  [LoginStep.EMAIL]: {
+    title: 'E-mail',
+    canGoBack: false,
+  },
+  [LoginStep.PASSWORD]: {
+    title: 'Senha',
+    canGoBack: false,
+  },
+} as const;
+
 export function LoginForm({
-  onSubmit,
-  isLoading = false,
   defaultValues,
 }: LoginFormProps) {
-  const [phase, setPhase] = useState<'email' | 'password'>('email');
+  const [currentStep, setCurrentStep] = useState<LoginStep>(LoginStep.EMAIL);
   const [email, setEmail] = useState<string>(defaultValues?.email || '');
+  const { login: setAuthToken } = useAuth();
 
   const emailForm = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
@@ -39,14 +57,16 @@ export function LoginForm({
     },
   });
 
+  const watchedEmail = emailForm.watch('email');
+
   const { mutate: checkEmail, isPending: isCheckingEmail } = usePostUsersCheckEmail({
     mutation: {
       onSuccess: (response, variables) => {
         if (response.exists) {
           const verifiedEmail = variables.data.email;
           setEmail(verifiedEmail);
-          setPhase('password');
           loginForm.setValue('email', verifiedEmail);
+          goToNextStep();
         } else {
           emailForm.setError('email', {
             message: 'E-mail não encontrado. Verifique o e-mail digitado.',
@@ -61,96 +81,183 @@ export function LoginForm({
     },
   });
 
+  const { mutate: login, isPending: isLoggingIn } = usePostUsersLogin({
+    mutation: {
+      onSuccess: (response) => {
+        if (response.token) {
+          setAuthToken(response.token);
+          toast.success('Login realizado com sucesso!');
+        }
+      },
+      onError: () => {
+        toast.error('Credenciais inválidas. Verifique seu e-mail e senha.');
+      },
+    },
+  });
+
   useEffect(() => {
     if (email) {
       loginForm.setValue('email', email);
     }
   }, [email, loginForm]);
 
+
+  const goToNextStep = () => {
+    setCurrentStep((prev) => {
+      const currentIndex = STEP_ORDER.indexOf(prev);
+      const nextIndex = Math.min(currentIndex + 1, STEP_ORDER.length - 1);
+      return STEP_ORDER[nextIndex];
+    });
+  };
+
+  const goToPreviousStep = () => {
+    setCurrentStep((prev) => {
+      const currentIndex = STEP_ORDER.indexOf(prev);
+      const previousIndex = Math.max(currentIndex - 1, 0);
+      return STEP_ORDER[previousIndex];
+    });
+  };
+
   const handleCheckEmail = (data: EmailFormData) => {
     checkEmail({ data: { email: data.email } });
   };
 
   const handleLogin = (data: LoginFormData) => {
-    onSubmit(data);
+    login({ data });
   };
 
-  if (phase === 'email') {
-    return (
-      <form
-        onSubmit={emailForm.handleSubmit(handleCheckEmail)}
-        className="bg-background-white p-6 sm:p-8 rounded-lg border border-border"
-      >
-        <div className="space-y-6">
-          <Input
-            label="E-mail (Obrigatório)"
-            placeholder="Insira seu e-mail"
-            type="email"
-            {...emailForm.register('email')}
-            error={emailForm.formState.errors.email?.message}
-            required
-            disabled={isCheckingEmail}
-          />
+  const renderStep = () => {
+    switch (currentStep) {
+      case LoginStep.EMAIL:
+        return (
+          <Form onSubmit={emailForm.handleSubmit(handleCheckEmail)}>
+            <div className="space-y-6">
+              <Controller
+                name="email"
+                control={emailForm.control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    label="E-mail (Obrigatório)"
+                    placeholder="Insira seu e-mail"
+                    type="email"
+                    error={fieldState.error?.message}
+                    required
+                    disabled={isCheckingEmail}
+                  />
+                )}
+              />
 
-          {emailForm.formState.errors.root && (
-            <div className="p-3 rounded-lg bg-error-light border border-error">
-              <p className="text-sm text-error">
-                {emailForm.formState.errors.root.message}
-              </p>
+              {emailForm.formState.errors.root && (
+                <div className="p-3 rounded-lg bg-error-light border border-error">
+                  <p className="text-sm text-error">
+                    {emailForm.formState.errors.root.message}
+                  </p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isCheckingEmail}
+                disabled={!watchedEmail || !!emailForm.formState.errors.email}
+                className="w-full"
+              >
+                Acessar conta
+              </Button>
+
+              <div className="text-center flex items-center justify-between">
+                <span className="text-sm font-normal text-primary leading-5">
+                  Ainda não tem um cadastro?
+                </span>
+                <a
+                  href="/auth/register"
+                  className="text-sm font-bold text-primary leading-5 underline pr-4"
+                >
+                  Cadastre-se
+                </a>
+              </div>
             </div>
-          )}
+          </Form>
+        );
 
-          <Button
-            type="submit"
-            variant="primary"
-            isLoading={isCheckingEmail}
-            className="w-full"
-          >
-            Acessar conta
-          </Button>
-        </div>
-      </form>
-    );
-  }
+      case LoginStep.PASSWORD:
+        return (
+          <Form onSubmit={loginForm.handleSubmit(handleLogin)}>
+            <div className="space-y-6">
+              <Controller
+                name="email"
+                control={loginForm.control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    {...field}
+                    label="E-mail (Obrigatório)"
+                    placeholder="Insira seu e-mail"
+                    type="email"
+                    error={fieldState.error?.message}
+                    required
+                  />
+                )}
+              />
 
-  return (
-    <form
-      onSubmit={loginForm.handleSubmit(handleLogin)}
-      className="bg-background-white p-6 sm:p-8 rounded-lg border border-border"
-    >
-      <div className="space-y-6">
-        <Input
-          label="E-mail (Obrigatório)"
-          placeholder="Insira seu e-mail"
-          type="email"
-          {...loginForm.register('email')}
-          error={loginForm.formState.errors.email?.message}
-          required
-          disabled={true}
-        />
+              <Controller
+                name="password"
+                control={loginForm.control}
+                render={({ field, fieldState }) => (
+                  <PasswordInput
+                    {...field}
+                    label="Senha de acesso (Obrigatório)"
+                    placeholder="Insira sua senha"
+                    error={fieldState.error?.message}
+                    required
+                    disabled={isLoggingIn}
+                    autoFocus
+                  />
+                )}
+              />
 
-        <PasswordInput
-          label="Senha de acesso (Obrigatório)"
-          placeholder="Insira sua senha"
-          {...loginForm.register('password')}
-          error={loginForm.formState.errors.password?.message}
-          required
-          disabled={isLoading}
-          autoFocus
-        />
+              <div className="flex gap-3">
+                {STEP_CONFIG[currentStep].canGoBack && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={goToPreviousStep}
+                    disabled={isLoggingIn}
+                    className="flex-1"
+                  >
+                    Voltar
+                  </Button>
+                )}
+                <Button
+                  type="submit"
+                  variant="primary"
+                  isLoading={isLoggingIn}
+                  className="flex-1"
+                >
+                  Entrar
+                </Button>
+              </div>
 
-        <div className="flex gap-3">
-          <Button
-            type="submit"
-            variant="primary"
-            isLoading={isLoading}
-            className="flex-1"
-          >
-            Entrar
-          </Button>
-        </div>
-      </div>
-    </form>
-  );
+              <div className="text-center">
+                <span className="text-sm font-normal text-primary leading-5">
+                  Ainda não tem um cadastro?{' '}
+                </span>
+                <a
+                  href="/auth/register"
+                  className="text-sm font-bold text-primary leading-5 underline"
+                >
+                  Cadastre-se
+                </a>
+              </div>
+            </div>
+          </Form>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return renderStep();
 }
 

@@ -77,6 +77,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = (newToken: string) => {
     setStoredToken(newToken);
     setToken(newToken);
+    if (isInitialized) {
+      refetchProfile();
+    }
   };
 
   const logout = () => {

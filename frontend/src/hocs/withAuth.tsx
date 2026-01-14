@@ -20,7 +20,7 @@ export function withAuth<P extends object>(
   const { redirectTo = DEFAULT_REDIRECT_PATH, requireRole } = options;
 
   return function AuthenticatedComponent(props: P) {
-    const { isAuthenticated, isLoading, user } = useAuth();
+    const { isAuthenticated, isLoading, user, token } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -28,30 +28,42 @@ export function withAuth<P extends object>(
 
     useEffect(() => {
       if (isLoginRoute) {
+        // Se está em rota de login, não faz nada
         return;
       }
 
-      if (!isLoading && !isAuthenticated) {
+      // Se tem token mas ainda está carregando o perfil, aguarda
+      if (token && isLoading) {
+        return;
+      }
+
+      // Se tem token mas ainda não está autenticado (perfil ainda carregando), aguarda
+      if (token && !isAuthenticated) {
+        return;
+      }
+
+      // Só redireciona se não tem token E não está carregando E não está autenticado
+      if (!token && !isLoading && !isAuthenticated) {
         router.replace(redirectTo);
+        return;
       }
 
-      if (!isLoading && isAuthenticated && requireRole && user?.roleId) {
-        const isAdmin = user.roleId === ROLES.ADMIN;
-        const isUser = user.roleId === ROLES.USER;
-
-        if (isAdmin) {
-          router.replace(DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]);
-        } else if (isUser) {
-          router.replace(DEFAULT_REDIRECT_ROUTES[ROLES.USER]);
-        }
+      // Se está autenticado mas não tem o role correto, redireciona
+      if (!isLoading && isAuthenticated && requireRole && user?.roleId && user.roleId !== requireRole) {
+        const redirectRoute = user.roleId === ROLES.ADMIN 
+          ? DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]
+          : DEFAULT_REDIRECT_ROUTES[ROLES.USER];
+        router.replace(redirectRoute);
+        return;
       }
-    }, [isAuthenticated, isLoading, user, router, isLoginRoute]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuthenticated, isLoading, user, router, isLoginRoute, redirectTo, token, requireRole]);
 
     if (isLoginRoute) {
       return <Component {...props} />;
     }
 
-    if (isLoading) {
+    if (isLoading || (token && !isAuthenticated)) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center">
           <Loading size="lg" />
@@ -60,6 +72,10 @@ export function withAuth<P extends object>(
     }
 
     if (!isAuthenticated) {
+      return null;
+    }
+
+    if (requireRole && user?.roleId !== requireRole) {
       return null;
     }
 

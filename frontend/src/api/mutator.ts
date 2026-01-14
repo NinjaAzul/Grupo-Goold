@@ -1,4 +1,5 @@
 import Axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { TOKEN_KEY, LOGIN_ROUTES, ROLES } from '@/constants';
 
 export const AXIOS_INSTANCE = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
@@ -8,7 +9,7 @@ export const AXIOS_INSTANCE = Axios.create({
 AXIOS_INSTANCE.interceptors.request.use((config) => {
   // Adiciona o token de autenticação se estiver disponível
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
       config.headers = config.headers || {};
       (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
@@ -28,12 +29,16 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
 AXIOS_INSTANCE.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    // Se receber 401 (Unauthorized), limpar token e redirecionar
     if (error.response?.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      // Redirecionar apenas se não estiver na página de login
-      if (!window.location.pathname.includes('/auth/login')) {
-        window.location.href = '/auth/login';
+      localStorage.removeItem(TOKEN_KEY);
+
+      const currentPath = window.location.pathname;
+      const loginRoute: string = currentPath.startsWith('/admin')
+        ? LOGIN_ROUTES[ROLES.ADMIN]
+        : LOGIN_ROUTES[ROLES.USER];
+
+      if (!currentPath.includes('/auth/login') && !currentPath.includes('/admin/login')) {
+        window.location.href = loginRoute;
       }
     }
     return Promise.reject(error);

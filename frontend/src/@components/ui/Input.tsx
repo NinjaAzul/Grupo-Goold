@@ -40,8 +40,8 @@ export interface InputProps
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, required, className, leftIcon, rightIcon, ...props }, ref) => {
     return (
-      <div className="w-full">
-        <label className="block text-sm font-medium text-primary mb-2">
+      <div className="w-full min-w-0">
+        <label className="block text-sm font-medium text-primary mb-2 break-words">
           {label}
           {required && <span className="text-error ml-1">*</span>}
         </label>

@@ -3,65 +3,38 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loading } from '@/@components/ui/Loading';
-import { usePostUsersLogin } from '@/api/generated/users/users';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginForm } from './LoginForm';
-import { type LoginFormData } from './schemas';
 import { ROLES, DEFAULT_REDIRECT_ROUTES } from '@/constants';
-import toast from 'react-hot-toast';
-
-
 
 export function LoginView() {
   const router = useRouter();
-  const { login: setAuthToken, isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
-      const roleId = user.roleId;
-      if (roleId === ROLES.ADMIN) {
-        router.replace(DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]);
-      } else {
-        router.replace(DEFAULT_REDIRECT_ROUTES[ROLES.USER]);
-      }
+    if (!isLoading && isAuthenticated && user?.roleId) {
+      const redirectRoute = user.roleId === ROLES.ADMIN 
+        ? DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]
+        : DEFAULT_REDIRECT_ROUTES[ROLES.USER];
+      
+      router.push(redirectRoute);
     }
-  }, [isAuthenticated, isLoading, router, user]);
-
-  const { mutate: login, isPending } = usePostUsersLogin({
-    mutation: {
-      onSuccess: (response) => {
-        if (response.token) {
-          setAuthToken(response.token);
-          toast.success('Login realizado com sucesso!');
-        }
-      },
-      onError: () => {
-        toast.error('Credenciais inválidas. Verifique seu e-mail e senha.');
-      },
-    },
-  });
-
-  const onSubmit = (data: LoginFormData) => {
-    login({ data });
-  };
+  }, [isAuthenticated, isLoading, user, router]);
 
   if (isLoading || isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="fixed inset-0 bg-background flex items-center justify-center z-50">
         <Loading size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-lg">
       <h1 className="text-2xl sm:text-3xl font-bold text-primary text-center mb-6 sm:mb-8">
         Entre na sua conta
       </h1>
-      <LoginForm
-        onSubmit={onSubmit}
-        isLoading={isPending}
-      />
+      <LoginForm />
     </div>
   );
 }
