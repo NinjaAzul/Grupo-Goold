@@ -18,8 +18,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const PROFILE_REFETCH_DELAY = 50;
-
 const isBrowser = () => typeof window !== 'undefined';
 
 const getStoredToken = (): string | null => {
@@ -63,23 +61,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsInitialized(true);
   }, []);
 
-  useEffect(() => {
-    if (!token || !isInitialized) return;
-
-    const timer = setTimeout(() => {
-      refetchProfile();
-    }, PROFILE_REFETCH_DELAY);
-
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, isInitialized]);
-
   const login = (newToken: string) => {
     setStoredToken(newToken);
     setToken(newToken);
-    if (isInitialized) {
-      refetchProfile();
-    }
   };
 
   const logout = () => {
