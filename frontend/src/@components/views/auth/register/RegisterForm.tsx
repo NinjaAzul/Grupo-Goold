@@ -10,18 +10,18 @@ import { PasswordInput } from '@/@components/ui/PasswordInput';
 import { Select } from '@/@components/ui/Select';
 import { Button } from '@/@components/ui/Button';
 import { Form } from '@/@components/ui/Form';
-import { ChevronDownIcon, SpinnerIcon } from '@/@components/icons';
+import { ChevronDownIcon } from '@/@components/icons';
 import { registerSchema, type RegisterFormData } from './schemas';
 import { usePostUsers } from '@/api/generated/users/users';
 import { useGetStates } from '@/api/generated/states/states';
-import { useGetCities } from '@/api/generated/cities/cities';
-import { AXIOS_INSTANCE } from '@/api/mutator';
+import { useGetCities, getCitiesSearchCepCep } from '@/api/generated/cities/cities';
+import { useDebounce } from '@/hooks/useDebounce';
 import toast from 'react-hot-toast';
+
+const REMOVE_NON_DIGITS_REGEX = /\D/g;
 
 export function RegisterForm() {
   const router = useRouter();
-  const [cepData, setCepData] = useState<any>(null);
-  const [selectedStateId, setSelectedStateId] = useState<number | null>(null);
   const [isSearchingCEP, setIsSearchingCEP] = useState(false);
 
   const form = useForm<RegisterFormData>({
@@ -36,15 +36,22 @@ export function RegisterForm() {
       number: '',
       complement: '',
       neighborhood: '',
+      stateId: undefined,
       cityId: 0,
     },
   });
 
+  const watchedStateId = form.watch('stateId');
+  const watchedCityId = form.watch('cityId');
+  const watchedStreet = form.watch('street');
+  
   const { data: statesData } = useGetStates();
   const { data: citiesData } = useGetCities(
-    { stateId: selectedStateId! },
-    { query: { enabled: !!selectedStateId } }
+    { stateId: watchedStateId! },
+    { query: { enabled: !!watchedStateId } }
   );
+  
+  const hasCepData = !!watchedCityId && !!watchedStreet;
 
   const { mutate: createUser, isPending: isCreatingUser } = usePostUsers({
     mutation: {
@@ -54,57 +61,61 @@ export function RegisterForm() {
       },
       onError: (error: any) => {
         const errorMessage =
-          error?.response?.data?.message || 'Erro ao realizar cadastro. Tente novamente.';
+          error?.response?.data?.error?.message || 
+          error?.response?.data?.message || 
+          'Erro ao realizar cadastro. Tente novamente.';
         toast.error(errorMessage);
       },
     },
   });
 
   const watchedZipCode = form.watch('zipCode');
+  const debouncedZipCode = useDebounce(watchedZipCode, 500);
 
-  // Buscar CEP quando completo (8 dígitos)
   useEffect(() => {
     const fetchCEP = async () => {
-      if (!watchedZipCode) return;
+      if (!debouncedZipCode) {
+        form.setValue('cityId', 0);
+        form.setValue('stateId', undefined);
+        return;
+      }
 
-      const cleanCEP = watchedZipCode.replace(/\D/g, '');
+      const cleanCEP = debouncedZipCode.replace(REMOVE_NON_DIGITS_REGEX, '');
       if (cleanCEP.length !== 8) return;
 
       setIsSearchingCEP(true);
       try {
-        const response = await AXIOS_INSTANCE.get(`/cities/search/cep/${cleanCEP}`);
-        const data = response.data;
+        const data = await getCitiesSearchCepCep(cleanCEP);
 
-        setCepData(data);
+        if (!data.city || !data.state || !data.city.id || !data.state.id) {
+          throw new Error('CEP não encontrado');
+        }
+
         form.setValue('street', data.street || '');
         form.setValue('complement', data.complement || '');
         form.setValue('neighborhood', data.neighborhood || '');
         form.setValue('cityId', data.city.id);
-        setSelectedStateId(data.state.id);
+        form.setValue('stateId', data.state.id);
       } catch (err) {
         form.setError('zipCode', {
           message: 'CEP não encontrado',
         });
-        setCepData(null);
+        form.setValue('cityId', 0);
+        form.setValue('stateId', undefined);
       } finally {
         setIsSearchingCEP(false);
       }
     };
 
-    const timeoutId = setTimeout(fetchCEP, 500); // Debounce de 500ms
-    return () => clearTimeout(timeoutId);
-  }, [watchedZipCode, form]);
+    fetchCEP();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedZipCode]);
 
-  // Carregar cidades quando estado for selecionado ou quando CEP for encontrado
-  useEffect(() => {
-    if (cepData && cepData.state?.id) {
-      setSelectedStateId(cepData.state.id);
-      form.setValue('cityId', cepData.city.id);
-    }
-  }, [cepData, form]);
 
   const handleSubmit = (data: RegisterFormData) => {
-    createUser({ data });
+    const { stateId: _stateId, ...payload } = data;
+    
+    createUser({ data: payload });
   };
 
   const statesOptions: Array<{ value: string | number; label: string }> =
@@ -198,7 +209,6 @@ export function RegisterForm() {
               value={field.value}
               onChange={field.onChange}
               onBlur={field.onBlur}
-              disabled={isSearchingCEP}
             >
               {(inputProps: any) => (
                 <Input
@@ -207,14 +217,14 @@ export function RegisterForm() {
                   placeholder="Insira seu CEP"
                   error={fieldState.error?.message}
                   required
-                  rightIcon={isSearchingCEP ? <SpinnerIcon className="w-5 h-5" /> : undefined}
+                  isLoading={isSearchingCEP}
                 />
               )}
             </InputMask>
           )}
         />
 
-        {cepData && (
+        {hasCepData && (
           <>
             <Controller
               name="street"
@@ -225,7 +235,7 @@ export function RegisterForm() {
                   label="Endereço"
                   placeholder="Rua, Avenida, etc."
                   error={fieldState.error?.message}
-                  disabled={!!cepData}
+                  disabled={hasCepData}
                 />
               )}
             />
@@ -271,7 +281,7 @@ export function RegisterForm() {
                   label="Bairro"
                   placeholder="Bairro"
                   error={fieldState.error?.message}
-                  disabled={!!cepData}
+                  disabled={hasCepData}
                 />
               )}
             />
@@ -283,13 +293,13 @@ export function RegisterForm() {
               <div className="relative">
                 <select
                   className="w-full py-2.5 sm:py-3 px-3 sm:px-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                  value={selectedStateId || ''}
+                  value={watchedStateId || ''}
                   onChange={(e) => {
                     const stateId = Number(e.target.value);
-                    setSelectedStateId(stateId);
-                    form.setValue('cityId', 0); // Reset cidade quando mudar estado
+                    form.setValue('stateId', stateId);
+                    form.setValue('cityId', 0);
                   }}
-                  disabled={!!cepData}
+                  disabled={hasCepData}
                 >
                   <option value="" disabled>
                     Selecione o estado
@@ -306,7 +316,7 @@ export function RegisterForm() {
               </div>
             </div>
 
-            {selectedStateId && (
+            {watchedStateId && (
               <Controller
                 name="cityId"
                 control={form.control}
@@ -333,16 +343,7 @@ export function RegisterForm() {
           type="submit"
           variant="primary"
           isLoading={isCreatingUser}
-          disabled={
-            !form.watch('firstName') ||
-            !form.watch('lastName') ||
-            !form.watch('email') ||
-            !form.watch('password') ||
-            !form.watch('zipCode') ||
-            (cepData && !form.watch('cityId')) ||
-            !!form.formState.errors.email ||
-            !!form.formState.errors.password
-          }
+          disabled={!form.formState.isValid}
           className="w-full"
         >
           Cadastrar-se

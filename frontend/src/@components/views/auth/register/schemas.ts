@@ -16,6 +16,7 @@ export const registerSchema = z.object({
   number: z.string().min(1, 'Número é obrigatório'),
   complement: z.string().optional(),
   neighborhood: z.string().min(1, 'Bairro é obrigatório'),
+  stateId: z.number().optional(),
   cityId: z.number().min(1, 'Cidade é obrigatória'),
 });
 

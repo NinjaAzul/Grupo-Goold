@@ -1,6 +1,7 @@
 import React, { InputHTMLAttributes, forwardRef } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import { SpinnerIcon } from '@/@components/icons';
 
 const inputVariants = cva(
   'w-full py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors',
@@ -30,21 +31,27 @@ const inputVariants = cva(
 export interface InputProps
   extends InputHTMLAttributes<HTMLInputElement>,
     Omit<VariantProps<typeof inputVariants>, 'hasError' | 'hasLeftIcon' | 'hasRightIcon'> {
-  label: string;
+  label?: string;
   error?: string;
   required?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, required, className, leftIcon, rightIcon, ...props }, ref) => {
+  ({ label, error, required, className, leftIcon, rightIcon, isLoading, ...props }, ref) => {
+    const showRightIcon = isLoading ? <SpinnerIcon className="w-5 h-5" /> : rightIcon;
+    const hasRightIcon = !!showRightIcon;
+
     return (
       <div className="w-full min-w-0">
-        <label className="block text-sm font-medium text-primary mb-2 break-words">
-          {label}
-          {required && <span className="text-error ml-1">*</span>}
-        </label>
+        {label && (
+          <label className="block text-sm font-medium text-primary mb-2 break-words">
+            {label}
+            {required && <span className="text-error ml-1">*</span>}
+          </label>
+        )}
         <div className="relative">
           {leftIcon && (
             <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -57,15 +64,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               inputVariants({
                 hasError: !!error,
                 hasLeftIcon: !!leftIcon,
-                hasRightIcon: !!rightIcon,
+                hasRightIcon,
               }),
               className
             )}
+            disabled={isLoading || props.disabled}
             {...props}
           />
-          {rightIcon && (
+          {showRightIcon && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-              {rightIcon}
+              {showRightIcon}
             </div>
           )}
         </div>

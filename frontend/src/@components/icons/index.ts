@@ -15,4 +15,5 @@ export { SortIcon } from './SortIcon';
 export { CheckIcon } from './CheckIcon';
 export { ClockIcon } from './ClockIcon';
 export { UserIcon } from './UserIcon';
+export { LogoutIcon } from './LogoutIcon';
 

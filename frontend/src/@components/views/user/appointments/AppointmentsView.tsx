@@ -5,11 +5,9 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/@components/ui/Divider';
 import { Pagination } from '@/@components/ui/pagination';
-import { Button } from '@/@components/ui/Button';
 import { usePage } from '@/contexts/PageContext';
 import { AppointmentsFilters } from './AppointmentsFilters';
 import { AppointmentsTable } from './AppointmentsTable';
-import { NewAppointmentModal } from './NewAppointmentModal';
 import { AXIOS_INSTANCE } from '@/api/mutator';
 import toast from 'react-hot-toast';
 import {
@@ -19,7 +17,7 @@ import {
   ApiAppointmentsResponse,
 } from './types';
 
-// Função para mapear dados da API para o formato do componente
+
 const mapApiAppointmentToAgendamento = (
   appointment: any
 ): Agendamento => {
@@ -52,7 +50,6 @@ export function AppointmentsView() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField>('data');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [appointments, setAppointments] = useState<Agendamento[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
@@ -160,7 +157,6 @@ export function AppointmentsView() {
   };
 
   const handleAppointmentCreated = () => {
-    setIsModalOpen(false);
     // Recarregar lista voltando para página 1
     setCurrentPage(1);
     setRefreshKey((prev) => prev + 1);
@@ -169,21 +165,13 @@ export function AppointmentsView() {
   return (
     <div className="space-y-6">
       <div className="bg-background-white rounded-[5px] border border-border p-4 lg:p-8">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-4">
-          <AppointmentsFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-          />
-          <Button
-            variant="primary"
-            className="w-full lg:w-auto"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Novo Agendamento
-          </Button>
-        </div>
+        <AppointmentsFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          onAppointmentCreated={handleAppointmentCreated}
+        />
         <Divider className="mb-4" />
 
         <AppointmentsTable
@@ -203,12 +191,6 @@ export function AppointmentsView() {
           onPageChange={setCurrentPage}
         />
       </div>
-
-      <NewAppointmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={handleAppointmentCreated}
-      />
     </div>
   );
 }

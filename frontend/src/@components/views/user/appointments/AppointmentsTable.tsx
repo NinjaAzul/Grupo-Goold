@@ -12,7 +12,6 @@ import { Badge } from '@/@components/ui/Badge';
 import { ActionButton } from '@/@components/ui/ActionButton';
 import { Skeleton } from '@/@components/ui/Skeleton';
 import { NotFound } from '@/@components/ui/NotFound';
-import { XIcon } from '@/@components/icons';
 import { Agendamento, SortField, SortDirection } from './types';
 
 interface AppointmentsTableProps {
@@ -71,7 +70,13 @@ export function AppointmentsTable({
               >
                 Data agendamento
               </TableHead>
-              <TableHead>Nome</TableHead>
+              <TableHead
+                sortable
+                sortDirection={sortField === 'nome' ? sortDirection : null}
+                onSort={() => onSort('nome')}
+              >
+                Nome
+              </TableHead>
               <TableHead>Sala de agendamento</TableHead>
               <TableHead>Status transação</TableHead>
               <TableHead className="text-right">Ação</TableHead>
@@ -139,9 +144,8 @@ export function AppointmentsTable({
                   <TableCell className="whitespace-nowrap text-right">
                     {agendamento.status !== 'cancelado' && onCancel && (
                       <ActionButton
-                        icon={<XIcon className="w-4 h-4" />}
+                        variant="close"
                         onClick={() => onCancel(agendamento.id)}
-                        variant="error"
                         aria-label="Cancelar agendamento"
                       />
                     )}

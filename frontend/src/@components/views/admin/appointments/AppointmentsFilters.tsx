@@ -28,17 +28,15 @@ export function AppointmentsFilters({
         <div className="w-full min-w-0 flex flex-col lg:grid lg:grid-cols-[7fr_3fr] gap-4 lg:gap-2">
           <div className="w-full min-w-0">
             <Input
-              label="Filtre por nome"
               type="text"
               leftIcon={<SearchIcon className="w-5 h-5 !text-black" />}
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Digite o nome do cliente..."
+              placeholder="Filtre por nome"
             />
           </div>
           <div className="w-full min-w-0">
             <DatePicker
-              label="Data"
               value={selectedDate}
               onChange={onDateChange}
               placeholder="Selecione"

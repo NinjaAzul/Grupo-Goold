@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { CreateUserService } from './create.service';
 import { CreateUserDto } from './create.dto';
 
@@ -9,10 +9,18 @@ export class CreateUserController {
     this.createUserService = new CreateUserService();
   }
 
-  handle = async (req: Request, res: Response): Promise<Response> => {
-    const request: CreateUserDto = req.body;
-    const response = await this.createUserService.execute(request);
+  handle = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    try {
+      const request: CreateUserDto = req.body;
+      const response = await this.createUserService.execute(request);
 
-    return res.status(201).json(response);
+      return res.status(201).json(response);
+    } catch (error) {
+      return next(error);
+    }
   };
 }

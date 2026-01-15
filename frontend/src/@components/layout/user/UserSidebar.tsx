@@ -1,16 +1,17 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogoIcon, XIcon, CalendarIcon, LogsIcon, UserIcon, ChevronDownIcon } from '@/@components/icons';
-import { cn } from '@/lib/utils';
+import { CalendarIcon, LogsIcon, UserIcon } from '@/@components/icons';
+import { SidebarMobile, SidebarDesktop, type NavItem } from '../common';
 
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-  requiresPermission?: string;
+interface IUserPermission {
+  permission: IPermission;
+  granted: boolean;
+}
+
+interface IPermission {
+  id: number;
+  name: string;
 }
 
 const navItems: NavItem[] = [
@@ -38,105 +39,37 @@ interface UserSidebarProps {
 }
 
 export function UserSidebar({ isOpen = true, onClose }: UserSidebarProps) {
-  const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const handleLinkClick = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
-
-  // Filtrar itens baseado em permissões
   const filteredNavItems = navItems.filter((item) => {
     if (!item.requiresPermission) return true;
-    if (!user?.permissions) return false;
-    const permission = user.permissions.find(
-      (p) => p.permission.name === item.requiresPermission
+    if (!user || !('permissions' in user) || !user.permissions) return false;
+    const permission = (user.permissions as IUserPermission []).find(
+      (p: IUserPermission) => p.permission?.name === item.requiresPermission
     );
     return permission?.granted === true;
   });
 
   return (
     <>
-      {/* Overlay para mobile */}
       {onClose && (
-        <div
-          className={cn(
-            'fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity',
-            isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          )}
-          onClick={onClose}
+        <SidebarMobile
+          isOpen={isOpen}
+          onClose={onClose}
+          navItems={filteredNavItems}
+          userFirstName={user?.firstName}
+          userLastName={user?.lastName}
+          roleLabel="Cliente"
+          onLogout={logout}
         />
       )}
-
-      {/* Sidebar */}
-      <div
-        className={cn(
-          'fixed lg:static inset-y-0 left-0 z-50 bg-background min-h-screen flex flex-col border-r border-sidebar transition-transform duration-300 ease-in-out',
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-          'w-64'
-        )}
-      >
-        {/* Logo */}
-        <div className="bg-background-white border-b border-border">
-          <div className="p-6 flex items-center justify-between h-[96px]">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center" style={{ backgroundColor: '#000000' }}>
-              <LogoIcon className="w-8 h-8 text-white" />
-            </div>
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="lg:hidden text-gray-500 hover:text-primary transition-colors"
-                aria-label="Fechar menu"
-              >
-                <XIcon className="w-6 h-6" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {filteredNavItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={handleLinkClick}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                  isActive
-                    ? 'bg-primary text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                )}
-              >
-                {item.icon}
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* User Profile */}
-        <div className="p-4 border-t border-border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-primary">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-sm text-gray-500">Cliente</p>
-            </div>
-            <button
-              className="text-gray-500 hover:text-primary transition-colors"
-              aria-label="Menu do usuário"
-            >
-              <ChevronDownIcon className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </div>
+      <SidebarDesktop
+        navItems={filteredNavItems}
+        userFirstName={user?.firstName}
+        userLastName={user?.lastName}
+        roleLabel="Cliente"
+        onLogout={logout}
+      />
     </>
   );
 }
