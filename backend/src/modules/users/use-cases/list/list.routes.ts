@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { ListUsersController } from './list.controller';
-import { ensureAuthenticated, ensureAdmin } from '@shared/middlewares';
+import {
+  ensureAuthenticated,
+  ensureAdmin,
+  queryValidationMiddleware,
+} from '@shared/middlewares';
+import { ListUsersQueryDto } from './list-query.dto';
 
 const router = Router();
 const listUsersController = new ListUsersController();
@@ -73,6 +78,7 @@ router.get(
   '/',
   ensureAuthenticated,
   ensureAdmin,
+  queryValidationMiddleware(ListUsersQueryDto),
   listUsersController.handle.bind(listUsersController)
 );
 

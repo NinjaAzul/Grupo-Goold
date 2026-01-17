@@ -66,6 +66,25 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], EnvironmentVariables.prototype, "DB_NAME_TEST", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], EnvironmentVariables.prototype, "ADMIN_DEFAULT_PASSWORD", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Object)
+], EnvironmentVariables.prototype, "JWT_SECRET", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Object)
+], EnvironmentVariables.prototype, "JWT_EXPIRES_IN", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], EnvironmentVariables.prototype, "FRONTEND_URL", void 0);
 async function validateEnvironment() {
     const env = (0, class_transformer_1.plainToInstance)(EnvironmentVariables, {
         NODE_ENV: process.env.NODE_ENV,
@@ -76,6 +95,10 @@ async function validateEnvironment() {
         DB_USER: process.env.DB_USER,
         DB_PASSWORD: process.env.DB_PASSWORD,
         DB_NAME_TEST: process.env.DB_NAME_TEST,
+        ADMIN_DEFAULT_PASSWORD: process.env.ADMIN_DEFAULT_PASSWORD,
+        JWT_SECRET: process.env.JWT_SECRET,
+        JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+        FRONTEND_URL: process.env.FRONTEND_URL,
     });
     const errors = await (0, class_validator_2.validate)(env);
     if (errors.length > 0) {

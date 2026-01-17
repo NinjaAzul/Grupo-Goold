@@ -1,5 +1,6 @@
 import { ListUsersRepository } from './list.repository';
-import { IListUsersRequest, IListUsersResponse } from './list.interface';
+import { IListUsersResponse } from './list.interface';
+import { ListUsersQueryDto } from './list-query.dto';
 
 export class ListUsersService {
   private repository: ListUsersRepository;
@@ -8,7 +9,7 @@ export class ListUsersService {
     this.repository = new ListUsersRepository();
   }
 
-  async execute(filters: IListUsersRequest): Promise<IListUsersResponse> {
+  async execute(filters: ListUsersQueryDto): Promise<IListUsersResponse> {
     const page = filters.page || 1;
     const limit = filters.limit || 10;
 

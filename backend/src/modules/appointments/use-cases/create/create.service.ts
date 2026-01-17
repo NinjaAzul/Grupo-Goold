@@ -17,7 +17,10 @@ export class CreateAppointmentService {
   ): Promise<ICreateAppointmentResponse> {
     const appointment = await this.repository.create(request);
 
-    // Registrar log de criação
+    if (!appointment) {
+      throw new Error('Failed to create appointment');
+    }
+
     await LoggerService.log(
       'Criação de agendamento',
       'Agendamento',

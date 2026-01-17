@@ -6,7 +6,7 @@ export class UserPermissionModel
   extends Model<IUserPermission>
   implements IUserPermission
 {
-  public id?: number; // Opcional agora
+  public id?: number;
   public userId!: number;
   public permissionId!: number;
   public granted!: boolean;
@@ -20,13 +20,13 @@ UserPermissionModel.init(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true, // Parte da chave primária composta
+      primaryKey: true,
       field: 'user_id',
     },
     permissionId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true, // Parte da chave primária composta
+      primaryKey: true,
       field: 'permission_id',
     },
     granted: {

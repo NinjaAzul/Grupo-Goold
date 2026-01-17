@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { ListLogsService } from '../list/list.service';
+import { MyLogsQueryDto } from './my-logs-query.dto';
 
 export class MyLogsController {
   private service: ListLogsService;
@@ -8,22 +9,23 @@ export class MyLogsController {
     this.service = new ListLogsService();
   }
 
-  async handle(req: Request, res: Response): Promise<Response> {
-    // O userId vem do middleware ensureAuthenticated através do req.user
-    const userId = req.user!.id;
+  async handle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user!.id;
+      const query = req.query as unknown as MyLogsQueryDto;
 
-    const filters = {
-      userId,
-      page: req.query.page ? Number(req.query.page) : undefined,
-      limit: req.query.limit ? Number(req.query.limit) : undefined,
-      activityType: req.query.activityType as string,
-      module: req.query.module as string,
-      startDate: req.query.startDate as string,
-      endDate: req.query.endDate as string,
-    };
+      const result = await this.service.execute({
+        userId,
+        ...query,
+      });
 
-    const result = await this.service.execute(filters);
-
-    return res.json(result);
+      return res.json(result);
+    } catch (error) {
+      return next(error);
+    }
   }
 }

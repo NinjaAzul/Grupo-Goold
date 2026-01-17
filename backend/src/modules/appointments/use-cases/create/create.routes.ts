@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import { CreateAppointmentController } from './create.controller';
-import { ensureAuthenticated } from '@shared/middlewares';
-import { validationMiddleware } from '@shared/middlewares';
+import {
+  ensureAuthenticated,
+  ensurePermission,
+  validationMiddleware,
+} from '@shared/middlewares';
+import { PERMISSIONS } from '@shared/constants';
 import { CreateAppointmentDto } from './create.dto';
 
 const router = Router();
@@ -43,9 +47,9 @@ const createAppointmentController = new CreateAppointmentController();
 router.post(
   '/',
   ensureAuthenticated,
+  ensurePermission(PERMISSIONS.APPOINTMENTS),
   validationMiddleware(CreateAppointmentDto),
   createAppointmentController.handle.bind(createAppointmentController)
 );
 
 export { router as createAppointmentRoutes };
-

@@ -6,32 +6,24 @@ import { Loading } from '@/@components/ui/Loading';
 import { usePostUsersLogin } from '@/api/generated/users/users';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginForm } from './LoginForm';
-import { type LoginFormData } from './types';
+import { type LoginFormData } from './schemas';
 import { ROLES, DEFAULT_REDIRECT_ROUTES } from '@/constants';
 import { toast } from 'react-hot-toast';
 import { LogoIcon } from '@/@components/icons';
 
-interface LoginViewProps {
-  title?: string;
-  redirectTo?: string;
-  defaultRedirect?: string;
-}
-
-export function LoginView({
-}: LoginViewProps) {
+export function LoginView() {
   const router = useRouter();
   const { login: setAuthToken, isAuthenticated, isLoading, user } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
+    if (!isLoading && isAuthenticated && user?.roleId) {
 
-      const roleId = user.roleId;
-      if (roleId === ROLES.ADMIN) {
-        router.replace(DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]);
-      } else {
-        router.replace(DEFAULT_REDIRECT_ROUTES[ROLES.USER]);
-
-      }
+      const roleId = Number(user.roleId);
+      const redirectRoute = roleId === ROLES.ADMIN 
+        ? DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]
+        : DEFAULT_REDIRECT_ROUTES[ROLES.USER];
+      
+      router.replace(redirectRoute);
     }
   }, [isAuthenticated, isLoading, router, user]);
 

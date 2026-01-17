@@ -1,10 +1,11 @@
+import '@infra/database/models';
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 import { UnauthorizedError } from '@shared/errors';
 import { UserModel } from '@modules/users/model/user.model';
 import { RoleModel } from '@modules/roles';
-// Importar models para garantir que as associações estejam carregadas
-import '@infra/database/models';
+import { PermissionModel } from '@modules/permissions';
+import { IUser } from '@/modules/users';
 
 interface IPayload {
   sub: string;
@@ -40,9 +41,18 @@ export async function ensureAuthenticated(
             model: RoleModel,
             as: 'role',
           },
+          {
+            model: PermissionModel,
+            as: 'permissions',
+            through: {
+              attributes: ['granted'],
+            },
+            attributes: ['id', 'name'],
+          },
         ],
         attributes: {
           exclude: ['password'],
+          include: ['roleId'],
         },
       });
 
@@ -50,7 +60,41 @@ export async function ensureAuthenticated(
         return next(new UnauthorizedError('User does not exist'));
       }
 
-      req.user = user.toJSON();
+      const userJson = user.toJSON() as unknown as Record<string, unknown>;
+      if (userJson.permissions && Array.isArray(userJson.permissions)) {
+        userJson.permissions = userJson.permissions.map(
+          (perm: Record<string, unknown>) => {
+            const userPermissionModel = perm.UserPermissionModel as
+              | { granted?: boolean | number }
+              | undefined;
+
+            let grantedValue = false;
+            if (userPermissionModel?.granted !== undefined) {
+              grantedValue = Boolean(userPermissionModel.granted);
+            }
+
+            return {
+              permission: {
+                id: perm.id,
+                name: perm.name,
+              },
+              granted: grantedValue,
+            };
+          }
+        );
+      }
+
+      const formattedUser = userJson as unknown as IUser;
+      if (!formattedUser.roleId) {
+        const userJsonAny = userJson as unknown as Record<string, unknown>;
+        if (userJsonAny.role_id) {
+          formattedUser.roleId = userJsonAny.role_id as number;
+        } else if (formattedUser.role?.id) {
+          formattedUser.roleId = formattedUser.role.id;
+        }
+      }
+
+      req.user = formattedUser;
       req.token = token;
 
       next();

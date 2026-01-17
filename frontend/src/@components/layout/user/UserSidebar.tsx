@@ -3,6 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { CalendarIcon, LogsIcon, UserIcon } from '@/@components/icons';
 import { SidebarMobile, SidebarDesktop, type NavItem } from '../common';
+import { PERMISSIONS } from '@/constants';
 
 interface IUserPermission {
   permission: IPermission;
@@ -19,12 +20,13 @@ const navItems: NavItem[] = [
     label: 'Agendamentos',
     href: '/user/appointments',
     icon: <CalendarIcon className="w-5 h-5" />,
+    requiresPermission: PERMISSIONS.APPOINTMENTS,
   },
   {
     label: 'Logs',
     href: '/user/logs',
     icon: <LogsIcon className="w-5 h-5" />,
-    requiresPermission: 'LOGS',
+    requiresPermission: PERMISSIONS.LOGS,
   },
   {
     label: 'Minha Conta',
@@ -41,13 +43,17 @@ interface UserSidebarProps {
 export function UserSidebar({ isOpen = true, onClose }: UserSidebarProps) {
   const { user, logout } = useAuth();
 
-  const filteredNavItems = navItems.filter((item) => {
+  const filteredNavItemsByPermission	 = navItems.filter((item) => {
     if (!item.requiresPermission) return true;
+    
     if (!user || !('permissions' in user) || !user.permissions) return false;
-    const permission = (user.permissions as IUserPermission []).find(
+    
+    const userPermissions = user.permissions as IUserPermission[];
+    const permission = userPermissions.find(
       (p: IUserPermission) => p.permission?.name === item.requiresPermission
     );
-    return permission?.granted === true;
+    
+    return permission !== undefined && permission.granted === true;
   });
 
   return (
@@ -56,7 +62,7 @@ export function UserSidebar({ isOpen = true, onClose }: UserSidebarProps) {
         <SidebarMobile
           isOpen={isOpen}
           onClose={onClose}
-          navItems={filteredNavItems}
+          navItems={filteredNavItemsByPermission}
           userFirstName={user?.firstName}
           userLastName={user?.lastName}
           roleLabel="Cliente"
@@ -64,7 +70,7 @@ export function UserSidebar({ isOpen = true, onClose }: UserSidebarProps) {
         />
       )}
       <SidebarDesktop
-        navItems={filteredNavItems}
+        navItems={filteredNavItemsByPermission}
         userFirstName={user?.firstName}
         userLastName={user?.lastName}
         roleLabel="Cliente"

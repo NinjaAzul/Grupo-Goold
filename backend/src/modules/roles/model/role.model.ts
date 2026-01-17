@@ -14,7 +14,6 @@ RoleModel.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       allowNull: false,
-      // Sem autoIncrement - IDs serão definidos via seed
     },
     name: {
       type: DataTypes.STRING(50),

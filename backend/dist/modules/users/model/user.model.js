@@ -23,6 +23,12 @@ UserModel.init({
         allowNull: false,
         field: 'last_name',
     },
+    email: {
+        type: sequelize_1.DataTypes.STRING(255),
+        allowNull: false,
+        unique: true,
+        field: 'email',
+    },
     password: {
         type: sequelize_1.DataTypes.STRING(255),
         allowNull: false,
@@ -63,6 +69,12 @@ UserModel.init({
         allowNull: false,
         defaultValue: constants_1.ROLES.USER,
         field: 'role_id',
+    },
+    active: {
+        type: sequelize_1.DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+        field: 'active',
     },
 }, {
     sequelize: config_1.sequelize,

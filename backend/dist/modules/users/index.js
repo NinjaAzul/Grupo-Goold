@@ -14,13 +14,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUserRoutes = exports.UserModel = void 0;
+exports.UserModel = void 0;
 // General exports
 __exportStar(require("./model/user.interface"), exports);
 var user_model_1 = require("./model/user.model");
 Object.defineProperty(exports, "UserModel", { enumerable: true, get: function () { return user_model_1.UserModel; } });
 // Use cases exports
 __exportStar(require("./use-cases/create"), exports);
-var create_1 = require("./use-cases/create");
-Object.defineProperty(exports, "createUserRoutes", { enumerable: true, get: function () { return create_1.createUserRoutes; } });
 //# sourceMappingURL=index.js.map

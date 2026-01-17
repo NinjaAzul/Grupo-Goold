@@ -36,7 +36,7 @@ services:
     volumes:
       - ./src:/app/src
       - /app/node_modules
-    command: npm run dev
+    entrypoint: sh -c "npm install && npm run dev"
     depends_on:
       - mysql
     networks:

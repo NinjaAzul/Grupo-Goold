@@ -10,7 +10,7 @@ export const registerSchema = z.object({
   password: z
     .string()
     .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter no mínimo 6 caracteres'),
+    .min(8, 'Senha deve ter no mínimo 8 caracteres'),
   zipCode: z.string().min(1, 'CEP é obrigatório'),
   street: z.string().min(1, 'Endereço é obrigatório'),
   number: z.string().min(1, 'Número é obrigatório'),

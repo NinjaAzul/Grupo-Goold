@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { ListUsersService } from './list.service';
-import { IListUsersRequest } from './list.interface';
+import { ListUsersQueryDto } from './list-query.dto';
 
 export class ListUsersController {
   private service: ListUsersService;
@@ -9,24 +9,19 @@ export class ListUsersController {
     this.service = new ListUsersService();
   }
 
-  async handle(req: Request, res: Response): Promise<Response> {
-    const filters: IListUsersRequest = {
-      page: req.query.page ? Number(req.query.page) : undefined,
-      limit: req.query.limit ? Number(req.query.limit) : undefined,
-      name: req.query.name as string,
-      email: req.query.email as string,
-      roleId: req.query.roleId ? Number(req.query.roleId) : undefined,
-      cityId: req.query.cityId ? Number(req.query.cityId) : undefined,
-      active:
-        typeof req.query.active === 'string'
-          ? req.query.active.toLowerCase() === 'true'
-          : undefined,
-      startDate: req.query.startDate as string,
-      endDate: req.query.endDate as string,
-    };
+  async handle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const query = req.query as unknown as ListUsersQueryDto;
 
-    const result = await this.service.execute(filters);
+      const result = await this.service.execute(query);
 
-    return res.json(result);
+      return res.json(result);
+    } catch (error) {
+      return next(error);
+    }
   }
 }

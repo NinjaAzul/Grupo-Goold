@@ -33,7 +33,6 @@ const swaggerDefinition = {
         },
     },
 };
-// Determina se está em desenvolvimento ou produção
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const rootDir = isDevelopment
     ? path_1.default.join(__dirname, '../../..')
@@ -50,17 +49,14 @@ const options = {
             path_1.default.join(rootDir, 'dist/modules/**/*.js'),
         ],
 };
-// Função para gerar o Swagger spec dinamicamente
 function getSwaggerSpec() {
     const swaggerSpec = (0, swagger_jsdoc_1.default)(options);
-    // Log para debug (apenas em desenvolvimento)
     if (process.env.NODE_ENV !== 'production') {
         console.log('Swagger paths:', options.apis);
         console.log('Swagger spec generated:', Object.keys(swaggerSpec.paths || {}).length, 'paths');
     }
     return swaggerSpec;
 }
-// Exporta a função e também o spec inicial para compatibilidade
+
 const swaggerSpec = getSwaggerSpec();
 exports.swaggerSpec = swaggerSpec;
-//# sourceMappingURL=swagger.js.map

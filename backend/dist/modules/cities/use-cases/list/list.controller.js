@@ -4,14 +4,19 @@ exports.ListCitiesController = void 0;
 const list_service_1 = require("./list.service");
 class ListCitiesController {
     constructor() {
-        this.handle = async (req, res) => {
-            const stateId = req.query.stateId ? Number(req.query.stateId) : undefined;
-            const uf = req.query.uf ? String(req.query.uf).toUpperCase() : undefined;
-            const response = await this.listCitiesService.execute({
-                stateId,
-                uf,
-            });
-            return res.status(200).json(response);
+        this.handle = async (req, res, next) => {
+            try {
+                const stateId = req.query.stateId ? Number(req.query.stateId) : undefined;
+                const uf = req.query.uf ? String(req.query.uf).toUpperCase() : undefined;
+                const response = await this.listCitiesService.execute({
+                    stateId,
+                    uf,
+                });
+                return res.status(200).json(response);
+            }
+            catch (error) {
+                return next(error);
+            }
         };
         this.listCitiesService = new list_service_1.ListCitiesService();
     }

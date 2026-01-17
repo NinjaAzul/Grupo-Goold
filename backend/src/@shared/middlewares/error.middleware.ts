@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../errors';
+import { logger } from '../utils';
 
 export const errorHandler = (
   err: Error | AppError,
@@ -7,15 +8,16 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): Response => {
-  if (process.env.NODE_ENV !== 'production') {
-    console.error('[Error Handler]', {
-      message: err.message,
-      stack: err.stack,
-      name: err.name,
-    });
-  }
-
   if (err instanceof AppError) {
+    if (process.env.NODE_ENV !== 'production') {
+      logger.error('[AppError Handler]', {
+        message: err.message,
+        statusCode: err.statusCode,
+        name: err.name,
+        stack: err.stack,
+      });
+    }
+
     return res.status(err.statusCode).json({
       error: {
         message: err.message,
@@ -25,7 +27,7 @@ export const errorHandler = (
     });
   }
 
-  console.error('[Unexpected Error]', err);
+  logger.error('[Unexpected Error]', err);
 
   return res.status(500).json({
     error: {

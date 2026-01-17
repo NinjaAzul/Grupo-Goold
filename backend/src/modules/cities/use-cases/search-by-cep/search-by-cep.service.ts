@@ -13,7 +13,6 @@ export class SearchByCEPService {
   async execute(cep: string): Promise<ISearchByCEPResponse> {
     const viaCEPData = await viaCepApi.getAddressByCEP(cep);
 
-    // 2. Buscar cidade pelo código IBGE retornado pela ViaCEP (já inclui o estado)
     const cityWithState = await this.searchByCEPRepository.findCityByIBGECode(
       Number(viaCEPData.ibge)
     );
@@ -24,7 +23,6 @@ export class SearchByCEPService {
       );
     }
 
-    // 3. Retornar dados formatados
     return {
       cep: viaCEPData.cep,
       street: viaCEPData.logradouro,

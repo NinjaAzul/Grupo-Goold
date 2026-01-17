@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import { routes } from './http/routes';
 import { errorHandler, notFoundHandler } from '@shared/middlewares';
 import { getSwaggerSpec } from '@shared/config/swagger';
+import { logger } from '@shared/utils/logger';
 
 const app: Application = express();
 
@@ -25,7 +26,6 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      // Em desenvolvimento, permitir qualquer origem
       if (process.env.NODE_ENV !== 'production') {
         callback(null, true);
       } else {
@@ -44,7 +44,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Handler OPTIONS para CORS do Swagger
 app.options('/api-docs.json', (_req, res) => {
   res.setHeader(
     'Access-Control-Allow-Origin',
@@ -67,7 +66,7 @@ app.get('/api-docs.json', (_req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.json(swaggerSpec);
   } catch (error) {
-    console.error('Error generating Swagger spec:', error);
+    logger.error('Error generating Swagger spec:', error);
     res.status(500).json({ error: 'Failed to generate Swagger specification' });
   }
 });

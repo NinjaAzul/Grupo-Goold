@@ -5,9 +5,8 @@ export const AXIOS_INSTANCE = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
 });
 
-// Interceptor para adicionar token de autenticação se necessário
+
 AXIOS_INSTANCE.interceptors.request.use((config) => {
-  // Adiciona o token de autenticação se estiver disponível
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
@@ -16,7 +15,6 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
     }
   }
   
-  // Definir Content-Type se não estiver definido
   config.headers = config.headers || {};
   if (!(config.headers as Record<string, string>)['Content-Type']) {
     (config.headers as Record<string, string>)['Content-Type'] = 'application/json';
@@ -25,7 +23,6 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor para tratamento de erros
 AXIOS_INSTANCE.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
@@ -45,13 +42,16 @@ AXIOS_INSTANCE.interceptors.response.use(
   }
 );
 
+interface CancellablePromise<T> extends Promise<T> {
+  cancel: () => void;
+}
+
 export const customInstance = <T>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig
-): Promise<T> => {
+): CancellablePromise<T> => {
   const source = Axios.CancelToken.source();
   
-  // Mesclar headers corretamente
   const mergedHeaders = {
     ...config.headers,
     ...options?.headers,
@@ -62,9 +62,8 @@ export const customInstance = <T>(
     ...options,
     headers: mergedHeaders,
     cancelToken: source.token,
-  }).then(({ data }) => data);
+  }).then(({ data }) => data) as CancellablePromise<T>;
 
-  // @ts-ignore
   promise.cancel = () => {
     source.cancel('Query was cancelled');
   };

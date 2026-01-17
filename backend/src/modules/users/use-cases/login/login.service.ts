@@ -37,7 +37,6 @@ export class LoginService {
       token,
     };
 
-    // Registrar log de login
     await LoggerService.log(
       'Login',
       'Minha Conta',

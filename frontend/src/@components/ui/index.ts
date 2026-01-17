@@ -13,8 +13,8 @@ export {
   TableRow,
   TableCell,
   TableCaption,
-} from './table';
-export { Pagination } from './pagination';
+} from './Table';
+export { Pagination } from './Pagination';
 export { Badge } from './Badge';
 export { NotFound } from './NotFound';
 export { ActionButton } from './ActionButton';
@@ -24,4 +24,5 @@ export { TimeInput } from './TimeInput';
 export { TimeRangeInput } from './TimeRangeInput';
 export { Tooltip } from './Tooltip';
 export { Switch } from './Switch';
-
+export { Loading } from './Loading';
+export { DatePicker } from './DatePicker';

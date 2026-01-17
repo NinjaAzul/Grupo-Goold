@@ -4,7 +4,7 @@ export interface ICreateUserRequest {
   firstName: string;
   lastName: string;
   password: string;
-  roleId?: number; // Opcional, default será USER (2)
+  roleId?: number;
   zipCode?: string;
   street?: string;
   number?: string;

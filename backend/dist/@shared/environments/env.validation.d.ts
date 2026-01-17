@@ -1,3 +1,4 @@
+import { Secret, type SignOptions } from 'jsonwebtoken';
 export declare enum NODE_ENV_ENUM {
     DEVELOPMENT = "development",
     PRODUCTION = "production",
@@ -12,6 +13,10 @@ export declare class EnvironmentVariables {
     DB_USER: string;
     DB_PASSWORD: string;
     DB_NAME_TEST?: string;
+    ADMIN_DEFAULT_PASSWORD?: string;
+    JWT_SECRET: Secret | string;
+    JWT_EXPIRES_IN: SignOptions['expiresIn'];
+    FRONTEND_URL?: string;
 }
 export declare function validateEnvironment(): Promise<void>;
 //# sourceMappingURL=env.validation.d.ts.map

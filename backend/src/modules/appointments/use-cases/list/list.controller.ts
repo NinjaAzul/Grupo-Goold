@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { ListAppointmentsService } from './list.service';
+import { ListAppointmentsQueryDto } from './list-query.dto';
 
 export class ListAppointmentsController {
   private service: ListAppointmentsService;
@@ -8,36 +9,28 @@ export class ListAppointmentsController {
     this.service = new ListAppointmentsService();
   }
 
-  async handle(req: Request, res: Response): Promise<Response> {
-    const userId = req.user?.id;
+  async handle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user!.id;
+      const query = req.query as unknown as ListAppointmentsQueryDto;
 
-    if (!userId) {
-      return res.status(401).json({
-        error: {
-          message: 'Unauthorized',
-          statusCode: 401,
-        },
+      const result = await this.service.execute({
+        userId,
+        page: query.page || 1,
+        limit: query.limit || 10,
+        name: query.name,
+        startDate: query.startDate,
+        endDate: query.endDate,
+        status: query.status,
       });
+
+      return res.json(result);
+    } catch (error) {
+      return next(error);
     }
-
-    const page = req.query.page ? Number(req.query.page) : 1;
-    const limit = req.query.limit ? Number(req.query.limit) : 10;
-    const name = req.query.name as string | undefined;
-    const startDate = req.query.startDate as string | undefined;
-    const endDate = req.query.endDate as string | undefined;
-    const status = req.query.status as string | undefined;
-
-    const result = await this.service.execute({
-      userId,
-      page,
-      limit,
-      name,
-      startDate,
-      endDate,
-      status,
-    });
-
-    return res.json(result);
   }
 }
-

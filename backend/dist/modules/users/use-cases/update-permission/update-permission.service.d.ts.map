@@ -1,0 +1,1 @@
+{"version":3,"file":"update-permission.service.d.ts","sourceRoot":"","sources":["../../../../../src/modules/users/use-cases/update-permission/update-permission.service.ts"],"names":[],"mappings":"AACA,OAAO,EACL,4BAA4B,EAC5B,6BAA6B,EAC9B,MAAM,+BAA+B,CAAC;AAEvC,qBAAa,2BAA2B;IACtC,OAAO,CAAC,UAAU,CAAiC;;IAM7C,OAAO,CACX,IAAI,EAAE,4BAA4B,GACjC,OAAO,CAAC,6BAA6B,CAAC;CAQ1C"}

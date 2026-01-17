@@ -13,11 +13,13 @@ export function LoginView() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.roleId) {
-      const redirectRoute = user.roleId === ROLES.ADMIN 
+
+      const roleId = Number(user.roleId);
+      const redirectRoute = roleId === ROLES.ADMIN 
         ? DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]
         : DEFAULT_REDIRECT_ROUTES[ROLES.USER];
       
-      router.push(redirectRoute);
+      router.replace(redirectRoute);
     }
   }, [isAuthenticated, isLoading, user, router]);
 

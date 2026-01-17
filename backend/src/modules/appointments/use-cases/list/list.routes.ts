@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { ListAppointmentsController } from './list.controller';
-import { ensureAuthenticated } from '@shared/middlewares';
+import {
+  ensureAuthenticated,
+  ensurePermission,
+  queryValidationMiddleware,
+} from '@shared/middlewares';
+import { PERMISSIONS } from '@shared/constants';
+import { ListAppointmentsQueryDto } from './list-query.dto';
 
 const router = Router();
 const listAppointmentsController = new ListAppointmentsController();
@@ -58,8 +64,9 @@ const listAppointmentsController = new ListAppointmentsController();
 router.get(
   '/',
   ensureAuthenticated,
+  ensurePermission(PERMISSIONS.APPOINTMENTS),
+  queryValidationMiddleware(ListAppointmentsQueryDto),
   listAppointmentsController.handle.bind(listAppointmentsController)
 );
 
 export { router as listAppointmentsRoutes };
-

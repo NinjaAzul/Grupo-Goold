@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/@components/ui/table';
+} from '@/@components/ui/Table';
 import { Badge } from '@/@components/ui/Badge';
 import { Skeleton } from '@/@components/ui/Skeleton';
 import { NotFound } from '@/@components/ui/NotFound';
@@ -39,8 +39,8 @@ export function LogsTable({
               <TableHead>Módulo</TableHead>
               <TableHead
                 sortable
-                sortDirection={sortField === 'data' ? sortDirection : null}
-                onSort={() => onSort('data')}
+                sortDirection={sortField === 'date' ? sortDirection : null}
+                onSort={() => onSort('date')}
               >
                 Data e horário
               </TableHead>
@@ -72,21 +72,21 @@ export function LogsTable({
                 <TableRow key={log.id}>
                   <TableCell className="whitespace-nowrap">
                     <Badge variant="secondary" className="bg-background text-black border-border">
-                      {log.tipoAtividade}
+                      {log.activityType}
                     </Badge>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <Badge variant="secondary" className="bg-background text-black border-border inline-flex items-center gap-1 w-auto">
-                      {log.modulo === 'Minha Conta' ? (
+                      {log.module === 'Minha Conta' ? (
                         <UserIcon className="w-4 h-4" />
-                      ) : log.modulo === 'Agendamento' ? (
+                      ) : log.module === 'Agendamento' ? (
                         <CalendarIcon className="w-4 h-4" />
                       ) : null}
-                      {log.modulo}
+                      {log.module}
                     </Badge>
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm text-primary">
-                    {log.dataHorario}
+                    {log.dateTime}
                   </TableCell>
                 </TableRow>
               ))

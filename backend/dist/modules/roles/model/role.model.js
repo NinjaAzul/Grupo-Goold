@@ -9,8 +9,9 @@ exports.RoleModel = RoleModel;
 RoleModel.init({
     id: {
         type: sequelize_1.DataTypes.INTEGER,
-        autoIncrement: true,
         primaryKey: true,
+        allowNull: false,
+        // Sem autoIncrement - IDs serão definidos via seed
     },
     name: {
         type: sequelize_1.DataTypes.STRING(50),

@@ -38,3 +38,6 @@ next-env.d.ts
 # Arquivos gerados pelo Orval
 /src/api/generated
 
+
+*storybook.log
+storybook-static

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { UpdateUserService } from './update.service';
 import { UpdateUserDto } from './update.dto';
 
@@ -9,15 +9,23 @@ export class UpdateUserController {
     this.service = new UpdateUserService();
   }
 
-  async handle(req: Request, res: Response): Promise<Response> {
-    const userId = Number(req.params.id);
-    const updateData = req.body as UpdateUserDto;
+  async handle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = Number(req.params.id);
+      const updateData = req.body as UpdateUserDto;
 
-    const result = await this.service.execute({
-      userId,
-      ...updateData,
-    });
+      const result = await this.service.execute({
+        userId,
+        ...updateData,
+      });
 
-    return res.json(result);
+      return res.json(result);
+    } catch (error) {
+      return next(error);
+    }
   }
 }

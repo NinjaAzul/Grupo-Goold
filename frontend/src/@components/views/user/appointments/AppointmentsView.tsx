@@ -1,46 +1,48 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/@components/ui/Divider';
-import { Pagination } from '@/@components/ui/pagination';
+import { Pagination } from '@/@components/ui/Pagination';
 import { usePage } from '@/contexts/PageContext';
-import { AppointmentsFilters } from './AppointmentsFilters';
-import { AppointmentsTable } from './AppointmentsTable';
-import { AXIOS_INSTANCE } from '@/api/mutator';
+import { AppointmentsFilters } from './components/AppointmentsFilters';
+import { AppointmentsTable } from './components/AppointmentsTable';
+import { useGetAppointments } from '@/api/generated/appointments/appointments';
+import { usePatchAppointmentsIdCancel } from '@/api/generated/appointments/appointments';
+import { getGetAppointmentsQueryKey } from '@/api/generated/appointments/appointments';
+import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import {
-  Agendamento,
+  Appointment,
   SortField,
   SortDirection,
   ApiAppointmentsResponse,
-} from './types';
+  ApiAppointment,
+} from './shared/types';
+import { GetAppointmentsParams } from '@/api/generated/models';
+import { sortAppointments } from './shared/utils';
+import { DateHelper } from '@/lib/date';
 
-
-const mapApiAppointmentToAgendamento = (
-  appointment: any
-): Agendamento => {
-  const appointmentDate = new Date(appointment.appointmentDate);
+const mapApiAppointmentToAppointment = (
+  appointment: ApiAppointment
+): Appointment => {
   const userName = appointment.user
     ? `${appointment.user.firstName} ${appointment.user.lastName}`.trim()
     : 'Usuário não encontrado';
   const userEmail = appointment.user?.email || '';
 
-  // Mapear status do backend para o formato do frontend
-  const statusMap: Record<string, 'agendado' | 'cancelado' | 'em_analise'> = {
-    scheduled: 'agendado',
-    cancelled: 'cancelado',
-    pending: 'em_analise',
+  const statusMap: Record<string, 'scheduled' | 'cancelled' | 'pending'> = {
+    scheduled: 'scheduled',
+    cancelled: 'cancelled',
+    pending: 'pending',
   };
 
   return {
     id: String(appointment.id),
-    data: format(appointmentDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
-    nome: userName,
-    tipo: userEmail,
-    sala: appointment.room,
-    status: statusMap[appointment.status] || 'em_analise',
+    date: DateHelper.formatAppointmentDate(appointment.appointmentDate),
+    name: userName,
+    type: userEmail,
+    room: appointment.room,
+    status: statusMap[appointment.status] || 'pending',
   };
 };
 
@@ -48,12 +50,9 @@ export function AppointmentsView() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<SortField>('data');
+  const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [appointments, setAppointments] = useState<Agendamento[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const queryClient = useQueryClient();
   const { setPageInfo } = usePage();
 
   useEffect(() => {
@@ -63,67 +62,47 @@ export function AppointmentsView() {
     );
   }, [setPageInfo]);
 
-  // Buscar agendamentos
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      setIsLoading(true);
-      try {
-        const params: any = {
-          page: currentPage,
-          limit: 10,
-        };
-
-        if (searchTerm) {
-          params.name = searchTerm;
-        }
-
-        if (selectedDate) {
-          const startOfDay = new Date(selectedDate);
-          startOfDay.setHours(0, 0, 0, 0);
-          const endOfDay = new Date(selectedDate);
-          endOfDay.setHours(23, 59, 59, 999);
-          params.startDate = startOfDay.toISOString().split('T')[0];
-          params.endDate = endOfDay.toISOString().split('T')[0];
-        }
-
-        const response = await AXIOS_INSTANCE.get('/appointments', { params });
-        const data = response.data as ApiAppointmentsResponse;
-
-        const mappedAppointments = data.data.map(mapApiAppointmentToAgendamento);
-        setAppointments(mappedAppointments);
-        setTotalPages(data.pagination.totalPages);
-      } catch (error) {
-        toast.error('Erro ao carregar agendamentos');
-      } finally {
-        setIsLoading(false);
-      }
+  const queryParams = useMemo(() => {
+    const params: GetAppointmentsParams = {
+      page: currentPage,
+      limit: 10,
     };
 
-    fetchAppointments();
-  }, [currentPage, searchTerm, selectedDate, refreshKey]);
+    if (searchTerm) {
+      params.name = searchTerm;
+    }
 
-  // Ordenação client-side
+    if (selectedDate) {
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(selectedDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      params.startDate = startOfDay.toISOString().split('T')[0];
+      params.endDate = endOfDay.toISOString().split('T')[0];
+    }
+
+    return params;
+  }, [currentPage, searchTerm, selectedDate]);
+
+  const { data: rawData, isLoading } = useGetAppointments(
+    queryParams,
+    {}
+  );
+
+  const appointmentsResponse = rawData as unknown as
+    | ApiAppointmentsResponse
+    | undefined;
+
+  const appointments: Appointment[] = useMemo(() => {
+    if (!appointmentsResponse?.data) return [];
+    return appointmentsResponse.data.map(mapApiAppointmentToAppointment);
+  }, [appointmentsResponse]);
+
+  const totalPages =
+    appointmentsResponse?.pagination?.totalPages || 1;
+
   const sortedData = useMemo(() => {
-    if (!sortField || !sortDirection) return appointments;
-
-    return [...appointments].sort((a, b) => {
-      if (sortField === 'data') {
-        const dateA = new Date(
-          a.data.split(' ')[0].split('/').reverse().join('-') +
-            ' ' +
-            a.data.split(' ')[2]
-        );
-        const dateB = new Date(
-          b.data.split(' ')[0].split('/').reverse().join('-') +
-            ' ' +
-            b.data.split(' ')[2]
-        );
-        return sortDirection === 'asc'
-          ? dateA.getTime() - dateB.getTime()
-          : dateB.getTime() - dateA.getTime();
-      }
-      return 0;
-    });
+    return sortAppointments(appointments, sortField, sortDirection);
   }, [appointments, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
@@ -142,24 +121,33 @@ export function AppointmentsView() {
     }
   };
 
-  const handleCancel = async (id: string) => {
-    try {
-      await AXIOS_INSTANCE.patch(`/appointments/${id}/cancel`);
-      toast.success('Agendamento cancelado com sucesso');
-      // Forçar recarregamento da lista
-      setRefreshKey((prev) => prev + 1);
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.error?.message ||
-        'Erro ao cancelar agendamento';
-      toast.error(message);
-    }
+  const cancelAppointment = usePatchAppointmentsIdCancel({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: getGetAppointmentsQueryKey(queryParams),
+        });
+        toast.success('Agendamento cancelado com sucesso');
+      },
+      onError: (error: unknown) => {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Erro ao cancelar agendamento. Tente novamente.';
+        toast.error(errorMessage);
+      },
+    },
+  });
+
+  const handleCancel = (id: string) => {
+    cancelAppointment.mutate({ id: Number(id) });
   };
 
   const handleAppointmentCreated = () => {
-    // Recarregar lista voltando para página 1
     setCurrentPage(1);
-    setRefreshKey((prev) => prev + 1);
+    queryClient.invalidateQueries({
+      queryKey: getGetAppointmentsQueryKey(queryParams),
+    });
   };
 
   return (

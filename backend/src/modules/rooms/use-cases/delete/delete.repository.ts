@@ -10,7 +10,6 @@ export class DeleteRoomRepository {
       throw new NotFoundError('Room not found');
     }
 
-    // Verificar se há agendamentos associados a esta sala
     const appointmentsCount = await AppointmentModel.count({
       where: { room: room.name },
     });

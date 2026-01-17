@@ -7,16 +7,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/@components/ui/table';
+} from '@/@components/ui/Table';
 import { Badge } from '@/@components/ui/Badge';
 import { Switch } from '@/@components/ui/Switch';
 import { Skeleton } from '@/@components/ui/Skeleton';
 import { NotFound } from '@/@components/ui/NotFound';
 import { cn } from '@/lib/utils';
-import { Cliente, SortField, SortDirection } from './types';
+import { Client, SortField, SortDirection } from './types';
 
 interface ClientsTableProps {
-  data: Cliente[];
+  data: Client[];
   isLoading: boolean;
   sortField: SortField;
   sortDirection: SortDirection;
@@ -43,8 +43,8 @@ export function ClientsTable({
             <TableRow>
               <TableHead
                 sortable
-                sortDirection={sortField === 'dataCadastro' ? sortDirection : null}
-                onSort={() => onSort('dataCadastro')}
+                sortDirection={sortField === 'registrationDate' ? sortDirection : null}
+                onSort={() => onSort('registrationDate')}
               >
                 Data de cadastro
               </TableHead>
@@ -88,66 +88,66 @@ export function ClientsTable({
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((cliente) => (
-                <TableRow key={cliente.id}>
+              data.map((client) => (
+                <TableRow key={client.id}>
                   <TableCell className="whitespace-nowrap text-sm text-primary">
-                    {cliente.dataCadastro}
+                    {client.registrationDate}
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-primary">
-                        {cliente.nome}
+                        {client.name}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {cliente.email}
+                        {client.email}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm text-primary">
-                    {cliente.endereco}
+                    {client.address}
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <div className="flex gap-2 flex-wrap">
-                      {cliente.permissoes.map((permissao) => (
+                      {client.permissions.map((permission) => (
                         <Badge
-                          key={permissao.id}
+                          key={permission.id}
                           variant="primary"
-                          textColor={permissao.granted ? '#FFFFFF' : '#000000'}
-                          backgroundColor={permissao.granted ? '#000000' : '#FFFFFF'}
+                          textColor={permission.granted ? '#FFFFFF' : '#000000'}
+                          backgroundColor={permission.granted ? '#000000' : '#FFFFFF'}
                           className={cn(
                             'cursor-pointer border border-black',
-                            !permissao.granted && 'transition-colors'
+                            !permission.granted && 'transition-colors'
                           )}
                           onMouseEnter={(e) => {
-                            if (!permissao.granted) {
+                            if (!permission.granted) {
                               e.currentTarget.style.backgroundColor = '#F9FAFB';
                             }
                           }}
                           onMouseLeave={(e) => {
-                            if (!permissao.granted) {
+                            if (!permission.granted) {
                               e.currentTarget.style.backgroundColor = '#FFFFFF';
                             }
                           }}
-                          onClick={() => onTogglePermission?.(cliente.id, permissao.id, !permissao.granted)}
+                          onClick={() => onTogglePermission?.(client.id, permission.id, !permission.granted)}
                           role="button"
                           tabIndex={0}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                               e.preventDefault();
-                              onTogglePermission?.(cliente.id, permissao.id, !permissao.granted);
+                              onTogglePermission?.(client.id, permission.id, !permission.granted);
                             }
                           }}
                         >
-                          {permissao.name}
+                          {permission.name}
                         </Badge>
                       ))}
                     </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <Switch
-                      checked={cliente.status}
-                      onChange={(checked) => onToggleStatus?.(cliente.id, checked)}
-                      aria-label={`${cliente.status ? 'Desativar' : 'Ativar'} cliente ${cliente.nome}`}
+                      checked={client.status}
+                      onChange={(checked) => onToggleStatus?.(client.id, checked)}
+                      aria-label={`${client.status ? 'Desativar' : 'Ativar'} cliente ${client.name}`}
                     />
                   </TableCell>
                 </TableRow>

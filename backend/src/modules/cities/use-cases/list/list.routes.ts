@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { ListCitiesController } from './list.controller';
+import { queryValidationMiddleware } from '@shared/middlewares';
+import { ListCitiesQueryDto } from './list-query.dto';
 
 const router = Router();
 const listCitiesController = new ListCitiesController();
@@ -78,6 +80,10 @@ const listCitiesController = new ListCitiesController();
  *                   description: Total de cidades retornadas
  *                   example: 645
  */
-router.get('/', listCitiesController.handle);
+router.get(
+  '/',
+  queryValidationMiddleware(ListCitiesQueryDto),
+  listCitiesController.handle
+);
 
 export { router as listCitiesRoutes };

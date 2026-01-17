@@ -10,7 +10,6 @@ import { PasswordInput } from '@/@components/ui/PasswordInput';
 import { Select } from '@/@components/ui/Select';
 import { Button } from '@/@components/ui/Button';
 import { Form } from '@/@components/ui/Form';
-import { ChevronDownIcon } from '@/@components/icons';
 import { registerSchema, type RegisterFormData } from './schemas';
 import { usePostUsers } from '@/api/generated/users/users';
 import { useGetStates } from '@/api/generated/states/states';
@@ -59,10 +58,18 @@ export function RegisterForm() {
         toast.success('Cadastro realizado com sucesso!');
         router.push('/auth/login');
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
+        const axiosError = error as {
+          response?: {
+            data?: {
+              error?: { message?: string };
+              message?: string;
+            };
+          };
+        };
         const errorMessage =
-          error?.response?.data?.error?.message || 
-          error?.response?.data?.message || 
+          axiosError?.response?.data?.error?.message ||
+          axiosError?.response?.data?.message ||
           'Erro ao realizar cadastro. Tente novamente.';
         toast.error(errorMessage);
       },
@@ -210,7 +217,7 @@ export function RegisterForm() {
               onChange={field.onChange}
               onBlur={field.onBlur}
             >
-              {(inputProps: any) => (
+              {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => (
                 <Input
                   {...inputProps}
                   label="CEP (Obrigatório)"
@@ -286,35 +293,26 @@ export function RegisterForm() {
               )}
             />
 
-            <div>
-              <label className="block text-sm font-medium text-primary mb-2">
-                Estado <span className="text-error ml-1">*</span>
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full py-2.5 sm:py-3 px-3 sm:px-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                  value={watchedStateId || ''}
-                  onChange={(e) => {
-                    const stateId = Number(e.target.value);
-                    form.setValue('stateId', stateId);
+            <Controller
+              name="stateId"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Select
+                  label="Estado"
+                  placeholder="Selecione o estado"
+                  options={statesOptions}
+                  error={fieldState.error?.message}
+                  required
+                  value={field.value || ''}
+                  onChange={(value) => {
+                    const stateId = value ? Number(value) : undefined;
+                    field.onChange(stateId);
                     form.setValue('cityId', 0);
                   }}
                   disabled={hasCepData}
-                >
-                  <option value="" disabled>
-                    Selecione o estado
-                  </option>
-                  {statesOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <ChevronDownIcon className="w-5 h-5 text-gray-600" />
-                </div>
-              </div>
-            </div>
+                />
+              )}
+            />
 
             {watchedStateId && (
               <Controller
@@ -322,15 +320,14 @@ export function RegisterForm() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Select
-                    {...field}
                     label="Cidade"
                     placeholder="Selecione a cidade"
                     options={citiesOptions}
                     error={fieldState.error?.message}
                     required
                     value={field.value || ''}
-                    onChange={(e) => {
-                      field.onChange(Number(e.target.value));
+                    onChange={(value) => {
+                      field.onChange(Number(value));
                     }}
                   />
                 )}

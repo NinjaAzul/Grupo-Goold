@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { SyncStatesController } from './sync.controller';
+import { ensureAuthenticated, ensureAdmin } from '@shared/middlewares';
 
 const router = Router();
 const syncStatesController = new SyncStatesController();
@@ -8,8 +9,10 @@ const syncStatesController = new SyncStatesController();
  * @swagger
  * /states/sync:
  *   post:
- *     summary: Sincronizar estados e cidades com API do IBGE
+ *     summary: Sincronizar estados e cidades com API do IBGE (Admin only)
  *     tags: [States]
+ *     security:
+ *       - bearerAuth: []
  *     description: Busca todos os estados e cidades do Brasil da API do IBGE e popula o banco de dados
  *     responses:
  *       200:
@@ -28,9 +31,16 @@ const syncStatesController = new SyncStatesController();
  *                 message:
  *                   type: string
  *                   example: Successfully synchronized 27 states and 5570 cities
+ *       401:
+ *         description: Não autorizado
  *       500:
  *         description: Erro interno do servidor
  */
-router.post('/sync', syncStatesController.handle);
+router.post(
+  '/sync',
+  ensureAuthenticated,
+  ensureAdmin,
+  syncStatesController.handle.bind(syncStatesController)
+);
 
 export { router as syncStatesRoutes };

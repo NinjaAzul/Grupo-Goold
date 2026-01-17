@@ -4,17 +4,13 @@ exports.CheckHealthController = void 0;
 const health_check_service_1 = require("./health-check.service");
 class CheckHealthController {
     constructor() {
-        this.handle = async (_req, res) => {
+        this.handle = async (_req, res, next) => {
             try {
                 const response = await this.checkHealthService.execute();
                 return res.status(200).json(response);
             }
             catch (error) {
-                return res.status(500).json({
-                    status: 'error',
-                    message: 'Internal server error',
-                    timestamp: new Date().toISOString(),
-                });
+                return next(error);
             }
         };
         this.checkHealthService = new health_check_service_1.CheckHealthService();

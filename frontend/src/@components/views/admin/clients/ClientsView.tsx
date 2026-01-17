@@ -4,29 +4,29 @@ import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/@components/ui/Divider';
-import { Pagination } from '@/@components/ui/pagination';
+import { Pagination } from '@/@components/ui/Pagination';
 import { usePage } from '@/contexts/PageContext';
 import { ClientsFilters } from './ClientsFilters';
 import { ClientsTable } from './ClientsTable';
-import { useGetUsers, usePatchUsersId } from '@/api/generated/users/users';
+import { useGetUsers, usePatchUsersId, usePatchUsersUserIdPermissionsPermissionId } from '@/api/generated/users/users';
 import { getGetUsersQueryKey } from '@/api/generated/users/users';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { AXIOS_INSTANCE } from '@/api/mutator';
+import type { GetUsersParams, PatchUsersIdBody } from '@/api/generated/models';
+import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { PERMISSIONS, PERMISSION_IDS } from '@/constants/permissions';
+import { ROLES } from '@/constants/roles';
 import {
-  Cliente,
+  Client,
   SortField,
   SortDirection,
   ApiUsersResponse,
   ApiUser,
 } from './types';
 
-// Função para mapear dados da API para o formato do componente
-const mapApiUserToCliente = (user: ApiUser): Cliente => {
+const mapApiUserToClient = (user: ApiUser): Client => {
   const createdAt = user.createdAt ? new Date(user.createdAt) : new Date();
   const fullName = `${user.firstName} ${user.lastName}`.trim();
   
-  // Construir endereço completo
   const addressParts = [
     user.street && user.number ? `${user.street}, ${user.number}` : user.street || '',
     user.complement || '',
@@ -35,15 +35,13 @@ const mapApiUserToCliente = (user: ApiUser): Cliente => {
     user.city?.state?.uf || '',
   ].filter(Boolean);
   
-  const endereco = addressParts.length > 0 
+  const address = addressParts.length > 0 
     ? addressParts.join(', ')
     : 'Endereço não informado';
 
-  // Mapear permissões do backend (apenas APPOINTMENTS e LOGS)
-  // Sempre mostrar ambas, mesmo que não existam no banco (granted = false por padrão)
   const permissionsMap = new Map();
-  (user.permissions || []).forEach((up: any) => {
-    if (up.permission?.name === 'APPOINTMENTS' || up.permission?.name === 'LOGS') {
+  (user.permissions || []).forEach((up: NonNullable<ApiUser['permissions']>[number]) => {
+    if (up.permission?.name === PERMISSIONS.APPOINTMENTS || up.permission?.name === PERMISSIONS.LOGS) {
       permissionsMap.set(up.permission.name, {
         id: up.permission.id,
         granted: up.granted,
@@ -51,27 +49,27 @@ const mapApiUserToCliente = (user: ApiUser): Cliente => {
     }
   });
 
-  const permissoes = [
+  const permissions = [
     {
-      id: permissionsMap.get('APPOINTMENTS')?.id || 1,
+      id: permissionsMap.get(PERMISSIONS.APPOINTMENTS)?.id || PERMISSION_IDS.APPOINTMENTS,
       name: 'Agendamentos',
-      granted: permissionsMap.get('APPOINTMENTS')?.granted || false,
+      granted: permissionsMap.get(PERMISSIONS.APPOINTMENTS)?.granted || false,
     },
     {
-      id: permissionsMap.get('LOGS')?.id || 2,
+      id: permissionsMap.get(PERMISSIONS.LOGS)?.id || PERMISSION_IDS.LOGS,
       name: 'Logs',
-      granted: permissionsMap.get('LOGS')?.granted || false,
+      granted: permissionsMap.get(PERMISSIONS.LOGS)?.granted || false,
     },
   ];
 
   return {
     id: String(user.id),
-    dataCadastro: format(createdAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
-    nome: fullName,
+    registrationDate: format(createdAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+    name: fullName,
     email: user.email,
-    endereco,
-    permissoes,
-    status: user.active !== undefined ? user.active : true, // Usar campo active do backend
+    address,
+    permissions,
+    status: user.active !== undefined ? user.active : true,
   };
 };
 
@@ -91,19 +89,17 @@ export function ClientsView() {
     );
   }, [setPageInfo]);
 
-  // Preparar parâmetros da query
-  const queryParams = useMemo(() => {
-    const params: any = {
+  const queryParams = useMemo((): GetUsersParams => {
+    const params: GetUsersParams = {
       page: currentPage,
       limit: 10,
-      roleId: 2, // Apenas usuários (não admins)
+      roleId: ROLES.USER,
     };
 
     if (searchTerm) {
       params.name = searchTerm;
     }
 
-    // Filtro por data de criação
     if (selectedDate) {
       const startOfDay = new Date(selectedDate);
       startOfDay.setHours(0, 0, 0, 0);
@@ -118,24 +114,19 @@ export function ClientsView() {
 
   const { data: rawData, isLoading } = useGetUsers(queryParams, {});
 
-  // Cast do tipo void para ApiUsersResponse
   const usersResponse = rawData as unknown as ApiUsersResponse | undefined;
 
-  // Mapear dados da API para o formato do componente
-  const clients: Cliente[] = useMemo(() => {
+  const clients: Client[] = useMemo(() => {
     if (!usersResponse?.data) return [];
-    return usersResponse.data.map(mapApiUserToCliente);
+    return usersResponse.data.map(mapApiUserToClient);
   }, [usersResponse]);
 
-  // Filtro de status agora é feito no backend, não precisa filtrar client-side
-
-  // Aplicar ordenação client-side (apenas por data de cadastro)
   const sortedData = useMemo(() => {
-    if (!sortField || sortField !== 'dataCadastro' || !sortDirection) return clients;
+    if (!sortField || sortField !== 'registrationDate' || !sortDirection) return clients;
 
     return [...clients].sort((a, b) => {
-      const aValue = a.dataCadastro;
-      const bValue = b.dataCadastro;
+      const aValue = a.registrationDate;
+      const bValue = b.registrationDate;
 
       if (sortDirection === 'asc') {
         return aValue.localeCompare(bValue);
@@ -184,46 +175,25 @@ export function ClientsView() {
   const handleToggleStatus = (id: string, status: boolean) => {
     updateUser.mutate({
       id: Number(id),
-      data: { active: status } as any,
+      data: { active: status } as PatchUsersIdBody,
     });
   };
 
-  const updatePermission = useMutation({
-    mutationFn: async ({
-      userId,
-      permissionId,
-      granted,
-    }: {
-      userId: number;
-      permissionId: number;
-      granted: boolean;
-    }) => {
-      const response = await AXIOS_INSTANCE.patch(
-        `/users/${userId}/permissions/${permissionId}`,
-        { granted }
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['users'],
-      });
-      
-      queryClient.invalidateQueries({
-        queryKey: getGetUsersQueryKey(queryParams),
-      });
-  
-      queryClient.refetchQueries({
-        queryKey: getGetUsersQueryKey(queryParams),
-      });
-      toast.success('Permissão atualizada com sucesso!');
-    },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Erro ao atualizar permissão. Tente novamente.';
-      toast.error(errorMessage);
+  const updatePermission = usePatchUsersUserIdPermissionsPermissionId({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: getGetUsersQueryKey(queryParams),
+        });
+        toast.success('Permissão atualizada com sucesso!');
+      },
+      onError: (error: unknown) => {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Erro ao atualizar permissão. Tente novamente.';
+        toast.error(errorMessage);
+      },
     },
   });
 
@@ -235,7 +205,7 @@ export function ClientsView() {
     updatePermission.mutate({
       userId: Number(userId),
       permissionId,
-      granted,
+      data: { granted },
     });
   };
 

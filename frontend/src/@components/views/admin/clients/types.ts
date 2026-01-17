@@ -1,23 +1,22 @@
-export interface Cliente {
+export interface Client {
   id: string;
-  dataCadastro: string;
-  nome: string;
+  registrationDate: string;
+  name: string;
   email: string;
-  endereco: string;
-  permissoes: Permissao[];
+  address: string;
+  permissions: Permission[];
   status: boolean;
 }
 
-export interface Permissao {
+export interface Permission {
   id: number;
   name: string;
   granted: boolean;
 }
 
-export type SortField = 'dataCadastro' | null;
+export type SortField = 'registrationDate' | null;
 export type SortDirection = 'asc' | 'desc' | null;
 
-// Tipos da API
 export interface ApiUser {
   id: number;
   firstName: string;

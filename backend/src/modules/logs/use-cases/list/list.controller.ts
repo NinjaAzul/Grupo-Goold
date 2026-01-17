@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { ListLogsService } from './list.service';
-import { IListLogsRequest } from './list.interface';
+import { ListLogsQueryDto } from './list-query.dto';
 
 export class ListLogsController {
   private service: ListLogsService;
@@ -9,19 +9,19 @@ export class ListLogsController {
     this.service = new ListLogsService();
   }
 
-  async handle(req: Request, res: Response): Promise<Response> {
-    const filters: IListLogsRequest = {
-      page: req.query.page ? Number(req.query.page) : undefined,
-      limit: req.query.limit ? Number(req.query.limit) : undefined,
-      userId: req.query.userId ? Number(req.query.userId) : undefined,
-      activityType: req.query.activityType as string,
-      module: req.query.module as string,
-      startDate: req.query.startDate as string,
-      endDate: req.query.endDate as string,
-    };
+  async handle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const query = req.query as unknown as ListLogsQueryDto;
 
-    const result = await this.service.execute(filters);
+      const result = await this.service.execute(query);
 
-    return res.json(result);
+      return res.json(result);
+    } catch (error) {
+      return next(error);
+    }
   }
 }

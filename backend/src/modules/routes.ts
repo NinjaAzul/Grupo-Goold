@@ -1,5 +1,3 @@
-// Centralized route exports
-
 //APP
 export { healthCheckRoutes } from './health-check/use-cases/health-check/health-check.routes';
 
@@ -9,6 +7,7 @@ export { loginRoutes } from './users/use-cases/login/login.routes';
 export { checkEmailRoutes } from './users/use-cases/check-email/check-email.routes';
 export { listUsersRoutes } from './users/use-cases/list/list.routes';
 export { updateUserRoutes } from './users/use-cases/update/update.routes';
+export { updateProfileRoutes } from './users/use-cases/update-profile/update-profile.routes';
 export { deleteUserRoutes } from './users/use-cases/delete/delete.routes';
 export { getProfileRoutes } from './users/use-cases/get/profile.routes';
 

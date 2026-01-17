@@ -4,10 +4,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/@components/ui/Divider';
-import { Pagination } from '@/@components/ui/pagination';
+import { Pagination } from '@/@components/ui/Pagination';
 import { usePage } from '@/contexts/PageContext';
-import { AppointmentsFilters } from './AppointmentsFilters';
-import { AppointmentsTable } from './AppointmentsTable';
+import { AppointmentsFilters } from './components/AppointmentsFilters';
+import { AppointmentsTable } from './components/AppointmentsTable';
 import {
   useGetAdminAppointments,
   usePatchAdminAppointmentsIdStatus,
@@ -16,36 +16,34 @@ import { getGetAdminAppointmentsQueryKey } from '@/api/generated/admin-appointme
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import {
-  Agendamento,
+  Appointment,
   SortField,
   SortDirection,
   ApiAppointmentsResponse,
-} from './types';
+  ApiAppointment,
+} from './shared/types';
+import type { GetAdminAppointmentsParams } from '@/api/generated/models';
 
-// Função para mapear dados da API para o formato do componente
-const mapApiAppointmentToAgendamento = (
-  appointment: any
-): Agendamento => {
+const mapApiAppointmentToAppointment = (appointment: ApiAppointment): Appointment => {
   const appointmentDate = new Date(appointment.appointmentDate);
   const userName = appointment.user
     ? `${appointment.user.firstName} ${appointment.user.lastName}`.trim()
-    : 'Usuário não encontrado';
+    : 'Usuário não encontrado'; 
   const userEmail = appointment.user?.email || '';
 
-  // Mapear status do backend para o formato do frontend
-  const statusMap: Record<string, 'agendado' | 'cancelado' | 'em_analise'> = {
-    scheduled: 'agendado',
-    cancelled: 'cancelado',
-    pending: 'em_analise',
+  const statusMap: Record<string, 'scheduled' | 'cancelled' | 'pending'> = {
+    scheduled: 'scheduled',
+    cancelled: 'cancelled',
+    pending: 'pending',
   };
 
   return {
     id: String(appointment.id),
-    data: format(appointmentDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
-    nome: userName,
-    tipo: userEmail,
-    sala: appointment.room,
-    status: statusMap[appointment.status] || 'em_analise',
+    date: format(appointmentDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+    name: userName,
+    type: userEmail,
+    room: appointment.room,
+    status: statusMap[appointment.status] || 'pending',
   };
 };
 
@@ -65,9 +63,8 @@ export function AppointmentsView() {
     );
   }, [setPageInfo]);
 
-  // Preparar parâmetros da query
-  const queryParams = useMemo(() => {
-    const params: any = {
+  const queryParams = useMemo((): GetAdminAppointmentsParams => {
+    const params: GetAdminAppointmentsParams = {
       page: currentPage,
       limit: 10,
     };
@@ -85,9 +82,6 @@ export function AppointmentsView() {
       params.endDate = endOfDay.toISOString().split('T')[0];
     }
 
-    // Se houver ordenação, aplicar (o backend ordena por appointmentDate DESC por padrão)
-    // Por enquanto, vamos manter a ordenação do backend e adicionar ordenação client-side se necessário
-
     return params;
   }, [currentPage, searchTerm, selectedDate]);
 
@@ -96,18 +90,15 @@ export function AppointmentsView() {
     {}
   );
 
-  // Cast do tipo void para ApiAppointmentsResponse
   const appointmentsResponse = rawData as unknown as
     | ApiAppointmentsResponse
     | undefined;
 
-  // Mapear dados da API para o formato do componente
-  const appointments: Agendamento[] = useMemo(() => {
+  const appointments: Appointment[] = useMemo(() => {
     if (!appointmentsResponse?.data) return [];
-    return appointmentsResponse.data.map(mapApiAppointmentToAgendamento);
+    return appointmentsResponse.data.map(mapApiAppointmentToAppointment);
   }, [appointmentsResponse]);
 
-  // Aplicar ordenação client-side se necessário
   const sortedData = useMemo(() => {
     if (!sortField || !sortDirection) return appointments;
 
@@ -115,12 +106,12 @@ export function AppointmentsView() {
       let aValue: string;
       let bValue: string;
 
-      if (sortField === 'data') {
-        aValue = a.data;
-        bValue = b.data;
+      if (sortField === 'date') {
+        aValue = a.date;
+        bValue = b.date;
       } else {
-        aValue = a.nome;
-        bValue = b.nome;
+        aValue = a.name;
+        bValue = b.name;
       }
 
       if (sortDirection === 'asc') {

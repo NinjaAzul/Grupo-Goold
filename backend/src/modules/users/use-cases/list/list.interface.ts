@@ -9,8 +9,8 @@ export interface IListUsersRequest {
   roleId?: number;
   cityId?: number;
   active?: boolean;
-  startDate?: string; // ISO date string (YYYY-MM-DD)
-  endDate?: string; // ISO date string (YYYY-MM-DD)
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface IListUsersResponse extends PaginatedResponse<IUser> {}

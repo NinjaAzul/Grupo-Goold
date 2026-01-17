@@ -6,6 +6,15 @@ const config_1 = require("@shared/config");
 const utils_1 = require("@shared/utils");
 const environments_1 = require("@shared/environments");
 require("./database/models");
+process.on('unhandledRejection', (reason, promise) => {
+    utils_1.logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (error) => {
+    utils_1.logger.error('Uncaught Exception:', error);
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
+});
 async function startServer() {
     try {
         await (0, environments_1.validateEnvironment)();

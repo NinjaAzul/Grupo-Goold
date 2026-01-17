@@ -1,16 +1,15 @@
 export interface Log {
   id: string;
-  clienteNome: string;
-  clienteEmail: string;
-  tipoAtividade: string;
-  modulo: string;
-  dataHorario: string;
+  clientName: string;
+  clientEmail: string;
+  activityType: string;
+  module: string;
+  dateTime: string;
 }
 
-export type SortField = 'data' | null;
+export type SortField = 'date' | null;
 export type SortDirection = 'asc' | 'desc' | null;
 
-// Tipos da API
 export interface ApiLog {
   id: number;
   userId?: number | null;

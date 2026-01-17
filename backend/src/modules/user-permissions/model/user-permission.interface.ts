@@ -2,7 +2,7 @@ import { IUser } from '@modules/users/model/user.interface';
 import { IPermission } from '@modules/permissions/model/permission.interface';
 
 export interface IUserPermission {
-  id?: number; // Opcional agora, já que não é mais primary key
+  id?: number;
   userId: number;
   permissionId: number;
   granted: boolean;

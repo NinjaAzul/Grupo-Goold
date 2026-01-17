@@ -1,5 +1,6 @@
 import { ILog } from '@/modules/logs/model';
 import { LogModel } from '@modules/logs/model/log.model';
+import { logger } from './logger';
 
 export interface ICreateLogParams {
   userId?: number | null;
@@ -9,10 +10,6 @@ export interface ICreateLogParams {
 }
 
 export class LoggerService {
-  /**
-   * Cria um log de atividade
-   * @param params Parâmetros do log
-   */
   static async createLog(params: ICreateLogParams): Promise<void> {
     try {
       await LogModel.create({
@@ -22,13 +19,10 @@ export class LoggerService {
         description: params.description ?? null,
       } as ILog);
     } catch (error) {
-      console.error('Error creating log:', error);
+      logger.error('Error creating log:', error);
     }
   }
 
-  /**
-   * Helper para criar logs de forma mais simples
-   */
   static async log(
     activityType: string,
     module: string,

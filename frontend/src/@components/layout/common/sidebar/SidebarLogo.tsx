@@ -19,7 +19,7 @@ export function SidebarLogo({ onClose }: SidebarLogoProps) {
               className="lg:hidden text-gray-500 hover:text-primary hover:bg-gray-100 p-2 rounded-lg transition-colors cursor-pointer"
               aria-label="Fechar menu"
             >
-              <XIcon className="w-6 h-6" />
+              <XIcon className="w-5 h-5" strokeWidth={1} />
             </button>
           )}
       </div>

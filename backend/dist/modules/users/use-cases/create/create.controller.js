@@ -4,10 +4,15 @@ exports.CreateUserController = void 0;
 const create_service_1 = require("./create.service");
 class CreateUserController {
     constructor() {
-        this.handle = async (req, res) => {
-            const request = req.body;
-            const response = await this.createUserService.execute(request);
-            return res.status(201).json(response);
+        this.handle = async (req, res, next) => {
+            try {
+                const request = req.body;
+                const response = await this.createUserService.execute(request);
+                return res.status(201).json(response);
+            }
+            catch (error) {
+                return next(error);
+            }
         };
         this.createUserService = new create_service_1.CreateUserService();
     }

@@ -37,7 +37,6 @@ module.exports = {
       const tableDescription = await queryInterface.describeTable('users');
       
       if (tableDescription.email) {
-        // Remove índice antes de remover a coluna
         const [indexes] = await queryInterface.sequelize.query(
           `SHOW INDEX FROM users WHERE Key_name = 'users_email_index'`
         );

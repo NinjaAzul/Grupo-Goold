@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { MyLogsController } from './my-logs.controller';
-import { ensureAuthenticated } from '@shared/middlewares';
+import {
+  ensureAuthenticated,
+  ensurePermission,
+  queryValidationMiddleware,
+} from '@shared/middlewares';
+import { PERMISSIONS } from '@shared/constants';
+import { MyLogsQueryDto } from './my-logs-query.dto';
 
 const router = Router();
 const myLogsController = new MyLogsController();
@@ -57,6 +63,8 @@ const myLogsController = new MyLogsController();
 router.get(
   '/me',
   ensureAuthenticated,
+  ensurePermission(PERMISSIONS.LOGS),
+  queryValidationMiddleware(MyLogsQueryDto),
   myLogsController.handle.bind(myLogsController)
 );
 

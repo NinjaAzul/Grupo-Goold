@@ -22,7 +22,7 @@ class ViaCEPApi {
   constructor() {
     this.client = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000, // 10 segundos
+      timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -34,7 +34,7 @@ class ViaCEPApi {
       const cleanCEP = cep.replace(/\D/g, '');
 
       if (cleanCEP.length !== 8) {
-        throw new Error('CEP inválido. Deve conter 8 dígitos');
+        throw new Error('Invalid CEP. Must contain 8 digits');
       }
 
       logger.info(`Fetching address for CEP ${cep} from ViaCEP API...`);
@@ -43,7 +43,7 @@ class ViaCEPApi {
       );
 
       if (response.data.erro) {
-        throw new Error('CEP não encontrado');
+        throw new Error('CEP not found');
       }
 
       logger.info(`Address found for CEP ${cep}`);

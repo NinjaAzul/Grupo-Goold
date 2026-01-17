@@ -68,9 +68,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     const userRoleId = profile?.user?.roleId;
-    const redirectPath = userRoleId && userRoleId in LOGIN_ROUTES 
-      ? LOGIN_ROUTES[userRoleId as keyof typeof LOGIN_ROUTES]
-      : LOGIN_ROUTES[ROLES.USER]; 
+   
+    const roleId = userRoleId ? Number(userRoleId) : null;
+    const redirectPath = roleId === ROLES.ADMIN
+      ? LOGIN_ROUTES[ROLES.ADMIN]
+      : LOGIN_ROUTES[ROLES.USER];
 
     removeStoredToken();
     setToken(null);

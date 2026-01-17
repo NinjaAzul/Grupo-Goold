@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { AvailableSlotsController } from './available-slots.controller';
-import { ensureAuthenticated } from '@shared/middlewares';
+import {
+  ensureAuthenticated,
+  ensurePermission,
+  queryValidationMiddleware,
+} from '@shared/middlewares';
+import { PERMISSIONS } from '@shared/constants';
+import { AvailableSlotsQueryDto } from './available-slots.dto';
 
 const router = Router();
 const availableSlotsController = new AvailableSlotsController();
@@ -48,8 +54,9 @@ const availableSlotsController = new AvailableSlotsController();
 router.get(
   '/available',
   ensureAuthenticated,
+  ensurePermission(PERMISSIONS.APPOINTMENTS),
+  queryValidationMiddleware(AvailableSlotsQueryDto),
   availableSlotsController.handle.bind(availableSlotsController)
 );
 
 export { router as availableSlotsRoutes };
-

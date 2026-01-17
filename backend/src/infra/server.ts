@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import 'dotenv/config';
 import { app } from './app';
 import { sequelize } from '@shared/config';
@@ -5,6 +6,20 @@ import { logger } from '@shared/utils';
 import { validateEnvironment } from '@shared/environments';
 
 import './database/models';
+
+process.on(
+  'unhandledRejection',
+  (reason: unknown, promise: Promise<unknown>) => {
+    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  }
+);
+
+process.on('uncaughtException', (error: Error) => {
+  logger.error('Uncaught Exception:', error);
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
+});
 
 async function startServer() {
   try {

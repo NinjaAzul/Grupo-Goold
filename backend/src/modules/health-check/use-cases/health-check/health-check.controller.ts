@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { CheckHealthService } from './health-check.service';
 
 export class CheckHealthController {
@@ -8,17 +8,17 @@ export class CheckHealthController {
     this.checkHealthService = new CheckHealthService();
   }
 
-  handle = async (_req: Request, res: Response): Promise<Response> => {
+  handle = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
     try {
       const response = await this.checkHealthService.execute();
 
       return res.status(200).json(response);
     } catch (error) {
-      return res.status(500).json({
-        status: 'error',
-        message: 'Internal server error',
-        timestamp: new Date().toISOString(),
-      });
+      return next(error);
     }
   };
 }

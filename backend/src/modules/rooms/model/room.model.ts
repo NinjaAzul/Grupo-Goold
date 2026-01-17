@@ -31,7 +31,7 @@ RoomModel.init(
       allowNull: false,
       field: 'start_time',
       validate: {
-        is: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, // Valida formato HH:mm
+        is: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/,
       },
     },
     endTime: {
@@ -39,7 +39,7 @@ RoomModel.init(
       allowNull: false,
       field: 'end_time',
       validate: {
-        is: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, // Valida formato HH:mm
+        is: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/,
       },
     },
     timeBlock: {

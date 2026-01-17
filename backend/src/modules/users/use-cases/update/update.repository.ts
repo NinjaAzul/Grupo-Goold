@@ -3,11 +3,13 @@ import { RoleModel } from '@modules/roles';
 import { CityModel } from '@modules/cities/model/city.model';
 import { IUser } from '@modules/users/model/user.interface';
 import { IUpdateUserRequest } from './update.interface';
-import { NotFoundError, BadRequestError } from '@shared/errors';
-import bcrypt from 'bcrypt';
+
+export interface UpdateUserRepositoryData extends IUpdateUserRequest {
+  password?: string;
+}
 
 export class UpdateUserRepository {
-  async update(data: IUpdateUserRequest): Promise<IUser> {
+  async update(data: UpdateUserRepositoryData): Promise<IUser | null> {
     const user = await UserModel.findByPk(data.userId, {
       include: [
         {
@@ -22,31 +24,7 @@ export class UpdateUserRepository {
     });
 
     if (!user) {
-      throw new NotFoundError('User not found');
-    }
-
-    if (data.email && data.email !== user.email) {
-      const existingUser = await UserModel.findOne({
-        where: { email: data.email },
-      });
-
-      if (existingUser) {
-        throw new BadRequestError('Email already in use');
-      }
-    }
-
-    if (data.cityId) {
-      const city = await CityModel.findByPk(data.cityId);
-      if (!city) {
-        throw new NotFoundError('City not found');
-      }
-    }
-
-    if (data.roleId) {
-      const role = await RoleModel.findByPk(data.roleId);
-      if (!role) {
-        throw new NotFoundError('Role not found');
-      }
+      return null;
     }
 
     const updateData: Partial<IUser> = {};
@@ -54,9 +32,7 @@ export class UpdateUserRepository {
     if (data.firstName !== undefined) updateData.firstName = data.firstName;
     if (data.lastName !== undefined) updateData.lastName = data.lastName;
     if (data.email !== undefined) updateData.email = data.email;
-    if (data.password !== undefined) {
-      updateData.password = await bcrypt.hash(data.password, 10);
-    }
+    if (data.password !== undefined) updateData.password = data.password;
     if (data.roleId !== undefined) updateData.roleId = data.roleId;
     if (data.active !== undefined) updateData.active = data.active;
     if (data.zipCode !== undefined) updateData.zipCode = data.zipCode || null;
@@ -86,6 +62,6 @@ export class UpdateUserRepository {
       },
     });
 
-    return updatedUser!.toJSON() as IUser;
+    return updatedUser ? (updatedUser.toJSON() as IUser) : null;
   }
 }

@@ -38,7 +38,7 @@ class IBGEApi {
   constructor() {
     this.client = axios.create({
       baseURL: this.baseURL,
-      timeout: 30000, // 30 segundos
+      timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
       },

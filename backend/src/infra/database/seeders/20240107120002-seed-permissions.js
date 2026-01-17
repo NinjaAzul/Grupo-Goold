@@ -10,7 +10,6 @@ module.exports = {
     const existingPermissionNames = existingPermissions.map((p) => p.name);
     const permissionsToInsert = [];
 
-    // Apenas 3 permissões
     const permissions = [
       { id: 1, name: 'APPOINTMENTS' },
       { id: 2, name: 'LOGS' },

@@ -40,7 +40,10 @@ export class ListUsersRepository {
     }
 
     if (filters.startDate || filters.endDate) {
-      const dateFilter: any = {};
+      const dateFilter: {
+        [Op.gte]?: Date;
+        [Op.lte]?: Date;
+      } = {};
       if (filters.startDate) {
         dateFilter[Op.gte] = new Date(filters.startDate);
       }
@@ -82,24 +85,26 @@ export class ListUsersRepository {
       order: [['createdAt', 'DESC']],
     });
 
-    // Mapear usuários e formatar permissões corretamente
     const users = rows.map((user) => {
-      const userJson = user.toJSON() as any;
+      type UserJsonWithPermissions = Record<string, unknown> & {
+        permissions?: Array<{
+          id: number;
+          name: string;
+          UserPermissionModel?: { granted?: boolean | number };
+        }>;
+      };
 
-      // Formatar permissões para o formato esperado
-      // Sequelize retorna através do through model como UserPermissionModel (nome do modelo)
+      const userJson = user.toJSON() as UserJsonWithPermissions;
+
       if (userJson.permissions && Array.isArray(userJson.permissions)) {
-        userJson.permissions = userJson.permissions.map(
+        const formattedPermissions = userJson.permissions.map(
           (perm: Record<string, unknown>) => {
-            // O Sequelize retorna o through model como UserPermissionModel (nome do modelo)
-            // O MySQL retorna tinyint(1) como 0 ou 1, então precisamos converter para boolean
             let grantedValue = false;
 
             const userPermissionModel = perm.UserPermissionModel as
               | { granted?: boolean | number }
               | undefined;
 
-            // Verificar e converter para boolean
             if (userPermissionModel?.granted !== undefined) {
               grantedValue = Boolean(userPermissionModel.granted);
             }
@@ -113,9 +118,14 @@ export class ListUsersRepository {
             };
           }
         );
+
+        return {
+          ...userJson,
+          permissions: formattedPermissions,
+        } as unknown as IUser;
       }
 
-      return userJson as IUser;
+      return userJson as unknown as IUser;
     });
 
     return {

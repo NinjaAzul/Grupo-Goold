@@ -28,27 +28,22 @@ export function withAuth<P extends object>(
 
     useEffect(() => {
       if (isLoginRoute) {
-        // Se está em rota de login, não faz nada
         return;
       }
 
-      // Se tem token mas ainda está carregando o perfil, aguarda
       if (token && isLoading) {
         return;
       }
 
-      // Se tem token mas ainda não está autenticado (perfil ainda carregando), aguarda
       if (token && !isAuthenticated) {
         return;
       }
 
-      // Só redireciona se não tem token E não está carregando E não está autenticado
       if (!token && !isLoading && !isAuthenticated) {
         router.replace(redirectTo);
         return;
       }
 
-      // Se está autenticado mas não tem o role correto, redireciona
       if (!isLoading && isAuthenticated && requireRole && user?.roleId && user.roleId !== requireRole) {
         const redirectRoute = user.roleId === ROLES.ADMIN 
           ? DEFAULT_REDIRECT_ROUTES[ROLES.ADMIN]

@@ -1,13 +1,14 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { SwaggerDefinition, OAS3Definition } from 'swagger-jsdoc';
 import path from 'path';
+import { logger } from '../utils/logger';
 
 const swaggerDefinition: SwaggerDefinition = {
   openapi: '3.0.0',
   info: {
     title: 'Grupo Goold API',
     version: '1.0.0',
-    description: 'Documentação da API do projeto Grupo Goold',
+    description: 'Documentation for the Grupo Goold API',
     contact: {
       name: 'Grupo Goold',
     },
@@ -15,7 +16,7 @@ const swaggerDefinition: SwaggerDefinition = {
   servers: [
     {
       url: 'http://localhost:3001/api',
-      description: 'Servidor de desenvolvimento',
+      description: 'Development server',
     },
   ],
   components: {
@@ -29,7 +30,6 @@ const swaggerDefinition: SwaggerDefinition = {
   },
 };
 
-// Determina se está em desenvolvimento ou produção
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const rootDir = isDevelopment
   ? path.join(__dirname, '../../..')
@@ -48,14 +48,15 @@ const options = {
       ],
 };
 
-// Função para gerar o Swagger spec dinamicamente
 function getSwaggerSpec(): OAS3Definition {
   const swaggerSpec = swaggerJsdoc(options) as OAS3Definition;
 
-  // Log para debug (apenas em desenvolvimento)
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Swagger paths:', options.apis);
-    console.log(
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    process.env.NODE_ENV !== 'test'
+  ) {
+    logger.info('Swagger paths:', options.apis);
+    logger.debug(
       'Swagger spec generated:',
       Object.keys(swaggerSpec.paths || {}).length,
       'paths'
@@ -65,6 +66,5 @@ function getSwaggerSpec(): OAS3Definition {
   return swaggerSpec;
 }
 
-// Exporta a função e também o spec inicial para compatibilidade
 const swaggerSpec = getSwaggerSpec();
 export { swaggerSpec, getSwaggerSpec };

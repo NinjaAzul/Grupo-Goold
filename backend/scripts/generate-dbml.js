@@ -3,18 +3,14 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-// Detecta se está rodando no Docker ou localmente
 const isInsideDocker = fs.existsSync('/.dockerenv');
 
-// Se executado localmente e DB_HOST for 'mysql', força 'localhost'
-// porque 'mysql' só funciona dentro da rede Docker
 let dbHost = process.env.DB_HOST;
 if (!isInsideDocker && dbHost === 'mysql') {
   dbHost = 'localhost';
-  console.log('⚠️  Executando localmente: usando localhost ao invés de mysql');
+  console.log('⚠️  Executing locally: using localhost instead of mysql');
 }
 
-// Configuração do Sequelize
 const dbConfig = {
   database: process.env.DB_NAME || 'grupo_goold',
   username: process.env.DB_USER || 'root',
@@ -41,9 +37,6 @@ const sequelize = new Sequelize(
   }
 );
 
-/**
- * Converte tipo MySQL para tipo DBML
- */
 function mapMySQLTypeToDBML(dataType, columnDefault) {
   const type = dataType.toUpperCase();
   
@@ -79,20 +72,16 @@ function mapMySQLTypeToDBML(dataType, columnDefault) {
   return typeMap[type] || 'varchar';
 }
 
-/**
- * Gera diagrama ERD em formato DBML
- */
 async function generateDBML() {
   try {
-    console.log('🔄 Tentando conectar ao banco de dados...');
+    console.log('🔄 Trying to connect to the database...');   
     console.log(`   Host: ${dbConfig.host}:${dbConfig.port}`);
     console.log(`   Database: ${dbConfig.database}`);
-    console.log(`   Ambiente: ${isInsideDocker ? 'Docker' : 'Local'}`);
+    console.log(`   Environment: ${isInsideDocker ? 'Docker' : 'Local'}`);
     
     await sequelize.authenticate();
-    console.log('✅ Conexão com banco de dados estabelecida.');
+    console.log('✅ Database connection established.');
 
-    // Busca todas as tabelas do banco
     const [tables] = await sequelize.query(
       "SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_TYPE = 'BASE TABLE'",
       {
@@ -102,25 +91,21 @@ async function generateDBML() {
 
     const dbmlContent = [];
 
-    // Adiciona comentário no início
     dbmlContent.push('// Generated DBML from database schema');
     dbmlContent.push(`// Database: ${dbConfig.database}`);
     dbmlContent.push(`// Generated at: ${new Date().toISOString()}`);
     dbmlContent.push('');
 
-    // Processa cada tabela
     for (const table of tables) {
       const tableName = table.TABLE_NAME;
       const tableComment = table.TABLE_COMMENT || '';
       
-      // Adiciona comentário da tabela se existir
       if (tableComment) {
         dbmlContent.push(`// ${tableComment}`);
       }
       
       dbmlContent.push(`Table ${tableName} {`);
 
-      // Busca colunas
       const [columns] = await sequelize.query(
         `SELECT 
           COLUMN_NAME,
@@ -142,15 +127,13 @@ async function generateDBML() {
       );
 
       for (const column of columns) {
-        // Verifica se é ENUM
+        
         let typeWithSize;
         if (column.COLUMN_TYPE && column.COLUMN_TYPE.toUpperCase().startsWith('ENUM')) {
-          // Para DBML, vamos usar varchar para evitar problemas de sintaxe com enum
           typeWithSize = 'varchar(50)';
         } else {
           const dbmlType = mapMySQLTypeToDBML(column.DATA_TYPE, column.COLUMN_DEFAULT);
           
-          // Monta o tipo com tamanho se aplicável
           typeWithSize = dbmlType;
           if (column.CHARACTER_MAXIMUM_LENGTH) {
             typeWithSize = `${dbmlType}(${column.CHARACTER_MAXIMUM_LENGTH})`;
@@ -161,13 +144,10 @@ async function generateDBML() {
           }
         }
         
-        // Monta a linha da coluna
         let columnLine = `  ${column.COLUMN_NAME} ${typeWithSize}`;
         
-        // Coleta todos os atributos inline
         const attributes = [];
         
-        // Adiciona constraints
         if (column.COLUMN_KEY === 'PRI') {
           attributes.push('pk');
         } else if (column.COLUMN_KEY === 'UNI') {
@@ -178,19 +158,14 @@ async function generateDBML() {
           attributes.push('not null');
         }
         
-        // Adiciona default (se não for função SQL)
         if (column.COLUMN_DEFAULT !== null && column.COLUMN_DEFAULT !== undefined) {
-          // Ignora defaults que são funções SQL (CURRENT_TIMESTAMP, etc)
           const defaultStr = String(column.COLUMN_DEFAULT);
           if (!defaultStr.includes('CURRENT_TIMESTAMP') && !defaultStr.includes('NOW()')) {
-            // Para números, não usa aspas. Para strings, usa aspas.
             let defaultValue;
             if (typeof column.COLUMN_DEFAULT === 'number') {
               defaultValue = column.COLUMN_DEFAULT;
             } else {
-              // Remove aspas se já tiver e trata como string
               const cleanDefault = String(column.COLUMN_DEFAULT).replace(/^['"]|['"]$/g, '');
-              // Tenta converter para número se possível
               const numValue = Number(cleanDefault);
               if (!isNaN(numValue) && cleanDefault === numValue.toString()) {
                 defaultValue = numValue;
@@ -202,8 +177,6 @@ async function generateDBML() {
           }
         }
         
-        // Adiciona todos os atributos de uma vez
-        // DBML aceita: [attr1, attr2] (vírgula separada) - sintaxe mais segura
         if (attributes.length > 0) {
           columnLine += ` [${attributes.join(', ')}]`;
         }
@@ -215,7 +188,6 @@ async function generateDBML() {
       dbmlContent.push('');
     }
 
-    // Busca relacionamentos (foreign keys)
     const [relationships] = await sequelize.query(
       `SELECT 
         kcu.TABLE_NAME,
@@ -240,14 +212,12 @@ async function generateDBML() {
       dbmlContent.push('');
       
       for (const rel of relationships) {
-        // DBML usa a sintaxe: Ref: table1.column > table2.column
         dbmlContent.push(
           `Ref: ${rel.TABLE_NAME}.${rel.COLUMN_NAME} > ${rel.REFERENCED_TABLE_NAME}.${rel.REFERENCED_COLUMN_NAME}`
         );
       }
     }
 
-    // Salva o arquivo
     const outputPath = path.join(__dirname, '../docs/schema.dbml');
     const outputDir = path.dirname(outputPath);
     
@@ -256,36 +226,36 @@ async function generateDBML() {
     }
 
     fs.writeFileSync(outputPath, dbmlContent.join('\n'));
-    console.log(`✅ DBML gerado com sucesso em: ${outputPath}`);
-    console.log(`\n💡 Você pode visualizar o diagrama em: https://dbdiagram.io/`);
-    console.log(`   Basta copiar o conteúdo do arquivo e colar no editor.`);
+    console.log(`✅ DBML generated successfully in: ${outputPath}`); 
+    console.log(`\n💡 You can view the diagram at: https://dbdiagram.io/`);
+    console.log(`   Just copy the file content and paste it into the editor.`);
 
     await sequelize.close();
   } catch (error) {
-    console.error('\n❌ Erro ao gerar DBML:');
-    console.error(`   Tipo: ${error.name}`);
-    console.error(`   Mensagem: ${error.message}`);
+    console.error('\n❌ Error generating DBML:');
+    console.error(`   Type: ${error.name}`);
+    console.error(`   Message: ${error.message}`);
     
     if (error.name === 'SequelizeConnectionError') {
-      console.error('\n💡 Possíveis soluções:');
+      console.error('\n💡 Possible solutions:');
       
       if (!isInsideDocker) {
-        console.error('   ⚠️  Você está executando LOCALMENTE.');
-        console.error('   O hostname "mysql" só funciona dentro da rede Docker.');
-        console.error('\n   Opções:');
-        console.error('   1. Execute dentro do container Docker:');
+          console.error('   ⚠️  You are executing LOCALLY.');
+        console.error('   The hostname "mysql" only works inside the Docker network.');
+        console.error('\n   Options:');
+        console.error('   1. Execute inside the Docker container:');
         console.error('      docker-compose exec backend npm run dbml:generate');
-        console.error('   2. Ou configure no .env:');
+        console.error('   2. Or configure in .env:');
         console.error('      DB_HOST=localhost');
         console.error('      DB_PORT=3306');
       } else {
-        console.error('   ⚠️  Você está executando DENTRO do Docker.');
+        console.error('   ⚠️  You are executing INSIDE the Docker container.');
         console.error('   Verifique:');
-        console.error('   1. Se o MySQL está rodando: docker-compose ps');
-        console.error('   2. Se os containers estão na mesma rede');
+        console.error('   1. If the MySQL is running: docker-compose ps');
+        console.error('   2. If the containers are on the same network');
       }
       
-      console.error('\n   3. Verifique as variáveis de ambiente no arquivo .env');
+      console.error('\n   3. Check the environment variables in the .env file');
     }
     
     process.exit(1);

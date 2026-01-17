@@ -55,7 +55,6 @@ module.exports = {
         },
       });
 
-      // Índice único para evitar duplicatas
       const [indexesUnique] = await queryInterface.sequelize.query(
         `SHOW INDEX FROM user_permissions WHERE Key_name = 'user_permissions_user_id_permission_id_unique'`
       );
@@ -70,7 +69,6 @@ module.exports = {
         );
       }
 
-      // Índices para melhor performance
       const [indexesUserId] = await queryInterface.sequelize.query(
         `SHOW INDEX FROM user_permissions WHERE Key_name = 'user_permissions_user_id_index'`
       );

@@ -1,3 +1,3 @@
 export { AppointmentsView } from './AppointmentsView';
-export type { Agendamento, SortField, SortDirection } from './types';
+export type { Appointment, SortField, SortDirection } from './shared/types';
 

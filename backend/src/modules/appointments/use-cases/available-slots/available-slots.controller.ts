@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { AvailableSlotsService } from './available-slots.service';
+import { AvailableSlotsQueryDto } from './available-slots.dto';
 
 export class AvailableSlotsController {
   private service: AvailableSlotsService;
@@ -8,27 +9,23 @@ export class AvailableSlotsController {
     this.service = new AvailableSlotsService();
   }
 
-  async handle(req: Request, res: Response): Promise<Response> {
-    const date = req.query.date as string;
-    const roomId = req.query.roomId
-      ? Number(req.query.roomId)
-      : undefined;
+  async handle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const query: AvailableSlotsQueryDto =
+        req.query as unknown as AvailableSlotsQueryDto;
 
-    if (!date) {
-      return res.status(400).json({
-        error: {
-          message: 'Date parameter is required (YYYY-MM-DD)',
-          statusCode: 400,
-        },
+      const result = await this.service.execute({
+        date: query.date,
+        roomId: query.roomId,
       });
+
+      return res.json(result);
+    } catch (error) {
+      return next(error);
     }
-
-    const result = await this.service.execute({
-      date,
-      roomId,
-    });
-
-    return res.json(result);
   }
 }
-

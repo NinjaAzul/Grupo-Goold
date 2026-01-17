@@ -5,7 +5,7 @@ import { AppointmentStatus } from '@modules/appointments/model/appointment.inter
 import { ICreateAppointmentRequest } from './create.interface';
 
 export class CreateAppointmentRepository {
-  async create(data: ICreateAppointmentRequest): Promise<IAppointment> {
+  async create(data: ICreateAppointmentRequest): Promise<IAppointment | null> {
     const appointment = await AppointmentModel.create({
       userId: data.userId,
       appointmentDate: data.appointmentDate,
@@ -29,7 +29,7 @@ export class CreateAppointmentRepository {
     );
 
     if (!appointmentWithUser) {
-      throw new Error('Failed to create appointment');
+      return null as unknown as IAppointment;
     }
 
     return appointmentWithUser.toJSON() as IAppointment;

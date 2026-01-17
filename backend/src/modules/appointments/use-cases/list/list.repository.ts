@@ -2,7 +2,7 @@ import { AppointmentModel } from '@modules/appointments/model/appointment.model'
 import { UserModel } from '@modules/users/model/user.model';
 import { IAppointment } from '@modules/appointments/model/appointment.interface';
 import { IListAppointmentsRequest } from './list.interface';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 
 export class ListAppointmentsRepository {
   async list(
@@ -12,16 +12,14 @@ export class ListAppointmentsRepository {
     const limit = filters.limit || 10;
     const offset = (page - 1) * limit;
 
-    const where: any = {
+    const where: WhereOptions = {
       userId: filters.userId,
     };
 
-    // Filtro por status
     if (filters.status) {
       where.status = filters.status;
     }
 
-    // Filtro por data
     if (filters.startDate || filters.endDate) {
       where.appointmentDate = {};
       if (filters.startDate) {
@@ -34,8 +32,7 @@ export class ListAppointmentsRepository {
       }
     }
 
-    // Filtro por nome/email (busca no próprio usuário)
-    let userWhere: any = {};
+    let userWhere: WhereOptions | undefined = undefined;
     if (filters.name) {
       const searchTerm = `%${filters.name}%`;
       userWhere = {
@@ -71,4 +68,3 @@ export class ListAppointmentsRepository {
     };
   }
 }
-

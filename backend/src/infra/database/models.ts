@@ -1,4 +1,3 @@
-// Centralized model exports and associations
 import { UserModel } from '@modules/users/model/user.model';
 import { RoleModel } from '@modules/roles';
 import { PermissionModel } from '@modules/permissions';

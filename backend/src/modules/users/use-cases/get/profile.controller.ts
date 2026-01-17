@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { GetProfileService } from './profile.service';
 
 export class GetProfileController {
@@ -8,12 +8,19 @@ export class GetProfileController {
     this.service = new GetProfileService();
   }
 
-  async handle(req: Request, res: Response): Promise<Response> {
-    // O userId vem do middleware ensureAuthenticated através do req.user
-    const userId = req.user!.id;
+  async handle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user!.id;
 
-    const result = await this.service.execute(userId);
+      const result = await this.service.execute(userId);
 
-    return res.json(result);
+      return res.json(result);
+    } catch (error) {
+      return next(error);
+    }
   }
 }

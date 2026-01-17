@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/@components/ui/Input';
 import { PasswordInput } from '@/@components/ui/PasswordInput';
 import { Button } from '@/@components/ui/Button';
-import { loginSchema, type LoginFormData } from './types';
+import { loginSchema, type LoginFormData } from './schemas';
 
 interface LoginFormProps {
   onSubmit: (data: LoginFormData) => void;

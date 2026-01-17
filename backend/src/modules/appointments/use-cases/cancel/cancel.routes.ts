@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { CancelAppointmentController } from './cancel.controller';
-import { ensureAuthenticated } from '@shared/middlewares';
+import { ensureAuthenticated, ensurePermission } from '@shared/middlewares';
+import { PERMISSIONS } from '@shared/constants';
 
 const router = Router();
 const cancelAppointmentController = new CancelAppointmentController();
@@ -33,8 +34,8 @@ const cancelAppointmentController = new CancelAppointmentController();
 router.patch(
   '/:id/cancel',
   ensureAuthenticated,
+  ensurePermission(PERMISSIONS.APPOINTMENTS),
   cancelAppointmentController.handle.bind(cancelAppointmentController)
 );
 
 export { router as cancelAppointmentRoutes };
-

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { SearchByCEPService } from './search-by-cep.service';
 import { ISearchByCEPResponse } from './search-by-cep.interface';
 
@@ -9,12 +9,20 @@ export class SearchByCEPController {
     this.searchByCEPService = new SearchByCEPService();
   }
 
-  handle = async (req: Request, res: Response): Promise<Response> => {
-    const { cep } = req.params;
+  handle = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    try {
+      const { cep } = req.params;
 
-    const response: ISearchByCEPResponse =
-      await this.searchByCEPService.execute(cep);
+      const response: ISearchByCEPResponse =
+        await this.searchByCEPService.execute(cep);
 
-    return res.status(200).json(response);
+      return res.status(200).json(response);
+    } catch (error) {
+      return next(error);
+    }
   };
 }
