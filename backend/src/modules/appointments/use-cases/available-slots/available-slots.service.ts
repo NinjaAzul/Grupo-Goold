@@ -1,4 +1,4 @@
-import { AvailableSlotsRepository } from './available-slots.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import {
   IAvailableSlotsRequest,
   IAvailableSlotsResponse,
@@ -9,10 +9,10 @@ import { Op } from 'sequelize';
 import { DateHelper } from '@shared/utils/date.helper';
 
 export class AvailableSlotsService {
-  private repository: AvailableSlotsRepository;
+  private appointmentRepository: AppointmentRepository;
 
   constructor() {
-    this.repository = new AvailableSlotsRepository();
+    this.appointmentRepository = new AppointmentRepository();
   }
 
   private async calculateSlotsForRoom(
@@ -146,7 +146,7 @@ export class AvailableSlotsService {
       return { slots: [] };
     }
 
-    const rooms = await this.repository.getRooms(request.roomId);
+    const rooms = await this.appointmentRepository.getRooms(request.roomId);
 
     if (rooms.length === 0) {
       return { slots: [] };

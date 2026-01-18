@@ -11,7 +11,7 @@ class IBGEApi {
         this.baseURL = 'https://servicodados.ibge.gov.br/api/v1/localidades';
         this.client = axios_1.default.create({
             baseURL: this.baseURL,
-            timeout: 30000, // 30 segundos
+            timeout: 30000,
             headers: {
                 'Content-Type': 'application/json',
             },

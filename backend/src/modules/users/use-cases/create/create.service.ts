@@ -1,18 +1,18 @@
-import { CreateUserRepository } from './create.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { ICreateUserResponse } from './create.interface';
-import { NotFoundError } from '@shared/errors';
-import { CityRepository } from '@modules/cities/use-cases/repositories/city.repository';
+import { NotFoundError, ConflictError } from '@shared/errors';
+import { CityRepository } from '@modules/cities/repositories/city.repository';
 import { CreateUserDto } from './create.dto';
 import { LoggerService } from '@shared/utils/logger.service';
 import bcrypt from 'bcrypt';
 import { IUser } from '../../model/user.interface';
 
 export class CreateUserService {
-  private createUserRepository: CreateUserRepository;
+  private userRepository: UserRepository;
   private cityRepository: CityRepository;
 
   constructor() {
-    this.createUserRepository = new CreateUserRepository();
+    this.userRepository = new UserRepository();
     this.cityRepository = new CityRepository();
   }
 
@@ -40,22 +40,27 @@ export class CreateUserService {
   }
 
   async execute(request: CreateUserDto): Promise<ICreateUserResponse> {
+    const emailExists = await this.userRepository.emailExists(request.email);
+    if (emailExists) {
+      throw new ConflictError('Este e-mail já está cadastrado');
+    }
+
     if (request.cityId) {
       const city = await this.cityRepository.findById(request.cityId);
       if (!city) {
-        throw new NotFoundError('City not found');
+        throw new NotFoundError('Cidade não encontrada');
       }
     }
 
     const hashedPassword = await this.hashPassword(request.password);
 
-    const user = await this.createUserRepository.create({
+    const user = await this.userRepository.create({
       ...request,
       password: hashedPassword,
     });
 
     if (!user) {
-      throw new Error('Failed to create user');
+      throw new Error('Falha ao criar usuário');
     }
 
     const formattedUser = await this.formatUserPermissions(user);

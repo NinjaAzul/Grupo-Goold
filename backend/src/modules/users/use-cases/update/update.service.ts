@@ -1,19 +1,19 @@
-import { UpdateUserRepository } from './update.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { IUpdateUserRequest, IUpdateUserResponse } from './update.interface';
 import { LoggerService } from '@shared/utils/logger.service';
 import { NotFoundError, BadRequestError } from '@shared/errors';
-import { CityRepository } from '@modules/cities/use-cases/repositories/city.repository';
-import { RoleRepository } from '@modules/roles/use-cases/repositories/role.repository';
+import { CityRepository } from '@modules/cities/repositories/city.repository';
+import { RoleRepository } from '@/modules/roles/repositories/role.repository';
 import { UserModel } from '@modules/users/model/user.model';
 import bcrypt from 'bcrypt';
 
 export class UpdateUserService {
-  private repository: UpdateUserRepository;
+  private userRepository: UserRepository;
   private cityRepository: CityRepository;
   private roleRepository: RoleRepository;
 
   constructor() {
-    this.repository = new UpdateUserRepository();
+    this.userRepository = new UserRepository();
     this.cityRepository = new CityRepository();
     this.roleRepository = new RoleRepository();
   }
@@ -26,30 +26,28 @@ export class UpdateUserService {
     const existingUser = await UserModel.findByPk(request.userId);
 
     if (!existingUser) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('Usuário não encontrado');
     }
 
     if (request.email && request.email !== existingUser.email) {
-      const emailExists = await UserModel.findOne({
-        where: { email: request.email },
-      });
+      const emailExists = await this.userRepository.emailExists(request.email);
 
       if (emailExists) {
-        throw new BadRequestError('Email already in use');
+        throw new BadRequestError('Este e-mail já está em uso');
       }
     }
 
     if (request.cityId) {
       const city = await this.cityRepository.findById(request.cityId);
       if (!city) {
-        throw new NotFoundError('City not found');
+        throw new NotFoundError('Cidade não encontrada');
       }
     }
 
     if (request.roleId) {
       const role = await this.roleRepository.findById(request.roleId);
       if (!role) {
-        throw new NotFoundError('Role not found');
+        throw new NotFoundError('Perfil não encontrado');
       }
     }
 
@@ -58,10 +56,10 @@ export class UpdateUserService {
       updateData.password = await this.hashPassword(request.password);
     }
 
-    const user = await this.repository.update(updateData);
+    const user = await this.userRepository.update(updateData);
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('Usuário não encontrado');
     }
 
     await LoggerService.log(

@@ -1,6 +1,6 @@
 import { ICancelAppointmentRequest, ICancelAppointmentResponse } from './cancel.interface';
 export declare class CancelAppointmentService {
-    private repository;
+    private appointmentRepository;
     constructor();
     execute(request: ICancelAppointmentRequest): Promise<ICancelAppointmentResponse>;
 }

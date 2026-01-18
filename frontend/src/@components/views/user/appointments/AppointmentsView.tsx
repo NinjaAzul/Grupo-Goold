@@ -129,13 +129,6 @@ export function AppointmentsView() {
         });
         toast.success('Agendamento cancelado com sucesso');
       },
-      onError: (error: unknown) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao cancelar agendamento. Tente novamente.';
-        toast.error(errorMessage);
-      },
     },
   });
 

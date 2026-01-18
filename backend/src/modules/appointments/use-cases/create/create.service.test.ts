@@ -1,27 +1,27 @@
 import { CreateAppointmentService } from './create.service';
-import { CreateAppointmentRepository } from './create.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import { LoggerService } from '@shared/utils/logger.service';
 import { AppointmentStatus } from '@modules/appointments/model/appointment.interface';
 import { IAppointment } from '@modules/appointments/model/appointment.interface';
 
 // Mocks
-jest.mock('./create.repository');
+jest.mock('../../repositories/appointment.repository');
 jest.mock('@shared/utils/logger.service');
 
 describe('CreateAppointmentService', () => {
   let createAppointmentService: CreateAppointmentService;
-  let mockCreateAppointmentRepository: jest.Mocked<CreateAppointmentRepository>;
+  let mockAppointmentRepository: jest.Mocked<AppointmentRepository>;
   const mockLoggerService = LoggerService as jest.Mocked<typeof LoggerService>;
 
   beforeEach(() => {
-    mockCreateAppointmentRepository =
-      new CreateAppointmentRepository() as jest.Mocked<CreateAppointmentRepository>;
+    mockAppointmentRepository =
+      new AppointmentRepository() as jest.Mocked<AppointmentRepository>;
     createAppointmentService = new CreateAppointmentService();
     (
       createAppointmentService as unknown as {
-        repository: CreateAppointmentRepository;
+        appointmentRepository: AppointmentRepository;
       }
-    ).repository = mockCreateAppointmentRepository;
+    ).appointmentRepository = mockAppointmentRepository;
     jest.clearAllMocks();
   });
 
@@ -35,7 +35,7 @@ describe('CreateAppointmentService', () => {
     };
 
     it('should successfully create appointment', async () => {
-      mockCreateAppointmentRepository.create = jest
+      mockAppointmentRepository.create = jest
         .fn()
         .mockResolvedValue(mockAppointment as IAppointment);
 
@@ -45,7 +45,7 @@ describe('CreateAppointmentService', () => {
         room: 'Sala A',
       });
 
-      expect(mockCreateAppointmentRepository.create).toHaveBeenCalledWith({
+      expect(mockAppointmentRepository.create).toHaveBeenCalledWith({
         userId: 1,
         appointmentDate: new Date('2024-01-20T10:00:00Z'),
         room: 'Sala A',
@@ -61,9 +61,7 @@ describe('CreateAppointmentService', () => {
     });
 
     it('should throw error when repository create returns null', async () => {
-      mockCreateAppointmentRepository.create = jest
-        .fn()
-        .mockResolvedValue(null);
+      mockAppointmentRepository.create = jest.fn().mockResolvedValue(null);
 
       await expect(
         createAppointmentService.execute({
@@ -71,7 +69,7 @@ describe('CreateAppointmentService', () => {
           appointmentDate: new Date('2024-01-20T10:00:00Z'),
           room: 'Sala A',
         })
-      ).rejects.toThrow('Failed to create appointment');
+      ).rejects.toThrow('Falha ao criar agendamento');
     });
 
     it('should log appointment creation with correct details', async () => {
@@ -81,7 +79,7 @@ describe('CreateAppointmentService', () => {
         room: 'Sala B',
       };
 
-      mockCreateAppointmentRepository.create = jest
+      mockAppointmentRepository.create = jest
         .fn()
         .mockResolvedValue(appointmentWithUser as IAppointment);
 

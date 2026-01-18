@@ -70,7 +70,7 @@ const loginController = new LoginController();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Email or password incorrect
+ *                   example: E-mail ou senha incorretos
  */
 router.post('/', validationMiddleware(LoginDto), loginController.handle);
 

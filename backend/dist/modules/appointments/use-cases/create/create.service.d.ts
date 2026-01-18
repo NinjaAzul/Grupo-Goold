@@ -1,6 +1,6 @@
 import { ICreateAppointmentRequest, ICreateAppointmentResponse } from './create.interface';
 export declare class CreateAppointmentService {
-    private repository;
+    private appointmentRepository;
     constructor();
     execute(request: ICreateAppointmentRequest): Promise<ICreateAppointmentResponse>;
 }

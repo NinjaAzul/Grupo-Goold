@@ -1,5 +1,6 @@
 import Axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { TOKEN_KEY, LOGIN_ROUTES, ROLES } from '@/constants';
+import toast from 'react-hot-toast';
 
 export const AXIOS_INSTANCE = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
@@ -38,6 +39,21 @@ AXIOS_INSTANCE.interceptors.response.use(
         window.location.href = loginRoute;
       }
     }
+
+    const errorData = error.response?.data as
+      | {
+          error?: { message?: string; statusCode?: number };
+          message?: string;
+        }
+      | undefined;
+
+    const errorMessage =
+      errorData?.error?.message ||
+      errorData?.message ||
+      'Erro ao processar requisição';
+
+    toast.error(errorMessage);
+
     return Promise.reject(error);
   }
 );

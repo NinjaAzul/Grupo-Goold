@@ -1,14 +1,14 @@
-import { ListRoomsRepository } from './list.repository';
+import { RoomRepository } from '../../repositories/room.repository';
 import { IRoom } from '@modules/rooms/model/room.interface';
 
 export class ListRoomsService {
-  private repository: ListRoomsRepository;
+  private roomRepository: RoomRepository;
 
   constructor() {
-    this.repository = new ListRoomsRepository();
+    this.roomRepository = new RoomRepository();
   }
 
   async execute(): Promise<IRoom[]> {
-    return await this.repository.findAll();
+    return await this.roomRepository.findAll();
   }
 }

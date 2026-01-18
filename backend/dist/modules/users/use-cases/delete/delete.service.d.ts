@@ -1,5 +1,5 @@
 export declare class DeleteUserService {
-    private repository;
+    private userRepository;
     constructor();
     execute(userId: number): Promise<void>;
 }

@@ -1,19 +1,22 @@
 import { DeleteUserService } from './delete.service';
+import { UserRepository } from '../../repositories/user.repository';
 import { UserModel } from '@modules/users/model/user.model';
 import { AppointmentModel } from '@modules/appointments/model/appointment.model';
 import { NotFoundError, BadRequestError } from '@shared/errors';
 import { ROLES } from '@/@shared/constants';
 import { LoggerService } from '@shared/utils/logger.service';
 import { IUser } from '@modules/users/model/user.interface';
-import { DeleteUserRepository } from './delete.repository';
 
-// Mock dos models
+// Mocks
+jest.mock('../../repositories/user.repository');
+
 jest.mock('@modules/users/model/user.model');
 jest.mock('@modules/appointments/model/appointment.model');
 jest.mock('@shared/utils/logger.service');
 
 describe('DeleteUserService', () => {
   let deleteUserService: DeleteUserService;
+  let mockUserRepository: jest.Mocked<UserRepository>;
   const mockUserModel = UserModel as jest.Mocked<typeof UserModel>;
   const mockAppointmentModel = AppointmentModel as jest.Mocked<
     typeof AppointmentModel
@@ -21,7 +24,11 @@ describe('DeleteUserService', () => {
   const mockLoggerService = LoggerService as jest.Mocked<typeof LoggerService>;
 
   beforeEach(() => {
+    mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
     deleteUserService = new DeleteUserService();
+    (
+      deleteUserService as unknown as { userRepository: UserRepository }
+    ).userRepository = mockUserRepository;
     jest.clearAllMocks();
   });
 
@@ -33,7 +40,7 @@ describe('DeleteUserService', () => {
         NotFoundError
       );
       await expect(deleteUserService.execute(999)).rejects.toThrow(
-        'User not found'
+        'Usuário não encontrado'
       );
 
       expect(mockUserModel.findByPk).toHaveBeenCalledWith(999);
@@ -53,7 +60,7 @@ describe('DeleteUserService', () => {
         BadRequestError
       );
       await expect(deleteUserService.execute(1)).rejects.toThrow(
-        'Cannot delete the last admin user. At least one admin must exist.'
+        'Não é possível excluir o último usuário administrador. Deve existir pelo menos um administrador.'
       );
 
       expect(mockUserModel.findByPk).toHaveBeenCalledWith(1);
@@ -73,13 +80,7 @@ describe('DeleteUserService', () => {
       mockUserModel.count = jest.fn().mockResolvedValue(2);
       mockAppointmentModel.count = jest.fn().mockResolvedValue(0);
 
-      // Mock do repository delete
-      const mockDelete = jest.fn().mockResolvedValue(true);
-      (
-        deleteUserService as unknown as { repository: DeleteUserRepository }
-      ).repository = {
-        delete: mockDelete,
-      } as DeleteUserRepository;
+      mockUserRepository.delete = jest.fn().mockResolvedValue(true);
 
       await deleteUserService.execute(1);
 
@@ -90,7 +91,7 @@ describe('DeleteUserService', () => {
       expect(mockAppointmentModel.count).toHaveBeenCalledWith({
         where: { userId: 1 },
       });
-      expect(mockDelete).toHaveBeenCalledWith(1);
+      expect(mockUserRepository.delete).toHaveBeenCalledWith(1);
     });
 
     it('should throw BadRequestError when user has appointments', async () => {
@@ -107,7 +108,7 @@ describe('DeleteUserService', () => {
         BadRequestError
       );
       await expect(deleteUserService.execute(2)).rejects.toThrow(
-        'Cannot delete user. There are 5 appointment(s) associated with this user.'
+        'Não é possível excluir o usuário. Existem 5 agendamento(s) associados a este usuário.'
       );
 
       expect(mockUserModel.findByPk).toHaveBeenCalledWith(2);
@@ -126,13 +127,7 @@ describe('DeleteUserService', () => {
       mockUserModel.findByPk = jest.fn().mockResolvedValue(user as IUser);
       mockAppointmentModel.count = jest.fn().mockResolvedValue(0);
 
-      // Mock do repository delete
-      const mockDelete = jest.fn().mockResolvedValue(true);
-      (
-        deleteUserService as unknown as { repository: DeleteUserRepository }
-      ).repository = {
-        delete: mockDelete,
-      } as DeleteUserRepository;
+      mockUserRepository.delete = jest.fn().mockResolvedValue(true);
 
       await deleteUserService.execute(3);
 
@@ -140,7 +135,7 @@ describe('DeleteUserService', () => {
       expect(mockAppointmentModel.count).toHaveBeenCalledWith({
         where: { userId: 3 },
       });
-      expect(mockDelete).toHaveBeenCalledWith(3);
+      expect(mockUserRepository.delete).toHaveBeenCalledWith(3);
       expect(mockLoggerService.log).toHaveBeenCalledWith(
         'Exclusão de usuário',
         'Minha Conta',
@@ -159,17 +154,11 @@ describe('DeleteUserService', () => {
       mockUserModel.findByPk = jest.fn().mockResolvedValue(user as IUser);
       mockAppointmentModel.count = jest.fn().mockResolvedValue(0);
 
-      // Mock do repository delete retornando false
-      const mockDelete = jest.fn().mockResolvedValue(false);
-      (
-        deleteUserService as unknown as { repository: DeleteUserRepository }
-      ).repository = {
-        delete: mockDelete,
-      } as DeleteUserRepository;
+      mockUserRepository.delete = jest.fn().mockResolvedValue(false);
 
       await expect(deleteUserService.execute(4)).rejects.toThrow(NotFoundError);
       await expect(deleteUserService.execute(4)).rejects.toThrow(
-        'User not found'
+        'Usuário não encontrado'
       );
     });
   });

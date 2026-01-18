@@ -1,5 +1,5 @@
 import { LoginService } from './login.service';
-import { LoginRepository } from './login.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { UnauthorizedError } from '@shared/errors';
 import { LoggerService } from '@shared/utils/logger.service';
 import bcrypt from 'bcrypt';
@@ -9,22 +9,22 @@ import { IUser } from '@modules/users/model/user.interface';
 // Mocks
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
-jest.mock('./login.repository');
+jest.mock('../../repositories/user.repository');
 jest.mock('@shared/utils/logger.service');
 
 describe('LoginService', () => {
   let loginService: LoginService;
-  let mockLoginRepository: jest.Mocked<LoginRepository>;
+  let mockUserRepository: jest.Mocked<UserRepository>;
   const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
   const mockJwt = jwt as jest.Mocked<typeof jwt>;
   const mockLoggerService = LoggerService as jest.Mocked<typeof LoggerService>;
 
   beforeEach(() => {
-    mockLoginRepository = new LoginRepository() as jest.Mocked<LoginRepository>;
+    mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
     loginService = new LoginService();
     (
-      loginService as unknown as { loginRepository: LoginRepository }
-    ).loginRepository = mockLoginRepository;
+      loginService as unknown as { userRepository: UserRepository }
+    ).userRepository = mockUserRepository;
     jest.clearAllMocks();
   });
 
@@ -40,7 +40,7 @@ describe('LoginService', () => {
     };
 
     it('should throw UnauthorizedError when user does not exist', async () => {
-      mockLoginRepository.findByEmail = jest.fn().mockResolvedValue(null);
+      mockUserRepository.findByEmail = jest.fn().mockResolvedValue(null);
 
       await expect(
         loginService.execute({
@@ -53,16 +53,20 @@ describe('LoginService', () => {
           email: 'nonexistent@test.com',
           password: 'password123',
         })
-      ).rejects.toThrow('Email or password incorrect');
+      ).rejects.toThrow('E-mail ou senha incorretos');
 
-      expect(mockLoginRepository.findByEmail).toHaveBeenCalledWith(
-        'nonexistent@test.com'
+      expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(
+        'nonexistent@test.com',
+        {
+          includePermissions: true,
+          excludePassword: false,
+        }
       );
       expect(mockBcrypt.compare).not.toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedError when password is incorrect', async () => {
-      mockLoginRepository.findByEmail = jest.fn().mockResolvedValue(mockUser);
+      mockUserRepository.findByEmail = jest.fn().mockResolvedValue(mockUser);
       mockBcrypt.compare = jest.fn().mockResolvedValue(false);
 
       await expect(
@@ -76,10 +80,14 @@ describe('LoginService', () => {
           email: 'user@test.com',
           password: 'wrongPassword',
         })
-      ).rejects.toThrow('Email or password incorrect');
+      ).rejects.toThrow('E-mail ou senha incorretos');
 
-      expect(mockLoginRepository.findByEmail).toHaveBeenCalledWith(
-        'user@test.com'
+      expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(
+        'user@test.com',
+        {
+          includePermissions: true,
+          excludePassword: false,
+        }
       );
       expect(mockBcrypt.compare).toHaveBeenCalledWith(
         'wrongPassword',
@@ -98,7 +106,7 @@ describe('LoginService', () => {
         roleId: 2,
       };
 
-      mockLoginRepository.findByEmail = jest.fn().mockResolvedValue(mockUser);
+      mockUserRepository.findByEmail = jest.fn().mockResolvedValue(mockUser);
       mockBcrypt.compare = jest.fn().mockResolvedValue(true);
       mockJwt.sign = jest.fn().mockReturnValue(mockToken);
 
@@ -107,8 +115,12 @@ describe('LoginService', () => {
         password: 'correctPassword',
       });
 
-      expect(mockLoginRepository.findByEmail).toHaveBeenCalledWith(
-        'user@test.com'
+      expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(
+        'user@test.com',
+        {
+          includePermissions: true,
+          excludePassword: false,
+        }
       );
       expect(mockBcrypt.compare).toHaveBeenCalledWith(
         'correctPassword',
@@ -136,7 +148,7 @@ describe('LoginService', () => {
       process.env.JWT_SECRET = 'custom-secret';
       process.env.JWT_EXPIRES_IN = '2h';
 
-      mockLoginRepository.findByEmail = jest.fn().mockResolvedValue(mockUser);
+      mockUserRepository.findByEmail = jest.fn().mockResolvedValue(mockUser);
       mockBcrypt.compare = jest.fn().mockResolvedValue(true);
       mockJwt.sign = jest.fn().mockReturnValue('token');
 

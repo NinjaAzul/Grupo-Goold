@@ -9,7 +9,7 @@ class CancelAppointmentController {
     async handle(req, res, next) {
         try {
             const appointmentId = Number(req.params.id);
-            const userId = req.user.id; // ensureAuthenticated garante que req.user existe
+            const userId = req.user.id;
             const result = await this.service.execute({
                 appointmentId,
                 userId,

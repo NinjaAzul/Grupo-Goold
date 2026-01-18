@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListUsersService = void 0;
-const list_repository_1 = require("./list.repository");
+const user_repository_1 = require("../../repositories/user.repository");
 class ListUsersService {
     constructor() {
-        this.repository = new list_repository_1.ListUsersRepository();
+        this.repository = new user_repository_1.UserRepository();
     }
     async execute(filters) {
         const page = filters.page || 1;

@@ -1,6 +1,6 @@
 import { ISearchByCEPResponse } from './search-by-cep.interface';
 export declare class SearchByCEPService {
-    private searchByCEPRepository;
+    private cityRepository;
     constructor();
     execute(cep: string): Promise<ISearchByCEPResponse>;
 }

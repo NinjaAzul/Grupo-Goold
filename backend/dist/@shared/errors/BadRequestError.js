@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BAD_REQUEST = exports.BadRequestError = void 0;
 const AppError_1 = require("./AppError");
 class BadRequestError extends AppError_1.AppError {
-    constructor(message = 'Bad Request') {
+    constructor(message = 'Requisição inválida') {
         super(message, 400);
         this.name = 'BadRequestError';
     }

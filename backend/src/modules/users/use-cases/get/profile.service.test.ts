@@ -1,22 +1,21 @@
 import { GetProfileService } from './profile.service';
-import { GetProfileRepository } from './profile.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { NotFoundError } from '@shared/errors';
 import { IUser } from '@modules/users/model/user.interface';
 
 // Mocks
-jest.mock('./profile.repository');
+jest.mock('../../repositories/user.repository');
 
 describe('GetProfileService', () => {
   let getProfileService: GetProfileService;
-  let mockGetProfileRepository: jest.Mocked<GetProfileRepository>;
+  let mockUserRepository: jest.Mocked<UserRepository>;
 
   beforeEach(() => {
-    mockGetProfileRepository =
-      new GetProfileRepository() as jest.Mocked<GetProfileRepository>;
+    mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
     getProfileService = new GetProfileService();
     (
-      getProfileService as unknown as { repository: GetProfileRepository }
-    ).repository = mockGetProfileRepository;
+      getProfileService as unknown as { repository: UserRepository }
+    ).repository = mockUserRepository;
     jest.clearAllMocks();
   });
 
@@ -29,29 +28,37 @@ describe('GetProfileService', () => {
     };
 
     it('should return user profile', async () => {
-      mockGetProfileRepository.findById = jest
+      mockUserRepository.findById = jest
         .fn()
         .mockResolvedValue(mockUser as IUser);
 
       const result = await getProfileService.execute(1);
 
-      expect(mockGetProfileRepository.findById).toHaveBeenCalledWith(1);
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(1, {
+        includeRole: true,
+        includeCity: true,
+        includePermissions: true,
+        excludePassword: true,
+      });
       expect(result.user).toEqual(mockUser);
     });
 
     it('should throw NotFoundError when user does not exist', async () => {
-      mockGetProfileRepository.findById = jest
-        .fn()
-        .mockRejectedValue(new NotFoundError('User not found'));
+      mockUserRepository.findById = jest.fn().mockResolvedValue(null);
 
       await expect(getProfileService.execute(999)).rejects.toThrow(
         NotFoundError
       );
       await expect(getProfileService.execute(999)).rejects.toThrow(
-        'User not found'
+        'Usuário não encontrado'
       );
 
-      expect(mockGetProfileRepository.findById).toHaveBeenCalledWith(999);
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(999, {
+        includeRole: true,
+        includeCity: true,
+        includePermissions: true,
+        excludePassword: true,
+      });
     });
   });
 });

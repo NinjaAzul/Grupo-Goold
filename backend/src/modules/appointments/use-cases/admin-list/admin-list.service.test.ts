@@ -1,23 +1,23 @@
 import { AdminListAppointmentsService } from './admin-list.service';
-import { AdminListAppointmentsRepository } from './admin-list.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import { IAppointment } from '@modules/appointments/model/appointment.interface';
 
 // Mocks
-jest.mock('./admin-list.repository');
+jest.mock('../../repositories/appointment.repository');
 
 describe('AdminListAppointmentsService', () => {
   let adminListAppointmentsService: AdminListAppointmentsService;
-  let mockAdminListAppointmentsRepository: jest.Mocked<AdminListAppointmentsRepository>;
+  let mockAppointmentRepository: jest.Mocked<AppointmentRepository>;
 
   beforeEach(() => {
-    mockAdminListAppointmentsRepository =
-      new AdminListAppointmentsRepository() as jest.Mocked<AdminListAppointmentsRepository>;
+    mockAppointmentRepository =
+      new AppointmentRepository() as jest.Mocked<AppointmentRepository>;
     adminListAppointmentsService = new AdminListAppointmentsService();
     (
       adminListAppointmentsService as unknown as {
-        repository: AdminListAppointmentsRepository;
+        appointmentRepository: AppointmentRepository;
       }
-    ).repository = mockAdminListAppointmentsRepository;
+    ).appointmentRepository = mockAppointmentRepository;
     jest.clearAllMocks();
   });
 
@@ -38,18 +38,14 @@ describe('AdminListAppointmentsService', () => {
     ];
 
     it('should return paginated appointments with default values', async () => {
-      mockAdminListAppointmentsRepository.findAll = jest
-        .fn()
-        .mockResolvedValue({
-          appointments: mockAppointments as IAppointment[],
-          total: 2,
-        });
+      mockAppointmentRepository.findAllAdmin = jest.fn().mockResolvedValue({
+        appointments: mockAppointments as IAppointment[],
+        total: 2,
+      });
 
       const result = await adminListAppointmentsService.execute({});
 
-      expect(mockAdminListAppointmentsRepository.findAll).toHaveBeenCalledWith(
-        {}
-      );
+      expect(mockAppointmentRepository.findAllAdmin).toHaveBeenCalledWith({});
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockAppointments);
       expect(result.pagination?.page).toBe(1);
@@ -59,12 +55,10 @@ describe('AdminListAppointmentsService', () => {
     });
 
     it('should return paginated appointments with custom filters', async () => {
-      mockAdminListAppointmentsRepository.findAll = jest
-        .fn()
-        .mockResolvedValue({
-          appointments: [mockAppointments[0]] as IAppointment[],
-          total: 1,
-        });
+      mockAppointmentRepository.findAllAdmin = jest.fn().mockResolvedValue({
+        appointments: [mockAppointments[0]] as IAppointment[],
+        total: 1,
+      });
 
       const result = await adminListAppointmentsService.execute({
         page: 1,
@@ -76,7 +70,7 @@ describe('AdminListAppointmentsService', () => {
         endDate: '2024-01-31',
       });
 
-      expect(mockAdminListAppointmentsRepository.findAll).toHaveBeenCalledWith({
+      expect(mockAppointmentRepository.findAllAdmin).toHaveBeenCalledWith({
         page: 1,
         limit: 5,
         name: 'John',
@@ -92,12 +86,10 @@ describe('AdminListAppointmentsService', () => {
     });
 
     it('should handle empty results', async () => {
-      mockAdminListAppointmentsRepository.findAll = jest
-        .fn()
-        .mockResolvedValue({
-          appointments: [],
-          total: 0,
-        });
+      mockAppointmentRepository.findAllAdmin = jest.fn().mockResolvedValue({
+        appointments: [],
+        total: 0,
+      });
 
       const result = await adminListAppointmentsService.execute({});
 

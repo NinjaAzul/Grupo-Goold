@@ -59,11 +59,6 @@ export function NewAppointmentModal({
     },
   });
 
-  useEffect(() => {
-    if (roomsError && isOpen) {
-      toast.error('Erro ao carregar salas');
-    }
-  }, [roomsError, isOpen]);
 
   const rooms: Room[] =
     (roomsResponse as unknown as { data?: Room[] })?.data || [];
@@ -94,11 +89,8 @@ export function NewAppointmentModal({
       }
     );
 
-  useEffect(() => {
-    if (slotsError && selectedDate && selectedRoomId) {
-      toast.error('Erro ao carregar horários disponíveis');
-    }
-  }, [slotsError, selectedDate, selectedRoomId]);
+  // Erros de query são interceptados automaticamente pelo interceptor do Axios
+  // useEffect removido - toast já é exibido automaticamente
 
   const availableSlots: string[] =
     (slotsResponse as unknown as { slots?: string[] })?.slots || [];
@@ -114,13 +106,7 @@ export function NewAppointmentModal({
         }
         reset();
         onSuccess();
-      },
-      onError: (error: unknown) => {
-        const message =
-          (error as { response?: { data?: { error?: { message?: string } } } })
-            ?.response?.data?.error?.message || 'Erro ao criar agendamento';
-        toast.error(message);
-      },
+      }
     },
   });
 

@@ -1,5 +1,5 @@
 import { CancelAppointmentService } from './cancel.service';
-import { CancelAppointmentRepository } from './cancel.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import { AppointmentModel } from '@modules/appointments/model/appointment.model';
 import {
   NotFoundError,
@@ -11,27 +11,27 @@ import { AppointmentStatus } from '@modules/appointments/model/appointment.inter
 import { IAppointment } from '@modules/appointments/model/appointment.interface';
 
 // Mocks
-jest.mock('./cancel.repository');
+jest.mock('../../repositories/appointment.repository');
 jest.mock('@modules/appointments/model/appointment.model');
 jest.mock('@shared/utils/logger.service');
 
 describe('CancelAppointmentService', () => {
   let cancelAppointmentService: CancelAppointmentService;
-  let mockCancelAppointmentRepository: jest.Mocked<CancelAppointmentRepository>;
+  let mockAppointmentRepository: jest.Mocked<AppointmentRepository>;
   const mockAppointmentModel = AppointmentModel as jest.Mocked<
     typeof AppointmentModel
   >;
   const mockLoggerService = LoggerService as jest.Mocked<typeof LoggerService>;
 
   beforeEach(() => {
-    mockCancelAppointmentRepository =
-      new CancelAppointmentRepository() as jest.Mocked<CancelAppointmentRepository>;
+    mockAppointmentRepository =
+      new AppointmentRepository() as jest.Mocked<AppointmentRepository>;
     cancelAppointmentService = new CancelAppointmentService();
     (
       cancelAppointmentService as unknown as {
-        repository: CancelAppointmentRepository;
+        appointmentRepository: AppointmentRepository;
       }
-    ).repository = mockCancelAppointmentRepository;
+    ).appointmentRepository = mockAppointmentRepository;
     jest.clearAllMocks();
   });
 
@@ -58,7 +58,7 @@ describe('CancelAppointmentService', () => {
           appointmentId: 999,
           userId: 1,
         })
-      ).rejects.toThrow('Appointment not found');
+      ).rejects.toThrow('Agendamento não encontrado');
 
       expect(mockAppointmentModel.findByPk).toHaveBeenCalledWith(999);
     });
@@ -79,7 +79,7 @@ describe('CancelAppointmentService', () => {
           appointmentId: 1,
           userId: 2,
         })
-      ).rejects.toThrow('You can only cancel your own appointments');
+      ).rejects.toThrow('Você só pode cancelar seus próprios agendamentos');
 
       expect(mockAppointmentModel.findByPk).toHaveBeenCalledWith(1);
     });
@@ -104,7 +104,7 @@ describe('CancelAppointmentService', () => {
           appointmentId: 1,
           userId: 1,
         })
-      ).rejects.toThrow('Appointment is already cancelled');
+      ).rejects.toThrow('O agendamento já está cancelado');
     });
 
     it('should successfully cancel appointment', async () => {
@@ -116,7 +116,7 @@ describe('CancelAppointmentService', () => {
       mockAppointmentModel.findByPk = jest
         .fn()
         .mockResolvedValue(mockAppointment as IAppointment);
-      mockCancelAppointmentRepository.cancel = jest
+      mockAppointmentRepository.cancel = jest
         .fn()
         .mockResolvedValue(cancelledAppointment as IAppointment);
 
@@ -126,7 +126,7 @@ describe('CancelAppointmentService', () => {
       });
 
       expect(mockAppointmentModel.findByPk).toHaveBeenCalledWith(1);
-      expect(mockCancelAppointmentRepository.cancel).toHaveBeenCalledWith({
+      expect(mockAppointmentRepository.cancel).toHaveBeenCalledWith({
         appointmentId: 1,
         userId: 1,
       });
@@ -144,9 +144,7 @@ describe('CancelAppointmentService', () => {
       mockAppointmentModel.findByPk = jest
         .fn()
         .mockResolvedValue(mockAppointment as IAppointment);
-      mockCancelAppointmentRepository.cancel = jest
-        .fn()
-        .mockResolvedValue(null);
+      mockAppointmentRepository.cancel = jest.fn().mockResolvedValue(null);
 
       await expect(
         cancelAppointmentService.execute({
@@ -159,7 +157,7 @@ describe('CancelAppointmentService', () => {
           appointmentId: 1,
           userId: 1,
         })
-      ).rejects.toThrow('Appointment not found');
+      ).rejects.toThrow('Agendamento não encontrado');
     });
   });
 });

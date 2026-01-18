@@ -1,21 +1,19 @@
 import { ListUsersService } from './list.service';
-import { ListUsersRepository } from './list.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { IUser } from '@modules/users/model/user.interface';
 
 // Mocks
-jest.mock('./list.repository');
+jest.mock('../../repositories/user.repository');
 
 describe('ListUsersService', () => {
   let listUsersService: ListUsersService;
-  let mockListUsersRepository: jest.Mocked<ListUsersRepository>;
+  let mockUserRepository: jest.Mocked<UserRepository>;
 
   beforeEach(() => {
-    mockListUsersRepository =
-      new ListUsersRepository() as jest.Mocked<ListUsersRepository>;
+    mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
     listUsersService = new ListUsersService();
-    (
-      listUsersService as unknown as { repository: ListUsersRepository }
-    ).repository = mockListUsersRepository;
+    (listUsersService as unknown as { repository: UserRepository }).repository =
+      mockUserRepository;
     jest.clearAllMocks();
   });
 
@@ -36,14 +34,14 @@ describe('ListUsersService', () => {
     ];
 
     it('should return paginated users with default values', async () => {
-      mockListUsersRepository.findAll = jest.fn().mockResolvedValue({
+      mockUserRepository.findAll = jest.fn().mockResolvedValue({
         users: mockUsers as IUser[],
         total: 2,
       });
 
       const result = await listUsersService.execute({});
 
-      expect(mockListUsersRepository.findAll).toHaveBeenCalledWith({});
+      expect(mockUserRepository.findAll).toHaveBeenCalledWith({});
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockUsers);
       expect(result.pagination?.page).toBe(1);
@@ -53,7 +51,7 @@ describe('ListUsersService', () => {
     });
 
     it('should return paginated users with custom filters', async () => {
-      mockListUsersRepository.findAll = jest.fn().mockResolvedValue({
+      mockUserRepository.findAll = jest.fn().mockResolvedValue({
         users: [mockUsers[0]] as IUser[],
         total: 1,
       });
@@ -70,7 +68,7 @@ describe('ListUsersService', () => {
         endDate: '2024-01-31',
       });
 
-      expect(mockListUsersRepository.findAll).toHaveBeenCalledWith({
+      expect(mockUserRepository.findAll).toHaveBeenCalledWith({
         page: 1,
         limit: 5,
         name: 'John',
@@ -88,7 +86,7 @@ describe('ListUsersService', () => {
     });
 
     it('should handle empty results', async () => {
-      mockListUsersRepository.findAll = jest.fn().mockResolvedValue({
+      mockUserRepository.findAll = jest.fn().mockResolvedValue({
         users: [],
         total: 0,
       });

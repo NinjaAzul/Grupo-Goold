@@ -72,7 +72,7 @@ const loginController = new login_controller_1.LoginController();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Email or password incorrect
+ *                   example: E-mail ou senha incorretos
  */
 router.post('/', (0, middlewares_1.validationMiddleware)(login_dto_1.LoginDto), loginController.handle);
 //# sourceMappingURL=login.routes.js.map

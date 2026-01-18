@@ -1,28 +1,27 @@
 import { SearchByCEPService } from './search-by-cep.service';
-import { SearchByCEPRepository } from './search-by-cep.repository';
+import { CityRepository } from '../../repositories/city.repository';
 import { viaCepApi } from '@shared/integrations';
 import { NotFoundError } from '@shared/errors';
 import { ICity } from '@modules/cities/model/city.interface';
 import { IState } from '@modules/states/model/state.interface';
 
 // Mocks
-jest.mock('./search-by-cep.repository');
+jest.mock('../../repositories/city.repository');
 jest.mock('@shared/integrations');
 
 describe('SearchByCEPService', () => {
   let searchByCEPService: SearchByCEPService;
-  let mockSearchByCEPRepository: jest.Mocked<SearchByCEPRepository>;
+  let mockCityRepository: jest.Mocked<CityRepository>;
   const mockViaCepApi = viaCepApi as jest.Mocked<typeof viaCepApi>;
 
   beforeEach(() => {
-    mockSearchByCEPRepository =
-      new SearchByCEPRepository() as jest.Mocked<SearchByCEPRepository>;
+    mockCityRepository = new CityRepository() as jest.Mocked<CityRepository>;
     searchByCEPService = new SearchByCEPService();
     (
       searchByCEPService as unknown as {
-        searchByCEPRepository: SearchByCEPRepository;
+        cityRepository: CityRepository;
       }
-    ).searchByCEPRepository = mockSearchByCEPRepository;
+    ).cityRepository = mockCityRepository;
     jest.clearAllMocks();
   });
 
@@ -55,19 +54,17 @@ describe('SearchByCEPService', () => {
       mockViaCepApi.getAddressByCEP = jest
         .fn()
         .mockResolvedValue(mockViaCEPData);
-      mockSearchByCEPRepository.findCityByIBGECode = jest
-        .fn()
-        .mockResolvedValue(null);
+      mockCityRepository.findCityByIBGECode = jest.fn().mockResolvedValue(null);
 
       await expect(searchByCEPService.execute('01310-100')).rejects.toThrow(
         NotFoundError
       );
       await expect(searchByCEPService.execute('01310-100')).rejects.toThrow(
-        'City with IBGE code 3550308 or its state not found in database'
+        'Cidade com código IBGE 3550308 ou seu estado não encontrado no banco de dados'
       );
 
       expect(mockViaCepApi.getAddressByCEP).toHaveBeenCalledWith('01310-100');
-      expect(mockSearchByCEPRepository.findCityByIBGECode).toHaveBeenCalledWith(
+      expect(mockCityRepository.findCityByIBGECode).toHaveBeenCalledWith(
         3550308
       );
     });
@@ -76,13 +73,11 @@ describe('SearchByCEPService', () => {
       mockViaCepApi.getAddressByCEP = jest
         .fn()
         .mockResolvedValue(mockViaCEPData);
-      mockSearchByCEPRepository.findCityByIBGECode = jest
-        .fn()
-        .mockResolvedValue({
-          id: 3550308,
-          name: 'São Paulo',
-          stateId: 35,
-        } as ICity & { state: IState });
+      mockCityRepository.findCityByIBGECode = jest.fn().mockResolvedValue({
+        id: 3550308,
+        name: 'São Paulo',
+        stateId: 35,
+      } as ICity & { state: IState });
 
       await expect(searchByCEPService.execute('01310-100')).rejects.toThrow(
         NotFoundError
@@ -93,14 +88,14 @@ describe('SearchByCEPService', () => {
       mockViaCepApi.getAddressByCEP = jest
         .fn()
         .mockResolvedValue(mockViaCEPData);
-      mockSearchByCEPRepository.findCityByIBGECode = jest
+      mockCityRepository.findCityByIBGECode = jest
         .fn()
         .mockResolvedValue(mockCityWithState);
 
       const result = await searchByCEPService.execute('01310-100');
 
       expect(mockViaCepApi.getAddressByCEP).toHaveBeenCalledWith('01310-100');
-      expect(mockSearchByCEPRepository.findCityByIBGECode).toHaveBeenCalledWith(
+      expect(mockCityRepository.findCityByIBGECode).toHaveBeenCalledWith(
         3550308
       );
       expect(result.cep).toBe('01310-100');
@@ -128,7 +123,7 @@ describe('SearchByCEPService', () => {
       mockViaCepApi.getAddressByCEP = jest
         .fn()
         .mockResolvedValue(viaCEPDataWithoutDash);
-      mockSearchByCEPRepository.findCityByIBGECode = jest
+      mockCityRepository.findCityByIBGECode = jest
         .fn()
         .mockResolvedValue(mockCityWithState);
 

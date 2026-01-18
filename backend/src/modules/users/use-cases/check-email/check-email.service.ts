@@ -1,18 +1,18 @@
-import { CheckEmailRepository } from './check-email.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import {
   ICheckEmailRequest,
   ICheckEmailResponse,
 } from './check-email.interface';
 
 export class CheckEmailService {
-  private checkEmailRepository: CheckEmailRepository;
+  private userRepository: UserRepository;
 
   constructor() {
-    this.checkEmailRepository = new CheckEmailRepository();
+    this.userRepository = new UserRepository();
   }
 
   async execute({ email }: ICheckEmailRequest): Promise<ICheckEmailResponse> {
-    const exists = await this.checkEmailRepository.exists(email);
+    const exists = await this.userRepository.emailExists(email);
 
     return { exists };
   }

@@ -1,6 +1,6 @@
 import { ILoginRequest, ILoginResponse } from './login.interface';
 export declare class LoginService {
-    private loginRepository;
+    private userRepository;
     constructor();
     execute({ email, password }: ILoginRequest): Promise<ILoginResponse>;
 }

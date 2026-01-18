@@ -1,26 +1,25 @@
 import { UpdateRoomService } from './update.service';
-import { UpdateRoomRepository } from './update.repository';
+import { RoomRepository } from '../../repositories/room.repository';
 import { RoomModel } from '@modules/rooms/model/room.model';
 import { NotFoundError, BadRequestError } from '@shared/errors';
 import { UpdateRoomDto } from './update.dto';
 import { IRoom } from '@modules/rooms/model/room.interface';
 
 // Mocks
-jest.mock('./update.repository');
+jest.mock('../../repositories/room.repository');
 jest.mock('@modules/rooms/model/room.model');
 
 describe('UpdateRoomService', () => {
   let updateRoomService: UpdateRoomService;
-  let mockUpdateRoomRepository: jest.Mocked<UpdateRoomRepository>;
+  let mockRoomRepository: jest.Mocked<RoomRepository>;
   const mockRoomModel = RoomModel as jest.Mocked<typeof RoomModel>;
 
   beforeEach(() => {
-    mockUpdateRoomRepository =
-      new UpdateRoomRepository() as jest.Mocked<UpdateRoomRepository>;
+    mockRoomRepository = new RoomRepository() as jest.Mocked<RoomRepository>;
     updateRoomService = new UpdateRoomService();
     (
-      updateRoomService as unknown as { repository: UpdateRoomRepository }
-    ).repository = mockUpdateRoomRepository;
+      updateRoomService as unknown as { roomRepository: RoomRepository }
+    ).roomRepository = mockRoomRepository;
     jest.clearAllMocks();
   });
 
@@ -44,7 +43,7 @@ describe('UpdateRoomService', () => {
         NotFoundError
       );
       await expect(updateRoomService.execute(999, updateData)).rejects.toThrow(
-        'Room not found'
+        'Sala não encontrada'
       );
 
       expect(mockRoomModel.findByPk).toHaveBeenCalledWith(999);
@@ -67,7 +66,7 @@ describe('UpdateRoomService', () => {
         BadRequestError
       );
       await expect(updateRoomService.execute(1, updateData)).rejects.toThrow(
-        'Room with this name already exists'
+        'Já existe uma sala com este nome'
       );
 
       expect(mockRoomModel.findByPk).toHaveBeenCalledWith(1);
@@ -84,7 +83,7 @@ describe('UpdateRoomService', () => {
         ...existingRoom,
         name: 'Sala A',
       };
-      mockUpdateRoomRepository.update = jest
+      mockRoomRepository.update = jest
         .fn()
         .mockResolvedValue(updatedRoom as IRoom);
 
@@ -95,10 +94,7 @@ describe('UpdateRoomService', () => {
       const result = await updateRoomService.execute(1, updateData);
 
       expect(mockRoomModel.findOne).not.toHaveBeenCalled();
-      expect(mockUpdateRoomRepository.update).toHaveBeenCalledWith(
-        1,
-        updateData
-      );
+      expect(mockRoomRepository.update).toHaveBeenCalledWith(1, updateData);
       expect(result).toEqual(updatedRoom);
     });
 
@@ -112,7 +108,7 @@ describe('UpdateRoomService', () => {
       mockRoomModel.findByPk = jest
         .fn()
         .mockResolvedValue(existingRoom as IRoom);
-      mockUpdateRoomRepository.update = jest
+      mockRoomRepository.update = jest
         .fn()
         .mockResolvedValue(updatedRoom as IRoom);
 
@@ -124,10 +120,7 @@ describe('UpdateRoomService', () => {
       const result = await updateRoomService.execute(1, updateData);
 
       expect(mockRoomModel.findOne).not.toHaveBeenCalled();
-      expect(mockUpdateRoomRepository.update).toHaveBeenCalledWith(
-        1,
-        updateData
-      );
+      expect(mockRoomRepository.update).toHaveBeenCalledWith(1, updateData);
       expect(result).toEqual(updatedRoom);
     });
 
@@ -141,7 +134,7 @@ describe('UpdateRoomService', () => {
         .fn()
         .mockResolvedValue(existingRoom as IRoom);
       mockRoomModel.findOne = jest.fn().mockResolvedValue(null);
-      mockUpdateRoomRepository.update = jest
+      mockRoomRepository.update = jest
         .fn()
         .mockResolvedValue(updatedRoom as IRoom);
 
@@ -154,10 +147,7 @@ describe('UpdateRoomService', () => {
       expect(mockRoomModel.findOne).toHaveBeenCalledWith({
         where: { name: 'Sala Nova' },
       });
-      expect(mockUpdateRoomRepository.update).toHaveBeenCalledWith(
-        1,
-        updateData
-      );
+      expect(mockRoomRepository.update).toHaveBeenCalledWith(1, updateData);
       expect(result).toEqual(updatedRoom);
     });
 
@@ -165,7 +155,7 @@ describe('UpdateRoomService', () => {
       mockRoomModel.findByPk = jest
         .fn()
         .mockResolvedValue(existingRoom as IRoom);
-      mockUpdateRoomRepository.update = jest.fn().mockResolvedValue(null);
+      mockRoomRepository.update = jest.fn().mockResolvedValue(null);
 
       const updateData: UpdateRoomDto = {
         name: 'Sala Nova',
@@ -175,7 +165,7 @@ describe('UpdateRoomService', () => {
         NotFoundError
       );
       await expect(updateRoomService.execute(1, updateData)).rejects.toThrow(
-        'Room not found'
+        'Sala não encontrada'
       );
     });
   });

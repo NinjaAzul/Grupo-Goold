@@ -8,18 +8,12 @@ class MyLogsController {
     }
     async handle(req, res, next) {
         try {
-            // O userId vem do middleware ensureAuthenticated através do req.user
             const userId = req.user.id;
-            const filters = {
+            const query = req.query;
+            const result = await this.service.execute({
                 userId,
-                page: req.query.page ? Number(req.query.page) : undefined,
-                limit: req.query.limit ? Number(req.query.limit) : undefined,
-                activityType: req.query.activityType,
-                module: req.query.module,
-                startDate: req.query.startDate,
-                endDate: req.query.endDate,
-            };
-            const result = await this.service.execute(filters);
+                ...query,
+            });
             return res.json(result);
         }
         catch (error) {

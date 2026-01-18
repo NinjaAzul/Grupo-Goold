@@ -1,5 +1,5 @@
 export declare class DeleteRoomService {
-    private repository;
+    private roomRepository;
     constructor();
     execute(roomId: number): Promise<void>;
 }

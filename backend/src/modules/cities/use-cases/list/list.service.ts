@@ -1,15 +1,15 @@
-import { ListCitiesRepository } from './list.repository';
+import { CityRepository } from '../../repositories/city.repository';
 import { IListCitiesResponse, IListCitiesQuery } from './list.interface';
 
 export class ListCitiesService {
-  private listCitiesRepository: ListCitiesRepository;
+  private cityRepository: CityRepository;
 
   constructor() {
-    this.listCitiesRepository = new ListCitiesRepository();
+    this.cityRepository = new CityRepository();
   }
 
   async execute(query: IListCitiesQuery): Promise<IListCitiesResponse> {
-    const cities = await this.listCitiesRepository.findAll(
+    const cities = await this.cityRepository.findAll(
       query.stateId,
       query.uf
     );

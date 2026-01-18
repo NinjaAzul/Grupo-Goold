@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SyncStatesService = void 0;
-const sync_repository_1 = require("./sync.repository");
+const state_repository_1 = require("../../repositories/state.repository");
 const integrations_1 = require("@shared/integrations");
 const utils_1 = require("@shared/utils");
 const errors_1 = require("@shared/errors");
 class SyncStatesService {
     constructor() {
-        this.syncStatesRepository = new sync_repository_1.SyncStatesRepository();
+        this.stateRepository = new state_repository_1.StateRepository();
     }
     async execute() {
         try {
@@ -18,7 +18,7 @@ class SyncStatesService {
                 name: state.nome,
                 uf: state.sigla,
             }));
-            const statesCount = await this.syncStatesRepository.bulkCreateStates(statesToSave);
+            const statesCount = await this.stateRepository.bulkCreateStates(statesToSave);
             utils_1.logger.info(`Synchronized ${statesCount} states`);
             let totalCitiesCount = 0;
             const citiesPromises = [];
@@ -31,7 +31,7 @@ class SyncStatesService {
                             name: city.nome,
                             stateId: state.id,
                         }));
-                        const citiesCount = await this.syncStatesRepository.bulkCreateCities(citiesToSave);
+                        const citiesCount = await this.stateRepository.bulkCreateCities(citiesToSave);
                         totalCitiesCount += citiesCount;
                         utils_1.logger.info(`Synchronized ${citiesCount} cities for state ${state.sigla}`);
                     }
@@ -51,7 +51,7 @@ class SyncStatesService {
         }
         catch (error) {
             utils_1.logger.error('Error during synchronization:', error);
-            throw new errors_1.InternalServerError('Failed to synchronize states and cities');
+            throw new errors_1.InternalServerError('Falha ao sincronizar estados e cidades');
         }
     }
 }

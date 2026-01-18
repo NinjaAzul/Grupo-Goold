@@ -10,13 +10,13 @@ UserPermissionModel.init({
     userId: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        primaryKey: true, // Parte da chave primária composta
+        primaryKey: true,
         field: 'user_id',
     },
     permissionId: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        primaryKey: true, // Parte da chave primária composta
+        primaryKey: true,
         field: 'permission_id',
     },
     granted: {

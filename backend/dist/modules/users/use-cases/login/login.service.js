@@ -3,21 +3,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginService = void 0;
 const bcrypt_1 = require("bcrypt");
 const jsonwebtoken_1 = require("jsonwebtoken");
-const login_repository_1 = require("./login.repository");
+const user_repository_1 = require("../../repositories/user.repository");
 const errors_1 = require("@shared/errors");
 const logger_service_1 = require("@shared/utils/logger.service");
 class LoginService {
     constructor() {
-        this.loginRepository = new login_repository_1.LoginRepository();
+        this.userRepository = new user_repository_1.UserRepository();
     }
     async execute({ email, password }) {
-        const user = await this.loginRepository.findByEmail(email);
+        const user = await this.userRepository.findByEmail(email, {
+            includePermissions: true,
+            excludePassword: false,
+        });
         if (!user) {
-            throw new errors_1.UnauthorizedError('Email or password incorrect');
+            throw new errors_1.UnauthorizedError('E-mail ou senha incorretos');
         }
         const passwordMatch = await (0, bcrypt_1.compare)(password, user.password);
         if (!passwordMatch) {
-            throw new errors_1.UnauthorizedError('Email or password incorrect');
+            throw new errors_1.UnauthorizedError('E-mail ou senha incorretos');
         }
         const { password: _, ...userWithoutPassword } = user;
         const token = (0, jsonwebtoken_1.sign)({}, process.env.JWT_SECRET, {
@@ -28,7 +31,6 @@ class LoginService {
             user: userWithoutPassword,
             token,
         };
-        // Registrar log de login
         await logger_service_1.LoggerService.log('Login', 'Minha Conta', user.id, `Usuário ${user.email} realizou login`);
         return tokenReturn;
     }

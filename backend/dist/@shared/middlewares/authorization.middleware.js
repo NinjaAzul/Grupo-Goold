@@ -19,6 +19,5 @@ function ensureAuthorized(...allowedRoles) {
         }
     };
 }
-// Middleware específico para ADMIN
 exports.ensureAdmin = ensureAuthorized(constants_1.ROLES.ADMIN);
 //# sourceMappingURL=authorization.middleware.js.map

@@ -1,23 +1,23 @@
 import { ListAppointmentsService } from './list.service';
-import { ListAppointmentsRepository } from './list.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import { IAppointment } from '@modules/appointments/model/appointment.interface';
 
 // Mocks
-jest.mock('./list.repository');
+jest.mock('../../repositories/appointment.repository');
 
 describe('ListAppointmentsService', () => {
   let listAppointmentsService: ListAppointmentsService;
-  let mockListAppointmentsRepository: jest.Mocked<ListAppointmentsRepository>;
+  let mockAppointmentRepository: jest.Mocked<AppointmentRepository>;
 
   beforeEach(() => {
-    mockListAppointmentsRepository =
-      new ListAppointmentsRepository() as jest.Mocked<ListAppointmentsRepository>;
+    mockAppointmentRepository =
+      new AppointmentRepository() as jest.Mocked<AppointmentRepository>;
     listAppointmentsService = new ListAppointmentsService();
     (
       listAppointmentsService as unknown as {
-        repository: ListAppointmentsRepository;
+        appointmentRepository: AppointmentRepository;
       }
-    ).repository = mockListAppointmentsRepository;
+    ).appointmentRepository = mockAppointmentRepository;
     jest.clearAllMocks();
   });
 
@@ -38,7 +38,7 @@ describe('ListAppointmentsService', () => {
     ];
 
     it('should return paginated appointments with default values', async () => {
-      mockListAppointmentsRepository.list = jest.fn().mockResolvedValue({
+      mockAppointmentRepository.findAll = jest.fn().mockResolvedValue({
         rows: mockAppointments as IAppointment[],
         count: 2,
       });
@@ -47,7 +47,7 @@ describe('ListAppointmentsService', () => {
         userId: 1,
       });
 
-      expect(mockListAppointmentsRepository.list).toHaveBeenCalledWith({
+      expect(mockAppointmentRepository.findAll).toHaveBeenCalledWith({
         userId: 1,
         page: undefined,
         limit: undefined,
@@ -65,7 +65,7 @@ describe('ListAppointmentsService', () => {
     });
 
     it('should return paginated appointments with custom page and limit', async () => {
-      mockListAppointmentsRepository.list = jest.fn().mockResolvedValue({
+      mockAppointmentRepository.findAll = jest.fn().mockResolvedValue({
         rows: [mockAppointments[0]] as IAppointment[],
         count: 2,
       });
@@ -83,7 +83,7 @@ describe('ListAppointmentsService', () => {
     });
 
     it('should pass filters to repository', async () => {
-      mockListAppointmentsRepository.list = jest.fn().mockResolvedValue({
+      mockAppointmentRepository.findAll = jest.fn().mockResolvedValue({
         rows: mockAppointments as IAppointment[],
         count: 2,
       });
@@ -98,7 +98,7 @@ describe('ListAppointmentsService', () => {
         status: 'scheduled',
       });
 
-      expect(mockListAppointmentsRepository.list).toHaveBeenCalledWith({
+      expect(mockAppointmentRepository.findAll).toHaveBeenCalledWith({
         userId: 1,
         page: 2,
         limit: 5,
@@ -110,7 +110,7 @@ describe('ListAppointmentsService', () => {
     });
 
     it('should handle empty results', async () => {
-      mockListAppointmentsRepository.list = jest.fn().mockResolvedValue({
+      mockAppointmentRepository.findAll = jest.fn().mockResolvedValue({
         rows: [],
         count: 0,
       });

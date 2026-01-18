@@ -4,6 +4,7 @@ exports.cancelAppointmentRoutes = void 0;
 const express_1 = require("express");
 const cancel_controller_1 = require("./cancel.controller");
 const middlewares_1 = require("@shared/middlewares");
+const constants_1 = require("@shared/constants");
 const router = (0, express_1.Router)();
 exports.cancelAppointmentRoutes = router;
 const cancelAppointmentController = new cancel_controller_1.CancelAppointmentController();
@@ -32,5 +33,5 @@ const cancelAppointmentController = new cancel_controller_1.CancelAppointmentCon
  *       401:
  *         description: Não autorizado
  */
-router.patch('/:id/cancel', middlewares_1.ensureAuthenticated, cancelAppointmentController.handle.bind(cancelAppointmentController));
+router.patch('/:id/cancel', middlewares_1.ensureAuthenticated, (0, middlewares_1.ensurePermission)(constants_1.PERMISSIONS.APPOINTMENTS), cancelAppointmentController.handle.bind(cancelAppointmentController));
 //# sourceMappingURL=cancel.routes.js.map

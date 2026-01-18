@@ -1,23 +1,22 @@
 import { ListCitiesService } from './list.service';
-import { ListCitiesRepository } from './list.repository';
+import { CityRepository } from '../../repositories/city.repository';
 import { ICity } from '@modules/cities/model/city.interface';
 
 // Mocks
-jest.mock('./list.repository');
+jest.mock('../../repositories/city.repository');
 
 describe('ListCitiesService', () => {
   let listCitiesService: ListCitiesService;
-  let mockListCitiesRepository: jest.Mocked<ListCitiesRepository>;
+  let mockCityRepository: jest.Mocked<CityRepository>;
 
   beforeEach(() => {
-    mockListCitiesRepository =
-      new ListCitiesRepository() as jest.Mocked<ListCitiesRepository>;
+    mockCityRepository = new CityRepository() as jest.Mocked<CityRepository>;
     listCitiesService = new ListCitiesService();
     (
       listCitiesService as unknown as {
-        listCitiesRepository: ListCitiesRepository;
+        cityRepository: CityRepository;
       }
-    ).listCitiesRepository = mockListCitiesRepository;
+    ).cityRepository = mockCityRepository;
     jest.clearAllMocks();
   });
 
@@ -36,13 +35,13 @@ describe('ListCitiesService', () => {
     ];
 
     it('should return all cities without filters', async () => {
-      mockListCitiesRepository.findAll = jest
+      mockCityRepository.findAll = jest
         .fn()
         .mockResolvedValue(mockCities as ICity[]);
 
       const result = await listCitiesService.execute({});
 
-      expect(mockListCitiesRepository.findAll).toHaveBeenCalledWith(
+      expect(mockCityRepository.findAll).toHaveBeenCalledWith(
         undefined,
         undefined
       );
@@ -51,48 +50,42 @@ describe('ListCitiesService', () => {
     });
 
     it('should filter cities by stateId', async () => {
-      mockListCitiesRepository.findAll = jest
+      mockCityRepository.findAll = jest
         .fn()
         .mockResolvedValue([mockCities[0]] as ICity[]);
 
       const result = await listCitiesService.execute({ stateId: 35 });
 
-      expect(mockListCitiesRepository.findAll).toHaveBeenCalledWith(
-        35,
-        undefined
-      );
+      expect(mockCityRepository.findAll).toHaveBeenCalledWith(35, undefined);
       expect(result.cities).toEqual([mockCities[0]]);
       expect(result.total).toBe(1);
     });
 
     it('should filter cities by uf', async () => {
-      mockListCitiesRepository.findAll = jest
+      mockCityRepository.findAll = jest
         .fn()
         .mockResolvedValue([mockCities[0]] as ICity[]);
 
       const result = await listCitiesService.execute({ uf: 'SP' });
 
-      expect(mockListCitiesRepository.findAll).toHaveBeenCalledWith(
-        undefined,
-        'SP'
-      );
+      expect(mockCityRepository.findAll).toHaveBeenCalledWith(undefined, 'SP');
       expect(result.cities).toEqual([mockCities[0]]);
       expect(result.total).toBe(1);
     });
 
     it('should filter cities by both stateId and uf', async () => {
-      mockListCitiesRepository.findAll = jest
+      mockCityRepository.findAll = jest
         .fn()
         .mockResolvedValue([mockCities[0]] as ICity[]);
 
       const result = await listCitiesService.execute({ stateId: 35, uf: 'SP' });
 
-      expect(mockListCitiesRepository.findAll).toHaveBeenCalledWith(35, 'SP');
+      expect(mockCityRepository.findAll).toHaveBeenCalledWith(35, 'SP');
       expect(result.cities).toEqual([mockCities[0]]);
     });
 
     it('should handle empty results', async () => {
-      mockListCitiesRepository.findAll = jest.fn().mockResolvedValue([]);
+      mockCityRepository.findAll = jest.fn().mockResolvedValue([]);
 
       const result = await listCitiesService.execute({});
 

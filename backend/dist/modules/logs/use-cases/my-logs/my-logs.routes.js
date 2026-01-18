@@ -4,6 +4,8 @@ exports.myLogsRoutes = void 0;
 const express_1 = require("express");
 const my_logs_controller_1 = require("./my-logs.controller");
 const middlewares_1 = require("@shared/middlewares");
+const constants_1 = require("@shared/constants");
+const my_logs_query_dto_1 = require("./my-logs-query.dto");
 const router = (0, express_1.Router)();
 exports.myLogsRoutes = router;
 const myLogsController = new my_logs_controller_1.MyLogsController();
@@ -56,5 +58,5 @@ const myLogsController = new my_logs_controller_1.MyLogsController();
  *       401:
  *         description: Não autorizado
  */
-router.get('/me', middlewares_1.ensureAuthenticated, myLogsController.handle.bind(myLogsController));
+router.get('/me', middlewares_1.ensureAuthenticated, (0, middlewares_1.ensurePermission)(constants_1.PERMISSIONS.LOGS), (0, middlewares_1.queryValidationMiddleware)(my_logs_query_dto_1.MyLogsQueryDto), myLogsController.handle.bind(myLogsController));
 //# sourceMappingURL=my-logs.routes.js.map

@@ -1,13 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateUserPermissionService = void 0;
-const update_permission_repository_1 = require("./update-permission.repository");
+const user_permission_repository_1 = require("@modules/user-permissions/repositories/user-permission.repository");
+const errors_1 = require("@shared/errors");
 class UpdateUserPermissionService {
     constructor() {
-        this.repository = new update_permission_repository_1.UpdateUserPermissionRepository();
+        this.userPermissionRepository = new user_permission_repository_1.UserPermissionRepository();
     }
     async execute(data) {
-        await this.repository.update(data);
+        const user = await this.userPermissionRepository.findUserById(data.userId);
+        if (!user) {
+            throw new errors_1.NotFoundError('Usuário não encontrado');
+        }
+        const permission = await this.userPermissionRepository.findPermissionById(data.permissionId);
+        if (!permission) {
+            throw new errors_1.NotFoundError('Permissão não encontrada');
+        }
+        await this.userPermissionRepository.update(data);
         return {
             success: true,
             message: 'User permission updated successfully',

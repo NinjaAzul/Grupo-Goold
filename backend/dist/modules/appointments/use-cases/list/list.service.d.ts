@@ -1,6 +1,6 @@
 import { IListAppointmentsRequest, IListAppointmentsResponse } from './list.interface';
 export declare class ListAppointmentsService {
-    private repository;
+    private appointmentRepository;
     constructor();
     execute(request: IListAppointmentsRequest): Promise<IListAppointmentsResponse>;
 }

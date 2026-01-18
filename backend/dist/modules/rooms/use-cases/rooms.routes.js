@@ -115,7 +115,7 @@ roomsRoutes.post('/', middlewares_1.ensureAuthenticated, middlewares_1.ensureAdm
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Room not found
+ *         description: Sala não encontrada
  */
 roomsRoutes.patch('/:id', middlewares_1.ensureAuthenticated, middlewares_1.ensureAdmin, (0, middlewares_2.validationMiddleware)(update_dto_1.UpdateRoomDto), updateRoomController.handle.bind(updateRoomController));
 /**
@@ -141,7 +141,7 @@ roomsRoutes.patch('/:id', middlewares_1.ensureAuthenticated, middlewares_1.ensur
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Room not found
+ *         description: Sala não encontrada
  */
 roomsRoutes.delete('/:id', middlewares_1.ensureAuthenticated, middlewares_1.ensureAdmin, deleteRoomController.handle.bind(deleteRoomController));
 //# sourceMappingURL=rooms.routes.js.map

@@ -1,4 +1,4 @@
-import { CreateAppointmentRepository } from './create.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import {
   ICreateAppointmentRequest,
   ICreateAppointmentResponse,
@@ -6,19 +6,19 @@ import {
 import { LoggerService } from '@shared/utils/logger.service';
 
 export class CreateAppointmentService {
-  private repository: CreateAppointmentRepository;
+  private appointmentRepository: AppointmentRepository;
 
   constructor() {
-    this.repository = new CreateAppointmentRepository();
+    this.appointmentRepository = new AppointmentRepository();
   }
 
   async execute(
     request: ICreateAppointmentRequest
   ): Promise<ICreateAppointmentResponse> {
-    const appointment = await this.repository.create(request);
+    const appointment = await this.appointmentRepository.create(request);
 
     if (!appointment) {
-      throw new Error('Failed to create appointment');
+      throw new Error('Falha ao criar agendamento');
     }
 
     await LoggerService.log(

@@ -46,7 +46,7 @@ const updateStatusController = new UpdateStatusController();
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Appointment not found
+ *         description: Agendamento não encontrado
  */
 router.patch(
   '/:id/status',

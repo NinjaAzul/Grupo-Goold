@@ -1,28 +1,31 @@
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
-import { LoginRepository } from './login.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { ILoginRequest, ILoginResponse } from './login.interface';
 import { UnauthorizedError } from '@shared/errors';
 import { LoggerService } from '@shared/utils/logger.service';
 
 export class LoginService {
-  private loginRepository: LoginRepository;
+  private userRepository: UserRepository;
 
   constructor() {
-    this.loginRepository = new LoginRepository();
+    this.userRepository = new UserRepository();
   }
 
   async execute({ email, password }: ILoginRequest): Promise<ILoginResponse> {
-    const user = await this.loginRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email, {
+      includePermissions: true,
+      excludePassword: false,
+    });
 
     if (!user) {
-      throw new UnauthorizedError('Email or password incorrect');
+      throw new UnauthorizedError('E-mail ou senha incorretos');
     }
 
     const passwordMatch = await compare(password, user.password);
 
     if (!passwordMatch) {
-      throw new UnauthorizedError('Email or password incorrect');
+      throw new UnauthorizedError('E-mail ou senha incorretos');
     }
 
     const { password: _, ...userWithoutPassword } = user;

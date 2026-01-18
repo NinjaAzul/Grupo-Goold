@@ -1,20 +1,20 @@
-import { ListAppointmentsRepository } from './list.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import {
   IListAppointmentsRequest,
   IListAppointmentsResponse,
 } from './list.interface';
 
 export class ListAppointmentsService {
-  private repository: ListAppointmentsRepository;
+  private appointmentRepository: AppointmentRepository;
 
   constructor() {
-    this.repository = new ListAppointmentsRepository();
+    this.appointmentRepository = new AppointmentRepository();
   }
 
   async execute(
     request: IListAppointmentsRequest
   ): Promise<IListAppointmentsResponse> {
-    const { rows, count } = await this.repository.list(request);
+    const { rows, count } = await this.appointmentRepository.findAll(request);
 
     const page = request.page || 1;
     const limit = request.limit || 10;

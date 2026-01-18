@@ -1,16 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 require("dotenv/config");
 const app_1 = require("./app");
 const config_1 = require("@shared/config");
 const utils_1 = require("@shared/utils");
 const environments_1 = require("@shared/environments");
+const error_formatter_1 = require("@shared/utils/error-formatter");
 require("./database/models");
-process.on('unhandledRejection', (reason, promise) => {
-    utils_1.logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on('unhandledRejection', (reason, _promise) => {
+    const errorId = (0, error_formatter_1.generateErrorId)();
+    const error = reason instanceof Error
+        ? reason
+        : new Error(String(reason || 'Unhandled Rejection'));
+    const formattedLog = (0, error_formatter_1.formatErrorForLog)(error, {
+        errorId,
+        path: 'process',
+        method: 'unhandledRejection',
+    });
+    utils_1.logger.error('[Unhandled Rejection]', formattedLog);
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
 });
 process.on('uncaughtException', (error) => {
-    utils_1.logger.error('Uncaught Exception:', error);
+    const errorId = (0, error_formatter_1.generateErrorId)();
+    const formattedLog = (0, error_formatter_1.formatErrorForLog)(error, {
+        errorId,
+        path: 'process',
+        method: 'uncaughtException',
+    });
+    utils_1.logger.error('[Uncaught Exception]', formattedLog);
     if (process.env.NODE_ENV === 'production') {
         process.exit(1);
     }

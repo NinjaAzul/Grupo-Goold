@@ -1,13 +1,13 @@
-import { CreateRoomRepository } from './create.repository';
+import { RoomRepository } from '../../repositories/room.repository';
 import { ICreateRoomRequest, ICreateRoomResponse } from './create.interface';
 import { BadRequestError } from '@shared/errors';
 import { RoomModel } from '@modules/rooms/model/room.model';
 
 export class CreateRoomService {
-  private repository: CreateRoomRepository;
+  private roomRepository: RoomRepository;
 
   constructor() {
-    this.repository = new CreateRoomRepository();
+    this.roomRepository = new RoomRepository();
   }
 
   async execute(request: ICreateRoomRequest): Promise<ICreateRoomResponse> {
@@ -16,13 +16,13 @@ export class CreateRoomService {
     });
 
     if (existingRoom) {
-      throw new BadRequestError('Room with this name already exists');
+      throw new BadRequestError('Já existe uma sala com este nome');
     }
 
-    const room = await this.repository.create(request);
+    const room = await this.roomRepository.create(request);
 
     if (!room) {
-      throw new Error('Failed to create room');
+      throw new Error('Falha ao criar sala');
     }
 
     return { room };

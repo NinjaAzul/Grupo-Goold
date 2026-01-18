@@ -1,23 +1,22 @@
 import { ListStatesService } from './list.service';
-import { ListStatesRepository } from './list.repository';
+import { StateRepository } from '../../repositories/state.repository';
 import { IState } from '@modules/states/model/state.interface';
 
 // Mocks
-jest.mock('./list.repository');
+jest.mock('../../repositories/state.repository');
 
 describe('ListStatesService', () => {
   let listStatesService: ListStatesService;
-  let mockListStatesRepository: jest.Mocked<ListStatesRepository>;
+  let mockStateRepository: jest.Mocked<StateRepository>;
 
   beforeEach(() => {
-    mockListStatesRepository =
-      new ListStatesRepository() as jest.Mocked<ListStatesRepository>;
+    mockStateRepository = new StateRepository() as jest.Mocked<StateRepository>;
     listStatesService = new ListStatesService();
     (
       listStatesService as unknown as {
-        listStatesRepository: ListStatesRepository;
+        stateRepository: StateRepository;
       }
-    ).listStatesRepository = mockListStatesRepository;
+    ).stateRepository = mockStateRepository;
     jest.clearAllMocks();
   });
 
@@ -36,19 +35,19 @@ describe('ListStatesService', () => {
     ];
 
     it('should return all states', async () => {
-      mockListStatesRepository.findAll = jest
+      mockStateRepository.findAll = jest
         .fn()
         .mockResolvedValue(mockStates as IState[]);
 
       const result = await listStatesService.execute();
 
-      expect(mockListStatesRepository.findAll).toHaveBeenCalled();
+      expect(mockStateRepository.findAll).toHaveBeenCalled();
       expect(result.states).toEqual(mockStates);
       expect(result.total).toBe(2);
     });
 
     it('should handle empty results', async () => {
-      mockListStatesRepository.findAll = jest.fn().mockResolvedValue([]);
+      mockStateRepository.findAll = jest.fn().mockResolvedValue([]);
 
       const result = await listStatesService.execute();
 

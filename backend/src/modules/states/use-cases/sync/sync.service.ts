@@ -1,14 +1,14 @@
-import { SyncStatesRepository } from './sync.repository';
+import { StateRepository } from '../../repositories/state.repository';
 import { ISyncStatesResponse } from './sync.interface';
 import { ibgeApi } from '@shared/integrations';
 import { logger } from '@shared/utils';
 import { InternalServerError } from '@shared/errors';
 
 export class SyncStatesService {
-  private syncStatesRepository: SyncStatesRepository;
+  private stateRepository: StateRepository;
 
   constructor() {
-    this.syncStatesRepository = new SyncStatesRepository();
+    this.stateRepository = new StateRepository();
   }
 
   async execute(): Promise<ISyncStatesResponse> {
@@ -24,7 +24,7 @@ export class SyncStatesService {
       }));
 
       const statesCount =
-        await this.syncStatesRepository.bulkCreateStates(statesToSave);
+        await this.stateRepository.bulkCreateStates(statesToSave);
       logger.info(`Synchronized ${statesCount} states`);
 
       let totalCitiesCount = 0;
@@ -42,7 +42,7 @@ export class SyncStatesService {
             }));
 
             const citiesCount =
-              await this.syncStatesRepository.bulkCreateCities(citiesToSave);
+              await this.stateRepository.bulkCreateCities(citiesToSave);
             totalCitiesCount += citiesCount;
             logger.info(
               `Synchronized ${citiesCount} cities for state ${state.sigla}`
@@ -71,7 +71,7 @@ export class SyncStatesService {
       };
     } catch (error) {
       logger.error('Error during synchronization:', error);
-      throw new InternalServerError('Failed to synchronize states and cities');
+      throw new InternalServerError('Falha ao sincronizar estados e cidades');
     }
   }
 }

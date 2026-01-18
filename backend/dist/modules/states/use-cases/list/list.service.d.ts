@@ -1,6 +1,6 @@
 import { IListStatesResponse } from './list.interface';
 export declare class ListStatesService {
-    private listStatesRepository;
+    private stateRepository;
     constructor();
     execute(): Promise<IListStatesResponse>;
 }

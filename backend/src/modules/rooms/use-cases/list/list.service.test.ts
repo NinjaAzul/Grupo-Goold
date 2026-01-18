@@ -1,21 +1,20 @@
 import { ListRoomsService } from './list.service';
-import { ListRoomsRepository } from './list.repository';
+import { RoomRepository } from '../../repositories/room.repository';
 import { IRoom } from '@modules/rooms/model/room.interface';
 
 // Mocks
-jest.mock('./list.repository');
+jest.mock('../../repositories/room.repository');
 
 describe('ListRoomsService', () => {
   let listRoomsService: ListRoomsService;
-  let mockListRoomsRepository: jest.Mocked<ListRoomsRepository>;
+  let mockRoomRepository: jest.Mocked<RoomRepository>;
 
   beforeEach(() => {
-    mockListRoomsRepository =
-      new ListRoomsRepository() as jest.Mocked<ListRoomsRepository>;
+    mockRoomRepository = new RoomRepository() as jest.Mocked<RoomRepository>;
     listRoomsService = new ListRoomsService();
     (
-      listRoomsService as unknown as { repository: ListRoomsRepository }
-    ).repository = mockListRoomsRepository;
+      listRoomsService as unknown as { roomRepository: RoomRepository }
+    ).roomRepository = mockRoomRepository;
     jest.clearAllMocks();
   });
 
@@ -38,18 +37,18 @@ describe('ListRoomsService', () => {
     ];
 
     it('should return all rooms', async () => {
-      mockListRoomsRepository.findAll = jest
+      mockRoomRepository.findAll = jest
         .fn()
         .mockResolvedValue(mockRooms as IRoom[]);
 
       const result = await listRoomsService.execute();
 
-      expect(mockListRoomsRepository.findAll).toHaveBeenCalled();
+      expect(mockRoomRepository.findAll).toHaveBeenCalled();
       expect(result).toEqual(mockRooms);
     });
 
     it('should handle empty results', async () => {
-      mockListRoomsRepository.findAll = jest.fn().mockResolvedValue([]);
+      mockRoomRepository.findAll = jest.fn().mockResolvedValue([]);
 
       const result = await listRoomsService.execute();
 

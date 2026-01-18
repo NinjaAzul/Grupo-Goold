@@ -11,7 +11,6 @@ RoleModel.init({
         type: sequelize_1.DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
-        // Sem autoIncrement - IDs serão definidos via seed
     },
     name: {
         type: sequelize_1.DataTypes.STRING(50),

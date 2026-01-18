@@ -4,6 +4,8 @@ exports.listAppointmentsRoutes = void 0;
 const express_1 = require("express");
 const list_controller_1 = require("./list.controller");
 const middlewares_1 = require("@shared/middlewares");
+const constants_1 = require("@shared/constants");
+const list_query_dto_1 = require("./list-query.dto");
 const router = (0, express_1.Router)();
 exports.listAppointmentsRoutes = router;
 const listAppointmentsController = new list_controller_1.ListAppointmentsController();
@@ -57,5 +59,5 @@ const listAppointmentsController = new list_controller_1.ListAppointmentsControl
  *       401:
  *         description: Não autorizado
  */
-router.get('/', middlewares_1.ensureAuthenticated, listAppointmentsController.handle.bind(listAppointmentsController));
+router.get('/', middlewares_1.ensureAuthenticated, (0, middlewares_1.ensurePermission)(constants_1.PERMISSIONS.APPOINTMENTS), (0, middlewares_1.queryValidationMiddleware)(list_query_dto_1.ListAppointmentsQueryDto), listAppointmentsController.handle.bind(listAppointmentsController));
 //# sourceMappingURL=list.routes.js.map

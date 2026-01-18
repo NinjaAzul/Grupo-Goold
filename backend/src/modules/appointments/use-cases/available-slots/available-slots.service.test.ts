@@ -1,5 +1,5 @@
 import { AvailableSlotsService } from './available-slots.service';
-import { AvailableSlotsRepository } from './available-slots.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import { AppointmentModel } from '@modules/appointments/model/appointment.model';
 import { RoomModel } from '@modules/rooms/model/room.model';
 import { DateHelper } from '@shared/utils/date.helper';
@@ -7,28 +7,28 @@ import { AppointmentStatus } from '@modules/appointments/model/appointment.inter
 import { IRoom } from '@modules/rooms/model/room.interface';
 
 // Mocks
-jest.mock('./available-slots.repository');
+jest.mock('../../repositories/appointment.repository');
 jest.mock('@modules/appointments/model/appointment.model');
 jest.mock('@modules/rooms/model/room.model');
 jest.mock('@shared/utils/date.helper');
 
 describe('AvailableSlotsService', () => {
   let availableSlotsService: AvailableSlotsService;
-  let mockAvailableSlotsRepository: jest.Mocked<AvailableSlotsRepository>;
+  let mockAppointmentRepository: jest.Mocked<AppointmentRepository>;
   const mockAppointmentModel = AppointmentModel as jest.Mocked<
     typeof AppointmentModel
   >;
   const mockDateHelper = DateHelper as jest.Mocked<typeof DateHelper>;
 
   beforeEach(() => {
-    mockAvailableSlotsRepository =
-      new AvailableSlotsRepository() as jest.Mocked<AvailableSlotsRepository>;
+    mockAppointmentRepository =
+      new AppointmentRepository() as jest.Mocked<AppointmentRepository>;
     availableSlotsService = new AvailableSlotsService();
     (
       availableSlotsService as unknown as {
-        repository: AvailableSlotsRepository;
+        appointmentRepository: AppointmentRepository;
       }
-    ).repository = mockAvailableSlotsRepository;
+    ).appointmentRepository = mockAppointmentRepository;
     jest.clearAllMocks();
   });
 
@@ -49,7 +49,7 @@ describe('AvailableSlotsService', () => {
       const result = await availableSlotsService.execute({ date: dateString });
 
       expect(result.slots).toEqual([]);
-      expect(mockAvailableSlotsRepository.getRooms).not.toHaveBeenCalled();
+      expect(mockAppointmentRepository.getRooms).not.toHaveBeenCalled();
     });
 
     it('should return empty slots when no rooms found', async () => {
@@ -57,12 +57,12 @@ describe('AvailableSlotsService', () => {
       futureDate.setDate(futureDate.getDate() + 1);
       const dateString = futureDate.toISOString().split('T')[0];
 
-      mockAvailableSlotsRepository.getRooms = jest.fn().mockResolvedValue([]);
+      mockAppointmentRepository.getRooms = jest.fn().mockResolvedValue([]);
 
       const result = await availableSlotsService.execute({ date: dateString });
 
       expect(result.slots).toEqual([]);
-      expect(mockAvailableSlotsRepository.getRooms).toHaveBeenCalledWith(
+      expect(mockAppointmentRepository.getRooms).toHaveBeenCalledWith(
         undefined
       );
     });
@@ -81,7 +81,7 @@ describe('AvailableSlotsService', () => {
         toJSON: () => mockRoom,
       } as unknown as RoomModel;
 
-      mockAvailableSlotsRepository.getRooms = jest
+      mockAppointmentRepository.getRooms = jest
         .fn()
         .mockResolvedValue([mockRoomModel]);
       mockAppointmentModel.findAll = jest.fn().mockResolvedValue([]);
@@ -105,7 +105,7 @@ describe('AvailableSlotsService', () => {
 
       const result = await availableSlotsService.execute({ date: dateString });
 
-      expect(mockAvailableSlotsRepository.getRooms).toHaveBeenCalledWith(
+      expect(mockAppointmentRepository.getRooms).toHaveBeenCalledWith(
         undefined
       );
       expect(mockAppointmentModel.findAll).toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe('AvailableSlotsService', () => {
         status: AppointmentStatus.SCHEDULED,
       };
 
-      mockAvailableSlotsRepository.getRooms = jest
+      mockAppointmentRepository.getRooms = jest
         .fn()
         .mockResolvedValue([mockRoomModel]);
       mockAppointmentModel.findAll = jest
@@ -183,11 +183,11 @@ describe('AvailableSlotsService', () => {
       futureDate.setDate(futureDate.getDate() + 1);
       const dateString = futureDate.toISOString().split('T')[0];
 
-      mockAvailableSlotsRepository.getRooms = jest.fn().mockResolvedValue([]);
+      mockAppointmentRepository.getRooms = jest.fn().mockResolvedValue([]);
 
       await availableSlotsService.execute({ date: dateString, roomId: 1 });
 
-      expect(mockAvailableSlotsRepository.getRooms).toHaveBeenCalledWith(1);
+      expect(mockAppointmentRepository.getRooms).toHaveBeenCalledWith(1);
     });
 
     it('should return unique and sorted slots when multiple rooms', async () => {
@@ -213,7 +213,7 @@ describe('AvailableSlotsService', () => {
         toJSON: () => ({ ...mockRoom, id: 2 }),
       } as unknown as RoomModel;
 
-      mockAvailableSlotsRepository.getRooms = jest
+      mockAppointmentRepository.getRooms = jest
         .fn()
         .mockResolvedValue([mockRoomModel1, mockRoomModel2]);
       mockAppointmentModel.findAll = jest.fn().mockResolvedValue([]);

@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListStatesService = void 0;
-const list_repository_1 = require("./list.repository");
+const state_repository_1 = require("../../repositories/state.repository");
 class ListStatesService {
     constructor() {
-        this.listStatesRepository = new list_repository_1.ListStatesRepository();
+        this.stateRepository = new state_repository_1.StateRepository();
     }
     async execute() {
-        const states = await this.listStatesRepository.findAll();
+        const states = await this.stateRepository.findAll();
         return {
             states,
             total: states.length,

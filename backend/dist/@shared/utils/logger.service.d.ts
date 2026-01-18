@@ -5,14 +5,7 @@ export interface ICreateLogParams {
     description?: string | null;
 }
 export declare class LoggerService {
-    /**
-     * Cria um log de atividade
-     * @param params Parâmetros do log
-     */
     static createLog(params: ICreateLogParams): Promise<void>;
-    /**
-     * Helper para criar logs de forma mais simples
-     */
     static log(activityType: string, module: string, userId?: number | null, description?: string | null): Promise<void>;
 }
 //# sourceMappingURL=logger.service.d.ts.map

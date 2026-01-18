@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.INTERNAL_SERVER_ERROR = exports.InternalServerError = void 0;
 const AppError_1 = require("./AppError");
 class InternalServerError extends AppError_1.AppError {
-    constructor(message = 'Internal Server Error') {
+    constructor(message = 'Erro interno do servidor') {
         super(message, 500);
         this.name = 'InternalServerError';
     }

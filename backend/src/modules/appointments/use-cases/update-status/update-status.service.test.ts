@@ -1,25 +1,27 @@
 import { UpdateStatusService } from './update-status.service';
-import { UpdateStatusRepository } from './update-status.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import { LoggerService } from '@shared/utils/logger.service';
 import { AppointmentStatus } from '@modules/appointments/model/appointment.interface';
 import { IAppointment } from '@modules/appointments/model/appointment.interface';
 
 // Mocks
-jest.mock('./update-status.repository');
+jest.mock('../../repositories/appointment.repository');
 jest.mock('@shared/utils/logger.service');
 
 describe('UpdateStatusService', () => {
   let updateStatusService: UpdateStatusService;
-  let mockUpdateStatusRepository: jest.Mocked<UpdateStatusRepository>;
+  let mockAppointmentRepository: jest.Mocked<AppointmentRepository>;
   const mockLoggerService = LoggerService as jest.Mocked<typeof LoggerService>;
 
   beforeEach(() => {
-    mockUpdateStatusRepository =
-      new UpdateStatusRepository() as jest.Mocked<UpdateStatusRepository>;
+    mockAppointmentRepository =
+      new AppointmentRepository() as jest.Mocked<AppointmentRepository>;
     updateStatusService = new UpdateStatusService();
     (
-      updateStatusService as unknown as { repository: UpdateStatusRepository }
-    ).repository = mockUpdateStatusRepository;
+      updateStatusService as unknown as {
+        appointmentRepository: AppointmentRepository;
+      }
+    ).appointmentRepository = mockAppointmentRepository;
     jest.clearAllMocks();
   });
 
@@ -38,7 +40,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.SCHEDULED,
       };
 
-      mockUpdateStatusRepository.updateStatus = jest
+      mockAppointmentRepository.updateStatus = jest
         .fn()
         .mockResolvedValue(updatedAppointment as IAppointment);
 
@@ -47,7 +49,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.SCHEDULED,
       });
 
-      expect(mockUpdateStatusRepository.updateStatus).toHaveBeenCalledWith(
+      expect(mockAppointmentRepository.updateStatus).toHaveBeenCalledWith(
         1,
         AppointmentStatus.SCHEDULED
       );
@@ -66,7 +68,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.CANCELLED,
       };
 
-      mockUpdateStatusRepository.updateStatus = jest
+      mockAppointmentRepository.updateStatus = jest
         .fn()
         .mockResolvedValue(updatedAppointment as IAppointment);
 
@@ -75,7 +77,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.CANCELLED,
       });
 
-      expect(mockUpdateStatusRepository.updateStatus).toHaveBeenCalledWith(
+      expect(mockAppointmentRepository.updateStatus).toHaveBeenCalledWith(
         1,
         AppointmentStatus.CANCELLED
       );
@@ -94,7 +96,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.PENDING,
       };
 
-      mockUpdateStatusRepository.updateStatus = jest
+      mockAppointmentRepository.updateStatus = jest
         .fn()
         .mockResolvedValue(updatedAppointment as IAppointment);
 
@@ -103,7 +105,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.PENDING,
       });
 
-      expect(mockUpdateStatusRepository.updateStatus).toHaveBeenCalledWith(
+      expect(mockAppointmentRepository.updateStatus).toHaveBeenCalledWith(
         1,
         AppointmentStatus.PENDING
       );
@@ -122,7 +124,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.SCHEDULED,
       };
 
-      mockUpdateStatusRepository.updateStatus = jest
+      mockAppointmentRepository.updateStatus = jest
         .fn()
         .mockResolvedValue(updatedAppointment as IAppointment);
 
@@ -148,7 +150,7 @@ describe('UpdateStatusService', () => {
         status: AppointmentStatus.CANCELLED,
       };
 
-      mockUpdateStatusRepository.updateStatus = jest
+      mockAppointmentRepository.updateStatus = jest
         .fn()
         .mockResolvedValue(updatedAppointment as IAppointment);
 

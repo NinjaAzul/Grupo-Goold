@@ -1,28 +1,34 @@
 import { UpdateUserPermissionService } from './update-permission.service';
-import { UpdateUserPermissionRepository } from './update-permission.repository';
+import { UserPermissionRepository } from '@modules/user-permissions/repositories/user-permission.repository';
 
 // Mocks
-jest.mock('./update-permission.repository');
+jest.mock('@modules/user-permissions/repositories/user-permission.repository');
 
 describe('UpdateUserPermissionService', () => {
   let updateUserPermissionService: UpdateUserPermissionService;
-  let mockUpdateUserPermissionRepository: jest.Mocked<UpdateUserPermissionRepository>;
+  let mockUserPermissionRepository: jest.Mocked<UserPermissionRepository>;
 
   beforeEach(() => {
-    mockUpdateUserPermissionRepository =
-      new UpdateUserPermissionRepository() as jest.Mocked<UpdateUserPermissionRepository>;
+    mockUserPermissionRepository =
+      new UserPermissionRepository() as jest.Mocked<UserPermissionRepository>;
     updateUserPermissionService = new UpdateUserPermissionService();
     (
       updateUserPermissionService as unknown as {
-        repository: UpdateUserPermissionRepository;
+        userPermissionRepository: UserPermissionRepository;
       }
-    ).repository = mockUpdateUserPermissionRepository;
+    ).userPermissionRepository = mockUserPermissionRepository;
     jest.clearAllMocks();
   });
 
   describe('execute', () => {
     it('should successfully grant permission', async () => {
-      mockUpdateUserPermissionRepository.update = jest
+      mockUserPermissionRepository.findUserById = jest
+        .fn()
+        .mockResolvedValue({ id: 1 });
+      mockUserPermissionRepository.findPermissionById = jest
+        .fn()
+        .mockResolvedValue({ id: 2 });
+      mockUserPermissionRepository.update = jest
         .fn()
         .mockResolvedValue(undefined);
 
@@ -32,7 +38,11 @@ describe('UpdateUserPermissionService', () => {
         granted: true,
       });
 
-      expect(mockUpdateUserPermissionRepository.update).toHaveBeenCalledWith({
+      expect(mockUserPermissionRepository.findUserById).toHaveBeenCalledWith(1);
+      expect(
+        mockUserPermissionRepository.findPermissionById
+      ).toHaveBeenCalledWith(2);
+      expect(mockUserPermissionRepository.update).toHaveBeenCalledWith({
         userId: 1,
         permissionId: 2,
         granted: true,
@@ -42,7 +52,13 @@ describe('UpdateUserPermissionService', () => {
     });
 
     it('should successfully revoke permission', async () => {
-      mockUpdateUserPermissionRepository.update = jest
+      mockUserPermissionRepository.findUserById = jest
+        .fn()
+        .mockResolvedValue({ id: 1 });
+      mockUserPermissionRepository.findPermissionById = jest
+        .fn()
+        .mockResolvedValue({ id: 2 });
+      mockUserPermissionRepository.update = jest
         .fn()
         .mockResolvedValue(undefined);
 
@@ -52,7 +68,11 @@ describe('UpdateUserPermissionService', () => {
         granted: false,
       });
 
-      expect(mockUpdateUserPermissionRepository.update).toHaveBeenCalledWith({
+      expect(mockUserPermissionRepository.findUserById).toHaveBeenCalledWith(1);
+      expect(
+        mockUserPermissionRepository.findPermissionById
+      ).toHaveBeenCalledWith(2);
+      expect(mockUserPermissionRepository.update).toHaveBeenCalledWith({
         userId: 1,
         permissionId: 2,
         granted: false,
@@ -63,9 +83,9 @@ describe('UpdateUserPermissionService', () => {
 
     it('should propagate NotFoundError when user does not exist', async () => {
       const { NotFoundError } = await import('@shared/errors');
-      mockUpdateUserPermissionRepository.update = jest
+      mockUserPermissionRepository.findUserById = jest
         .fn()
-        .mockRejectedValue(new NotFoundError('User not found'));
+        .mockResolvedValue(null);
 
       await expect(
         updateUserPermissionService.execute({
@@ -73,14 +93,32 @@ describe('UpdateUserPermissionService', () => {
           permissionId: 2,
           granted: true,
         })
-      ).rejects.toThrow('User not found');
+      ).rejects.toThrow(NotFoundError);
+      await expect(
+        updateUserPermissionService.execute({
+          userId: 999,
+          permissionId: 2,
+          granted: true,
+        })
+      ).rejects.toThrow('Usuário não encontrado');
+
+      expect(mockUserPermissionRepository.findUserById).toHaveBeenCalledWith(
+        999
+      );
+      expect(
+        mockUserPermissionRepository.findPermissionById
+      ).not.toHaveBeenCalled();
+      expect(mockUserPermissionRepository.update).not.toHaveBeenCalled();
     });
 
     it('should propagate NotFoundError when permission does not exist', async () => {
       const { NotFoundError } = await import('@shared/errors');
-      mockUpdateUserPermissionRepository.update = jest
+      mockUserPermissionRepository.findUserById = jest
         .fn()
-        .mockRejectedValue(new NotFoundError('Permission not found'));
+        .mockResolvedValue({ id: 1 });
+      mockUserPermissionRepository.findPermissionById = jest
+        .fn()
+        .mockResolvedValue(null);
 
       await expect(
         updateUserPermissionService.execute({
@@ -88,7 +126,20 @@ describe('UpdateUserPermissionService', () => {
           permissionId: 999,
           granted: true,
         })
-      ).rejects.toThrow('Permission not found');
+      ).rejects.toThrow(NotFoundError);
+      await expect(
+        updateUserPermissionService.execute({
+          userId: 1,
+          permissionId: 999,
+          granted: true,
+        })
+      ).rejects.toThrow('Permissão não encontrada');
+
+      expect(mockUserPermissionRepository.findUserById).toHaveBeenCalledWith(1);
+      expect(
+        mockUserPermissionRepository.findPermissionById
+      ).toHaveBeenCalledWith(999);
+      expect(mockUserPermissionRepository.update).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,7 +1,7 @@
 import { AppError } from './AppError';
 
 export class InternalServerError extends AppError {
-  constructor(message: string = 'Internal Server Error') {
+  constructor(message: string = 'Erro interno do servidor') {
     super(message, 500);
     this.name = 'InternalServerError';
   }

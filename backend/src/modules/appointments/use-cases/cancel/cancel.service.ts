@@ -1,4 +1,4 @@
-import { CancelAppointmentRepository } from './cancel.repository';
+import { AppointmentRepository } from '../../repositories/appointment.repository';
 import {
   ICancelAppointmentRequest,
   ICancelAppointmentResponse,
@@ -13,10 +13,10 @@ import { AppointmentModel } from '@modules/appointments/model/appointment.model'
 import { AppointmentStatus } from '@modules/appointments/model/appointment.interface';
 
 export class CancelAppointmentService {
-  private repository: CancelAppointmentRepository;
+  private appointmentRepository: AppointmentRepository;
 
   constructor() {
-    this.repository = new CancelAppointmentRepository();
+    this.appointmentRepository = new AppointmentRepository();
   }
 
   async execute(
@@ -25,21 +25,24 @@ export class CancelAppointmentService {
     const appointment = await AppointmentModel.findByPk(request.appointmentId);
 
     if (!appointment) {
-      throw new NotFoundError('Appointment not found');
+      throw new NotFoundError('Agendamento não encontrado');
     }
 
     if (appointment.userId !== request.userId) {
-      throw new UnauthorizedError('You can only cancel your own appointments');
+      throw new UnauthorizedError(
+        'Você só pode cancelar seus próprios agendamentos'
+      );
     }
 
     if (appointment.status === AppointmentStatus.CANCELLED) {
-      throw new BadRequestError('Appointment is already cancelled');
+      throw new BadRequestError('O agendamento já está cancelado');
     }
 
-    const cancelledAppointment = await this.repository.cancel(request);
+    const cancelledAppointment =
+      await this.appointmentRepository.cancel(request);
 
     if (!cancelledAppointment) {
-      throw new NotFoundError('Appointment not found');
+      throw new NotFoundError('Agendamento não encontrado');
     }
 
     await LoggerService.log(

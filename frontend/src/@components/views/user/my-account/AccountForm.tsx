@@ -50,12 +50,6 @@ export function AccountForm({
         });
         refreshUser();
       },
-      onError: (error: unknown) => {
-        const message =
-          (error as { response?: { data?: { error?: { message?: string } } } })
-            ?.response?.data?.error?.message || 'Erro ao atualizar dados';
-        toast.error(message);
-      },
     },
   }, queryClient);
 

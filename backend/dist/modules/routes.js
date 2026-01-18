@@ -1,7 +1,6 @@
 "use strict";
-// Centralized route exports
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.myLogsRoutes = exports.listLogsRoutes = exports.searchByCEPRoutes = exports.listCitiesRoutes = exports.listStatesRoutes = exports.syncStatesRoutes = exports.getProfileRoutes = exports.deleteUserRoutes = exports.updateUserRoutes = exports.listUsersRoutes = exports.checkEmailRoutes = exports.loginRoutes = exports.createUserRoutes = exports.healthCheckRoutes = void 0;
+exports.myLogsRoutes = exports.listLogsRoutes = exports.searchByCEPRoutes = exports.listCitiesRoutes = exports.listStatesRoutes = exports.syncStatesRoutes = exports.getProfileRoutes = exports.deleteUserRoutes = exports.updateProfileRoutes = exports.updateUserRoutes = exports.listUsersRoutes = exports.checkEmailRoutes = exports.loginRoutes = exports.createUserRoutes = exports.healthCheckRoutes = void 0;
 //APP
 var health_check_routes_1 = require("./health-check/use-cases/health-check/health-check.routes");
 Object.defineProperty(exports, "healthCheckRoutes", { enumerable: true, get: function () { return health_check_routes_1.healthCheckRoutes; } });
@@ -16,6 +15,8 @@ var list_routes_1 = require("./users/use-cases/list/list.routes");
 Object.defineProperty(exports, "listUsersRoutes", { enumerable: true, get: function () { return list_routes_1.listUsersRoutes; } });
 var update_routes_1 = require("./users/use-cases/update/update.routes");
 Object.defineProperty(exports, "updateUserRoutes", { enumerable: true, get: function () { return update_routes_1.updateUserRoutes; } });
+var update_profile_routes_1 = require("./users/use-cases/update-profile/update-profile.routes");
+Object.defineProperty(exports, "updateProfileRoutes", { enumerable: true, get: function () { return update_profile_routes_1.updateProfileRoutes; } });
 var delete_routes_1 = require("./users/use-cases/delete/delete.routes");
 Object.defineProperty(exports, "deleteUserRoutes", { enumerable: true, get: function () { return delete_routes_1.deleteUserRoutes; } });
 var profile_routes_1 = require("./users/use-cases/get/profile.routes");

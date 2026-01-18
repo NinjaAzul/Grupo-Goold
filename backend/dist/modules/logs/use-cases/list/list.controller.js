@@ -8,16 +8,8 @@ class ListLogsController {
     }
     async handle(req, res, next) {
         try {
-            const filters = {
-                page: req.query.page ? Number(req.query.page) : undefined,
-                limit: req.query.limit ? Number(req.query.limit) : undefined,
-                userId: req.query.userId ? Number(req.query.userId) : undefined,
-                activityType: req.query.activityType,
-                module: req.query.module,
-                startDate: req.query.startDate,
-                endDate: req.query.endDate,
-            };
-            const result = await this.service.execute(filters);
+            const query = req.query;
+            const result = await this.service.execute(query);
             return res.json(result);
         }
         catch (error) {

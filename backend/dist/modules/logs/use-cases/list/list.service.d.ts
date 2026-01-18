@@ -1,6 +1,6 @@
 import { IListLogsRequest, IListLogsResponse } from './list.interface';
 export declare class ListLogsService {
-    private repository;
+    private logRepository;
     constructor();
     execute(filters: IListLogsRequest): Promise<IListLogsResponse>;
 }

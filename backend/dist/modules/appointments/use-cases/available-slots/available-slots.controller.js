@@ -8,21 +8,10 @@ class AvailableSlotsController {
     }
     async handle(req, res, next) {
         try {
-            const date = req.query.date;
-            const roomId = req.query.roomId
-                ? Number(req.query.roomId)
-                : undefined;
-            if (!date) {
-                return res.status(400).json({
-                    error: {
-                        message: 'Date parameter is required (YYYY-MM-DD)',
-                        statusCode: 400,
-                    },
-                });
-            }
+            const query = req.query;
             const result = await this.service.execute({
-                date,
-                roomId,
+                date: query.date,
+                roomId: query.roomId,
             });
             return res.json(result);
         }

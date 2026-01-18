@@ -1,5 +1,5 @@
 import { IAppointment } from '@modules/appointments/model/appointment.interface';
-import { PaginatedResponse } from '@shared/types/pagination.interface';
+import { PaginatedResponse } from '@shared/types';
 export interface IListAppointmentsRequest {
     userId: number;
     page?: number;

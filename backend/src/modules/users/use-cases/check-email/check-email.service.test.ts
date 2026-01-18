@@ -1,47 +1,46 @@
 import { CheckEmailService } from './check-email.service';
-import { CheckEmailRepository } from './check-email.repository';
+import { UserRepository } from '../../repositories/user.repository';
 
 // Mocks
-jest.mock('./check-email.repository');
+jest.mock('../../repositories/user.repository');
 
 describe('CheckEmailService', () => {
   let checkEmailService: CheckEmailService;
-  let mockCheckEmailRepository: jest.Mocked<CheckEmailRepository>;
+  let mockUserRepository: jest.Mocked<UserRepository>;
 
   beforeEach(() => {
-    mockCheckEmailRepository =
-      new CheckEmailRepository() as jest.Mocked<CheckEmailRepository>;
+    mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
     checkEmailService = new CheckEmailService();
     (
       checkEmailService as unknown as {
-        checkEmailRepository: CheckEmailRepository;
+        userRepository: UserRepository;
       }
-    ).checkEmailRepository = mockCheckEmailRepository;
+    ).userRepository = mockUserRepository;
     jest.clearAllMocks();
   });
 
   describe('execute', () => {
     it('should return exists true when email is found', async () => {
-      mockCheckEmailRepository.exists = jest.fn().mockResolvedValue(true);
+      mockUserRepository.emailExists = jest.fn().mockResolvedValue(true);
 
       const result = await checkEmailService.execute({
         email: 'test@example.com',
       });
 
-      expect(mockCheckEmailRepository.exists).toHaveBeenCalledWith(
+      expect(mockUserRepository.emailExists).toHaveBeenCalledWith(
         'test@example.com'
       );
       expect(result.exists).toBe(true);
     });
 
     it('should return exists false when email is not found', async () => {
-      mockCheckEmailRepository.exists = jest.fn().mockResolvedValue(false);
+      mockUserRepository.emailExists = jest.fn().mockResolvedValue(false);
 
       const result = await checkEmailService.execute({
         email: 'notfound@example.com',
       });
 
-      expect(mockCheckEmailRepository.exists).toHaveBeenCalledWith(
+      expect(mockUserRepository.emailExists).toHaveBeenCalledWith(
         'notfound@example.com'
       );
       expect(result.exists).toBe(false);

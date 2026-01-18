@@ -37,6 +37,6 @@ LogModel.init({
     tableName: 'logs',
     underscored: true,
     timestamps: true,
-    updatedAt: false, // Logs são imutáveis, apenas created_at
+    updatedAt: false,
 });
 //# sourceMappingURL=log.model.js.map

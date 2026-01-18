@@ -4,7 +4,7 @@ exports.createAppointmentRoutes = void 0;
 const express_1 = require("express");
 const create_controller_1 = require("./create.controller");
 const middlewares_1 = require("@shared/middlewares");
-const middlewares_2 = require("@shared/middlewares");
+const constants_1 = require("@shared/constants");
 const create_dto_1 = require("./create.dto");
 const router = (0, express_1.Router)();
 exports.createAppointmentRoutes = router;
@@ -42,5 +42,5 @@ const createAppointmentController = new create_controller_1.CreateAppointmentCon
  *       401:
  *         description: Não autorizado
  */
-router.post('/', middlewares_1.ensureAuthenticated, (0, middlewares_2.validationMiddleware)(create_dto_1.CreateAppointmentDto), createAppointmentController.handle.bind(createAppointmentController));
+router.post('/', middlewares_1.ensureAuthenticated, (0, middlewares_1.ensurePermission)(constants_1.PERMISSIONS.APPOINTMENTS), (0, middlewares_1.validationMiddleware)(create_dto_1.CreateAppointmentDto), createAppointmentController.handle.bind(createAppointmentController));
 //# sourceMappingURL=create.routes.js.map

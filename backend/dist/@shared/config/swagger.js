@@ -7,12 +7,13 @@ exports.swaggerSpec = void 0;
 exports.getSwaggerSpec = getSwaggerSpec;
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const path_1 = __importDefault(require("path"));
+const logger_1 = require("../utils/logger");
 const swaggerDefinition = {
     openapi: '3.0.0',
     info: {
         title: 'Grupo Goold API',
         version: '1.0.0',
-        description: 'Documentação da API do projeto Grupo Goold',
+        description: 'Documentation for the Grupo Goold API',
         contact: {
             name: 'Grupo Goold',
         },
@@ -20,7 +21,7 @@ const swaggerDefinition = {
     servers: [
         {
             url: 'http://localhost:3001/api',
-            description: 'Servidor de desenvolvimento',
+            description: 'Development server',
         },
     ],
     components: {
@@ -51,12 +52,13 @@ const options = {
 };
 function getSwaggerSpec() {
     const swaggerSpec = (0, swagger_jsdoc_1.default)(options);
-    if (process.env.NODE_ENV !== 'production') {
-        console.log('Swagger paths:', options.apis);
-        console.log('Swagger spec generated:', Object.keys(swaggerSpec.paths || {}).length, 'paths');
+    if (process.env.NODE_ENV !== 'production' &&
+        process.env.NODE_ENV !== 'test') {
+        logger_1.logger.info('Swagger paths:', options.apis);
+        logger_1.logger.debug('Swagger spec generated:', Object.keys(swaggerSpec.paths || {}).length, 'paths');
     }
     return swaggerSpec;
 }
-
 const swaggerSpec = getSwaggerSpec();
 exports.swaggerSpec = swaggerSpec;
+//# sourceMappingURL=swagger.js.map

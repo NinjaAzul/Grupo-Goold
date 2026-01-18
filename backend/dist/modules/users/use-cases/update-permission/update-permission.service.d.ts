@@ -1,6 +1,6 @@
 import { IUpdateUserPermissionRequest, IUpdateUserPermissionResponse } from './update-permission.interface';
 export declare class UpdateUserPermissionService {
-    private repository;
+    private userPermissionRepository;
     constructor();
     execute(data: IUpdateUserPermissionRequest): Promise<IUpdateUserPermissionResponse>;
 }

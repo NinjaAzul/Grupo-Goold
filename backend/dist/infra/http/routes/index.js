@@ -3,11 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.routes = void 0;
 const express_1 = require("express");
 const routes_1 = require("@modules/routes");
-const admin_routes_1 = require("@modules/appointments/use-cases/admin/admin.routes");
 const create_routes_1 = require("@modules/appointments/use-cases/create/create.routes");
 const list_routes_1 = require("@modules/appointments/use-cases/list/list.routes");
+const admin_list_routes_1 = require("@modules/appointments/use-cases/admin-list/admin-list.routes");
 const available_slots_routes_1 = require("@modules/appointments/use-cases/available-slots/available-slots.routes");
 const cancel_routes_1 = require("@modules/appointments/use-cases/cancel/cancel.routes");
+const update_status_routes_1 = require("@modules/appointments/use-cases/update-status/update-status.routes");
 const rooms_routes_1 = require("@modules/rooms/use-cases/rooms.routes");
 const list_routes_2 = require("@modules/rooms/use-cases/list/list.routes");
 const update_permission_routes_1 = require("@modules/users/use-cases/update-permission/update-permission.routes");
@@ -18,6 +19,7 @@ routes.use('/health', routes_1.healthCheckRoutes);
 //USERS ROUTES
 routes.use('/users', routes_1.createUserRoutes);
 routes.use('/users', routes_1.listUsersRoutes);
+routes.use('/users', routes_1.updateProfileRoutes);
 routes.use('/users', routes_1.updateUserRoutes);
 routes.use('/users', routes_1.deleteUserRoutes);
 routes.use('/users', update_permission_routes_1.updateUserPermissionRoutes);
@@ -38,7 +40,8 @@ routes.use('/appointments', cancel_routes_1.cancelAppointmentRoutes);
 //ROOMS ROUTES
 routes.use('/rooms', list_routes_2.listRoomsRoutes);
 //ADMIN ROUTES
-routes.use('/admin', admin_routes_1.adminRoutes);
+routes.use('/admin/appointments', admin_list_routes_1.adminListAppointmentsRoutes);
+routes.use('/admin/appointments', update_status_routes_1.updateStatusRoutes);
 routes.use('/admin/rooms', rooms_routes_1.roomsRoutes);
 //LOGS ROUTES
 routes.use('/logs', routes_1.listLogsRoutes);

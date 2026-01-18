@@ -10,23 +10,11 @@ class UpdateUserPermissionController {
         try {
             const userId = Number(req.params.userId);
             const permissionId = Number(req.params.permissionId);
-            if (isNaN(userId) || isNaN(permissionId)) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Invalid user ID or permission ID',
-                });
-            }
-            // Validar que granted é um boolean
-            if (typeof req.body.granted !== 'boolean') {
-                return res.status(400).json({
-                    success: false,
-                    message: 'granted must be a boolean',
-                });
-            }
+            const dto = req.body;
             const data = {
                 userId,
                 permissionId,
-                granted: req.body.granted,
+                granted: dto.granted,
             };
             const result = await this.service.execute(data);
             return res.json(result);

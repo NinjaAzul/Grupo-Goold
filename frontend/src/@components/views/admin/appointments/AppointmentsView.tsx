@@ -149,13 +149,6 @@ export function AppointmentsView() {
         });
         toast.success('Status do agendamento atualizado com sucesso!');
       },
-      onError: (error: unknown) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao atualizar status. Tente novamente.';
-        toast.error(errorMessage);
-      },
     },
   });
 

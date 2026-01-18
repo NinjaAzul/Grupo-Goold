@@ -6,11 +6,10 @@ class ListCitiesController {
     constructor() {
         this.handle = async (req, res, next) => {
             try {
-                const stateId = req.query.stateId ? Number(req.query.stateId) : undefined;
-                const uf = req.query.uf ? String(req.query.uf).toUpperCase() : undefined;
+                const query = req.query;
                 const response = await this.listCitiesService.execute({
-                    stateId,
-                    uf,
+                    stateId: query.stateId,
+                    uf: query.uf?.toUpperCase(),
                 });
                 return res.status(200).json(response);
             }

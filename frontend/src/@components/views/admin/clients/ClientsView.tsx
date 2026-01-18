@@ -162,13 +162,6 @@ export function ClientsView() {
         });
         toast.success('Status do cliente atualizado com sucesso!');
       },
-      onError: (error: unknown) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao atualizar status. Tente novamente.';
-        toast.error(errorMessage);
-      },
     },
   });
 
@@ -186,13 +179,6 @@ export function ClientsView() {
           queryKey: getGetUsersQueryKey(queryParams),
         });
         toast.success('Permissão atualizada com sucesso!');
-      },
-      onError: (error: unknown) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao atualizar permissão. Tente novamente.';
-        toast.error(errorMessage);
       },
     },
   });

@@ -1,4 +1,4 @@
-import { DeleteUserRepository } from './delete.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { LoggerService } from '@shared/utils/logger.service';
 import { NotFoundError, BadRequestError } from '@shared/errors';
 import { UserModel } from '@modules/users/model/user.model';
@@ -6,17 +6,17 @@ import { AppointmentModel } from '@modules/appointments/model/appointment.model'
 import { ROLES } from '@/@shared/constants';
 
 export class DeleteUserService {
-  private repository: DeleteUserRepository;
+  private userRepository: UserRepository;
 
   constructor() {
-    this.repository = new DeleteUserRepository();
+    this.userRepository = new UserRepository();
   }
 
   async execute(userId: number): Promise<void> {
     const user = await UserModel.findByPk(userId);
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('Usuário não encontrado');
     }
 
     if (user.roleId === ROLES.ADMIN) {
@@ -26,7 +26,7 @@ export class DeleteUserService {
 
       if (adminCount === 1) {
         throw new BadRequestError(
-          'Cannot delete the last admin user. At least one admin must exist.'
+          'Não é possível excluir o último usuário administrador. Deve existir pelo menos um administrador.'
         );
       }
     }
@@ -37,14 +37,14 @@ export class DeleteUserService {
 
     if (appointmentsCount > 0) {
       throw new BadRequestError(
-        `Cannot delete user. There are ${appointmentsCount} appointment(s) associated with this user.`
+        `Não é possível excluir o usuário. Existem ${appointmentsCount} agendamento(s) associados a este usuário.`
       );
     }
 
-    const deleted = await this.repository.delete(userId);
+    const deleted = await this.userRepository.delete(userId);
 
     if (!deleted) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('Usuário não encontrado');
     }
 
     await LoggerService.log(

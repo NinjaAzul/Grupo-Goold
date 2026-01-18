@@ -1,15 +1,15 @@
-import { ListStatesRepository } from './list.repository';
+import { StateRepository } from '../../repositories/state.repository';
 import { IListStatesResponse } from './list.interface';
 
 export class ListStatesService {
-  private listStatesRepository: ListStatesRepository;
+  private stateRepository: StateRepository;
 
   constructor() {
-    this.listStatesRepository = new ListStatesRepository();
+    this.stateRepository = new StateRepository();
   }
 
   async execute(): Promise<IListStatesResponse> {
-    const states = await this.listStatesRepository.findAll();
+    const states = await this.stateRepository.findAll();
 
     return {
       states,

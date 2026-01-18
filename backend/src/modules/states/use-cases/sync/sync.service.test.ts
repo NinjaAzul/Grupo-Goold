@@ -1,11 +1,11 @@
 import { SyncStatesService } from './sync.service';
-import { SyncStatesRepository } from './sync.repository';
+import { StateRepository } from '../../repositories/state.repository';
 import { ibgeApi } from '@shared/integrations';
 import { InternalServerError } from '@shared/errors';
 import { logger } from '@shared/utils';
 
 // Mocks
-jest.mock('./sync.repository');
+jest.mock('../../repositories/state.repository');
 jest.mock('@shared/integrations');
 jest.mock('@shared/utils', () => ({
   logger: {
@@ -16,19 +16,18 @@ jest.mock('@shared/utils', () => ({
 
 describe('SyncStatesService', () => {
   let syncStatesService: SyncStatesService;
-  let mockSyncStatesRepository: jest.Mocked<SyncStatesRepository>;
+  let mockStateRepository: jest.Mocked<StateRepository>;
   const mockIbgeApi = ibgeApi as jest.Mocked<typeof ibgeApi>;
   const mockLogger = logger as jest.Mocked<typeof logger>;
 
   beforeEach(() => {
-    mockSyncStatesRepository =
-      new SyncStatesRepository() as jest.Mocked<SyncStatesRepository>;
+    mockStateRepository = new StateRepository() as jest.Mocked<StateRepository>;
     syncStatesService = new SyncStatesService();
     (
       syncStatesService as unknown as {
-        syncStatesRepository: SyncStatesRepository;
+        stateRepository: StateRepository;
       }
-    ).syncStatesRepository = mockSyncStatesRepository;
+    ).stateRepository = mockStateRepository;
     jest.clearAllMocks();
   });
 
@@ -86,10 +85,8 @@ describe('SyncStatesService', () => {
         .fn()
         .mockResolvedValueOnce(mockIBGECitiesSP)
         .mockResolvedValueOnce(mockIBGECitiesRJ);
-      mockSyncStatesRepository.bulkCreateStates = jest
-        .fn()
-        .mockResolvedValue(2);
-      mockSyncStatesRepository.bulkCreateCities = jest
+      mockStateRepository.bulkCreateStates = jest.fn().mockResolvedValue(2);
+      mockStateRepository.bulkCreateCities = jest
         .fn()
         .mockResolvedValueOnce(1)
         .mockResolvedValueOnce(1);
@@ -99,14 +96,14 @@ describe('SyncStatesService', () => {
       expect(mockIbgeApi.getStates).toHaveBeenCalled();
       expect(mockIbgeApi.getCitiesByState).toHaveBeenCalledWith('SP');
       expect(mockIbgeApi.getCitiesByState).toHaveBeenCalledWith('RJ');
-      expect(mockSyncStatesRepository.bulkCreateStates).toHaveBeenCalledWith([
+      expect(mockStateRepository.bulkCreateStates).toHaveBeenCalledWith([
         { id: 35, name: 'São Paulo', uf: 'SP' },
         { id: 33, name: 'Rio de Janeiro', uf: 'RJ' },
       ]);
-      expect(mockSyncStatesRepository.bulkCreateCities).toHaveBeenCalledWith([
+      expect(mockStateRepository.bulkCreateCities).toHaveBeenCalledWith([
         { id: 3550308, name: 'São Paulo', stateId: 35 },
       ]);
-      expect(mockSyncStatesRepository.bulkCreateCities).toHaveBeenCalledWith([
+      expect(mockStateRepository.bulkCreateCities).toHaveBeenCalledWith([
         { id: 3304557, name: 'Rio de Janeiro', stateId: 33 },
       ]);
       expect(result.statesCount).toBe(2);
@@ -125,7 +122,7 @@ describe('SyncStatesService', () => {
         InternalServerError
       );
       await expect(syncStatesService.execute()).rejects.toThrow(
-        'Failed to synchronize states and cities'
+        'Falha ao sincronizar estados e cidades'
       );
 
       expect(mockLogger.error).toHaveBeenCalled();
@@ -137,12 +134,8 @@ describe('SyncStatesService', () => {
         .fn()
         .mockRejectedValueOnce(new Error('Cities API error'))
         .mockResolvedValueOnce(mockIBGECitiesRJ);
-      mockSyncStatesRepository.bulkCreateStates = jest
-        .fn()
-        .mockResolvedValue(2);
-      mockSyncStatesRepository.bulkCreateCities = jest
-        .fn()
-        .mockResolvedValueOnce(1);
+      mockStateRepository.bulkCreateStates = jest.fn().mockResolvedValue(2);
+      mockStateRepository.bulkCreateCities = jest.fn().mockResolvedValueOnce(1);
 
       const result = await syncStatesService.execute();
 
@@ -159,10 +152,8 @@ describe('SyncStatesService', () => {
         .fn()
         .mockResolvedValueOnce(mockIBGECitiesSP)
         .mockResolvedValueOnce(mockIBGECitiesRJ);
-      mockSyncStatesRepository.bulkCreateStates = jest
-        .fn()
-        .mockResolvedValue(2);
-      mockSyncStatesRepository.bulkCreateCities = jest
+      mockStateRepository.bulkCreateStates = jest.fn().mockResolvedValue(2);
+      mockStateRepository.bulkCreateCities = jest
         .fn()
         .mockResolvedValueOnce(1)
         .mockResolvedValueOnce(1);

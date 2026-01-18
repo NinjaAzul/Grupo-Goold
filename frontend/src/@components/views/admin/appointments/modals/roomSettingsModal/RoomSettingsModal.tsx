@@ -42,13 +42,6 @@ export function RoomSettingsModal({ isOpen, onClose }: RoomSettingsModalProps) {
         queryClient.invalidateQueries({ queryKey: getGetAdminRoomsQueryKey() });
         toast.success('Sala criada com sucesso!');
       },
-      onError: (error: unknown) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao criar sala. Tente novamente.';
-        toast.error(errorMessage);
-      },
     },
   });
 
@@ -58,13 +51,6 @@ export function RoomSettingsModal({ isOpen, onClose }: RoomSettingsModalProps) {
         queryClient.invalidateQueries({ queryKey: getGetAdminRoomsQueryKey() });
         toast.success('Sala atualizada com sucesso!');
       },
-      onError: (error: unknown) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao atualizar sala. Tente novamente.';
-        toast.error(errorMessage);
-      },
     },
   });
 
@@ -73,13 +59,6 @@ export function RoomSettingsModal({ isOpen, onClose }: RoomSettingsModalProps) {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetAdminRoomsQueryKey() });
         toast.success('Sala deletada com sucesso!');
-      },
-      onError: (error: unknown) => {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao deletar sala. Tente novamente.';
-        toast.error(errorMessage);
       },
     },
   });

@@ -10,6 +10,7 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const routes_1 = require("./http/routes");
 const middlewares_1 = require("@shared/middlewares");
 const swagger_1 = require("@shared/config/swagger");
+const logger_1 = require("@shared/utils/logger");
 const app = (0, express_1.default)();
 exports.app = app;
 const corsOptions = {
@@ -26,7 +27,6 @@ const corsOptions = {
             callback(null, true);
         }
         else {
-            // Em desenvolvimento, permitir qualquer origem
             if (process.env.NODE_ENV !== 'production') {
                 callback(null, true);
             }
@@ -44,7 +44,6 @@ const corsOptions = {
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-// Handler OPTIONS para CORS do Swagger
 app.options('/api-docs.json', (_req, res) => {
     res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -61,7 +60,7 @@ app.get('/api-docs.json', (_req, res) => {
         res.json(swaggerSpec);
     }
     catch (error) {
-        console.error('Error generating Swagger spec:', error);
+        logger_1.logger.error('Error generating Swagger spec:', error);
         res.status(500).json({ error: 'Failed to generate Swagger specification' });
     }
 });

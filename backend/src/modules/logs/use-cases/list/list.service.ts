@@ -1,18 +1,18 @@
-import { ListLogsRepository } from './list.repository';
+import { LogRepository } from '../../repositories/log.repository';
 import { IListLogsRequest, IListLogsResponse } from './list.interface';
 
 export class ListLogsService {
-  private repository: ListLogsRepository;
+  private logRepository: LogRepository;
 
   constructor() {
-    this.repository = new ListLogsRepository();
+    this.logRepository = new LogRepository();
   }
 
   async execute(filters: IListLogsRequest): Promise<IListLogsResponse> {
     const page = filters.page || 1;
     const limit = filters.limit || 10;
 
-    const { logs, total } = await this.repository.findAll(filters);
+    const { logs, total } = await this.logRepository.findAll(filters);
 
     const totalPages = Math.ceil(total / limit);
 

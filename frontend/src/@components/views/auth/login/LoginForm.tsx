@@ -89,9 +89,6 @@ export function LoginForm({
           toast.success('Login realizado com sucesso!');
         }
       },
-      onError: () => {
-        toast.error('Credenciais inválidas. Verifique seu e-mail e senha.');
-      },
     },
   });
 

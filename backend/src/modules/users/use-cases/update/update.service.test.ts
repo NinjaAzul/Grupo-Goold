@@ -1,7 +1,7 @@
 import { UpdateUserService } from './update.service';
-import { UpdateUserRepository } from './update.repository';
-import { CityRepository } from '@modules/cities/use-cases/repositories/city.repository';
-import { RoleRepository } from '@modules/roles/use-cases/repositories/role.repository';
+import { UserRepository } from '../../repositories/user.repository';
+import { CityRepository } from '@modules/cities/repositories/city.repository';
+import { RoleRepository } from '@modules/roles/repositories/role.repository';
 import { UserModel } from '@modules/users/model/user.model';
 import { NotFoundError, BadRequestError } from '@shared/errors';
 import { LoggerService } from '@shared/utils/logger.service';
@@ -13,15 +13,15 @@ import { IRole } from '@modules/roles/model/role.interface';
 
 // Mocks
 jest.mock('bcrypt');
-jest.mock('./update.repository');
-jest.mock('@modules/cities/use-cases/repositories/city.repository');
-jest.mock('@modules/roles/use-cases/repositories/role.repository');
+jest.mock('../../repositories/user.repository');
+jest.mock('@modules/cities/repositories/city.repository');
+jest.mock('@modules/roles/repositories/role.repository');
 jest.mock('@modules/users/model/user.model');
 jest.mock('@shared/utils/logger.service');
 
 describe('UpdateUserService', () => {
   let updateUserService: UpdateUserService;
-  let mockUpdateUserRepository: jest.Mocked<UpdateUserRepository>;
+  let mockUserRepository: jest.Mocked<UserRepository>;
   let mockCityRepository: jest.Mocked<CityRepository>;
   let mockRoleRepository: jest.Mocked<RoleRepository>;
   const mockUserModel = UserModel as jest.Mocked<typeof UserModel>;
@@ -29,28 +29,27 @@ describe('UpdateUserService', () => {
   const mockLoggerService = LoggerService as jest.Mocked<typeof LoggerService>;
 
   beforeEach(() => {
-    mockUpdateUserRepository =
-      new UpdateUserRepository() as jest.Mocked<UpdateUserRepository>;
+    mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
     mockCityRepository = new CityRepository() as jest.Mocked<CityRepository>;
     mockRoleRepository = new RoleRepository() as jest.Mocked<RoleRepository>;
     updateUserService = new UpdateUserService();
     (
       updateUserService as unknown as {
-        repository: UpdateUserRepository;
+        userRepository: UserRepository;
         cityRepository: CityRepository;
         roleRepository: RoleRepository;
       }
-    ).repository = mockUpdateUserRepository;
+    ).userRepository = mockUserRepository;
     (
       updateUserService as unknown as {
-        repository: UpdateUserRepository;
+        userRepository: UserRepository;
         cityRepository: CityRepository;
         roleRepository: RoleRepository;
       }
     ).cityRepository = mockCityRepository;
     (
       updateUserService as unknown as {
-        repository: UpdateUserRepository;
+        userRepository: UserRepository;
         cityRepository: CityRepository;
         roleRepository: RoleRepository;
       }
@@ -78,7 +77,7 @@ describe('UpdateUserService', () => {
         NotFoundError
       );
       await expect(updateUserService.execute(updateRequest)).rejects.toThrow(
-        'User not found'
+        'Usuário não encontrado'
       );
 
       expect(mockUserModel.findByPk).toHaveBeenCalledWith(999);
@@ -88,10 +87,7 @@ describe('UpdateUserService', () => {
       mockUserModel.findByPk = jest
         .fn()
         .mockResolvedValue(existingUser as IUser);
-      mockUserModel.findOne = jest.fn().mockResolvedValue({
-        id: 2,
-        email: 'newemail@test.com',
-      } as IUser);
+      mockUserRepository.emailExists = jest.fn().mockResolvedValue(true);
 
       const updateRequest: IUpdateUserRequest = {
         userId: 1,
@@ -102,20 +98,20 @@ describe('UpdateUserService', () => {
         BadRequestError
       );
       await expect(updateUserService.execute(updateRequest)).rejects.toThrow(
-        'Email already in use'
+        'Este e-mail já está em uso'
       );
 
       expect(mockUserModel.findByPk).toHaveBeenCalledWith(1);
-      expect(mockUserModel.findOne).toHaveBeenCalledWith({
-        where: { email: 'newemail@test.com' },
-      });
+      expect(mockUserRepository.emailExists).toHaveBeenCalledWith(
+        'newemail@test.com'
+      );
     });
 
     it('should allow updating email to the same email', async () => {
       mockUserModel.findByPk = jest
         .fn()
         .mockResolvedValue(existingUser as IUser);
-      mockUpdateUserRepository.update = jest.fn().mockResolvedValue({
+      mockUserRepository.update = jest.fn().mockResolvedValue({
         ...existingUser,
         firstName: 'Updated',
       } as IUser);
@@ -129,7 +125,7 @@ describe('UpdateUserService', () => {
       await updateUserService.execute(updateRequest);
 
       expect(mockUserModel.findOne).not.toHaveBeenCalled();
-      expect(mockUpdateUserRepository.update).toHaveBeenCalled();
+      expect(mockUserRepository.update).toHaveBeenCalled();
     });
 
     it('should throw NotFoundError when city does not exist', async () => {
@@ -147,7 +143,7 @@ describe('UpdateUserService', () => {
         NotFoundError
       );
       await expect(updateUserService.execute(updateRequest)).rejects.toThrow(
-        'City not found'
+        'Cidade não encontrada'
       );
 
       expect(mockCityRepository.findById).toHaveBeenCalledWith(999);
@@ -168,9 +164,10 @@ describe('UpdateUserService', () => {
         NotFoundError
       );
       await expect(updateUserService.execute(updateRequest)).rejects.toThrow(
-        'Role not found'
+        'Perfil não encontrado'
       );
 
+      expect(mockUserModel.findByPk).toHaveBeenCalledWith(1);
       expect(mockRoleRepository.findById).toHaveBeenCalledWith(999);
     });
 
@@ -180,7 +177,7 @@ describe('UpdateUserService', () => {
         .fn()
         .mockResolvedValue(existingUser as IUser);
       mockBcrypt.hash = jest.fn().mockResolvedValue(hashedPassword);
-      mockUpdateUserRepository.update = jest.fn().mockResolvedValue({
+      mockUserRepository.update = jest.fn().mockResolvedValue({
         ...existingUser,
       } as IUser);
 
@@ -192,7 +189,7 @@ describe('UpdateUserService', () => {
       await updateUserService.execute(updateRequest);
 
       expect(mockBcrypt.hash).toHaveBeenCalledWith('newPassword123', 10);
-      expect(mockUpdateUserRepository.update).toHaveBeenCalledWith(
+      expect(mockUserRepository.update).toHaveBeenCalledWith(
         expect.objectContaining({
           password: hashedPassword,
         })
@@ -207,7 +204,7 @@ describe('UpdateUserService', () => {
       mockUserModel.findByPk = jest
         .fn()
         .mockResolvedValue(existingUser as IUser);
-      mockUpdateUserRepository.update = jest
+      mockUserRepository.update = jest
         .fn()
         .mockResolvedValue(updatedUser as IUser);
 
@@ -219,9 +216,7 @@ describe('UpdateUserService', () => {
       const result = await updateUserService.execute(updateRequest);
 
       expect(mockBcrypt.hash).not.toHaveBeenCalled();
-      expect(mockUpdateUserRepository.update).toHaveBeenCalledWith(
-        updateRequest
-      );
+      expect(mockUserRepository.update).toHaveBeenCalledWith(updateRequest);
       expect(result.user).toEqual(updatedUser);
       expect(mockLoggerService.log).toHaveBeenCalledWith(
         'Atualização de perfil',
@@ -245,11 +240,11 @@ describe('UpdateUserService', () => {
       mockUserModel.findByPk = jest
         .fn()
         .mockResolvedValue(existingUser as IUser);
-      mockUserModel.findOne = jest.fn().mockResolvedValue(null);
+      mockUserRepository.emailExists = jest.fn().mockResolvedValue(false);
       mockCityRepository.findById = jest.fn().mockResolvedValue(mockCity);
       mockRoleRepository.findById = jest.fn().mockResolvedValue(mockRole);
       mockBcrypt.hash = jest.fn().mockResolvedValue(hashedPassword);
-      mockUpdateUserRepository.update = jest
+      mockUserRepository.update = jest
         .fn()
         .mockResolvedValue(updatedUser as IUser);
 
@@ -264,9 +259,9 @@ describe('UpdateUserService', () => {
 
       const result = await updateUserService.execute(updateRequest);
 
-      expect(mockUserModel.findOne).toHaveBeenCalledWith({
-        where: { email: 'newemail@test.com' },
-      });
+      expect(mockUserRepository.emailExists).toHaveBeenCalledWith(
+        'newemail@test.com'
+      );
       expect(mockCityRepository.findById).toHaveBeenCalledWith(1);
       expect(mockRoleRepository.findById).toHaveBeenCalledWith(2);
       expect(mockBcrypt.hash).toHaveBeenCalledWith('newPassword123', 10);
@@ -277,7 +272,7 @@ describe('UpdateUserService', () => {
       mockUserModel.findByPk = jest
         .fn()
         .mockResolvedValue(existingUser as IUser);
-      mockUpdateUserRepository.update = jest.fn().mockResolvedValue(null);
+      mockUserRepository.update = jest.fn().mockResolvedValue(null);
 
       const updateRequest: IUpdateUserRequest = {
         userId: 1,
@@ -288,7 +283,7 @@ describe('UpdateUserService', () => {
         NotFoundError
       );
       await expect(updateUserService.execute(updateRequest)).rejects.toThrow(
-        'User not found'
+        'Usuário não encontrado'
       );
     });
   });

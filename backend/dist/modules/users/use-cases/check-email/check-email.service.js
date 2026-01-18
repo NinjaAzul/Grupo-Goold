@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CheckEmailService = void 0;
-const check_email_repository_1 = require("./check-email.repository");
+const user_repository_1 = require("../../repositories/user.repository");
 class CheckEmailService {
     constructor() {
-        this.checkEmailRepository = new check_email_repository_1.CheckEmailRepository();
+        this.userRepository = new user_repository_1.UserRepository();
     }
     async execute({ email }) {
-        const exists = await this.checkEmailRepository.exists(email);
+        const exists = await this.userRepository.emailExists(email);
         return { exists };
     }
 }

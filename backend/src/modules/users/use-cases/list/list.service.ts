@@ -1,12 +1,12 @@
-import { ListUsersRepository } from './list.repository';
+import { UserRepository } from '../../repositories/user.repository';
 import { IListUsersResponse } from './list.interface';
 import { ListUsersQueryDto } from './list-query.dto';
 
 export class ListUsersService {
-  private repository: ListUsersRepository;
+  private repository: UserRepository;
 
   constructor() {
-    this.repository = new ListUsersRepository();
+    this.repository = new UserRepository();
   }
 
   async execute(filters: ListUsersQueryDto): Promise<IListUsersResponse> {

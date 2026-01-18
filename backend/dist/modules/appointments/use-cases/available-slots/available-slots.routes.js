@@ -4,6 +4,8 @@ exports.availableSlotsRoutes = void 0;
 const express_1 = require("express");
 const available_slots_controller_1 = require("./available-slots.controller");
 const middlewares_1 = require("@shared/middlewares");
+const constants_1 = require("@shared/constants");
+const available_slots_dto_1 = require("./available-slots.dto");
 const router = (0, express_1.Router)();
 exports.availableSlotsRoutes = router;
 const availableSlotsController = new available_slots_controller_1.AvailableSlotsController();
@@ -47,5 +49,5 @@ const availableSlotsController = new available_slots_controller_1.AvailableSlots
  *       401:
  *         description: Não autorizado
  */
-router.get('/available', middlewares_1.ensureAuthenticated, availableSlotsController.handle.bind(availableSlotsController));
+router.get('/available', middlewares_1.ensureAuthenticated, (0, middlewares_1.ensurePermission)(constants_1.PERMISSIONS.APPOINTMENTS), (0, middlewares_1.queryValidationMiddleware)(available_slots_dto_1.AvailableSlotsQueryDto), availableSlotsController.handle.bind(availableSlotsController));
 //# sourceMappingURL=available-slots.routes.js.map

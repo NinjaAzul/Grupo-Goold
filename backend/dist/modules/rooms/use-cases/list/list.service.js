@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListRoomsService = void 0;
-const list_repository_1 = require("./list.repository");
+const room_repository_1 = require("../../repositories/room.repository");
 class ListRoomsService {
     constructor() {
-        this.repository = new list_repository_1.ListRoomsRepository();
+        this.roomRepository = new room_repository_1.RoomRepository();
     }
     async execute() {
-        return await this.repository.findAll();
+        return await this.roomRepository.findAll();
     }
 }
 exports.ListRoomsService = ListRoomsService;

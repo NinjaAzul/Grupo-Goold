@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureAuthenticated = ensureAuthenticated;
+require("@infra/database/models");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const errors_1 = require("@shared/errors");
 const user_model_1 = require("@modules/users/model/user.model");
 const roles_1 = require("@modules/roles");
-// Importar models para garantir que as associações estejam carregadas
-require("@infra/database/models");
+const permissions_1 = require("@modules/permissions");
 async function ensureAuthenticated(req, res, next) {
     try {
         const authHeader = req.headers.authorization;
@@ -25,6 +25,14 @@ async function ensureAuthenticated(req, res, next) {
                         model: roles_1.RoleModel,
                         as: 'role',
                     },
+                    {
+                        model: permissions_1.PermissionModel,
+                        as: 'permissions',
+                        through: {
+                            attributes: ['granted'],
+                        },
+                        attributes: ['id', 'name'],
+                    },
                 ],
                 attributes: {
                     exclude: ['password'],
@@ -35,16 +43,33 @@ async function ensureAuthenticated(req, res, next) {
                 return next(new errors_1.UnauthorizedError('User does not exist'));
             }
             const userJson = user.toJSON();
-            if (!userJson.roleId) {
+            if (userJson.permissions && Array.isArray(userJson.permissions)) {
+                userJson.permissions = userJson.permissions.map((perm) => {
+                    const userPermissionModel = perm.UserPermissionModel;
+                    let grantedValue = false;
+                    if (userPermissionModel?.granted !== undefined) {
+                        grantedValue = Boolean(userPermissionModel.granted);
+                    }
+                    return {
+                        permission: {
+                            id: perm.id,
+                            name: perm.name,
+                        },
+                        granted: grantedValue,
+                    };
+                });
+            }
+            const formattedUser = userJson;
+            if (!formattedUser.roleId) {
                 const userJsonAny = userJson;
                 if (userJsonAny.role_id) {
-                    userJson.roleId = userJsonAny.role_id;
+                    formattedUser.roleId = userJsonAny.role_id;
                 }
-                else if (userJson.role?.id) {
-                    userJson.roleId = userJson.role.id;
+                else if (formattedUser.role?.id) {
+                    formattedUser.roleId = formattedUser.role.id;
                 }
             }
-            req.user = userJson;
+            req.user = formattedUser;
             req.token = token;
             next();
         }

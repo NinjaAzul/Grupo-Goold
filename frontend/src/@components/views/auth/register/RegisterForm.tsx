@@ -58,21 +58,6 @@ export function RegisterForm() {
         toast.success('Cadastro realizado com sucesso!');
         router.push('/auth/login');
       },
-      onError: (error: unknown) => {
-        const axiosError = error as {
-          response?: {
-            data?: {
-              error?: { message?: string };
-              message?: string;
-            };
-          };
-        };
-        const errorMessage =
-          axiosError?.response?.data?.error?.message ||
-          axiosError?.response?.data?.message ||
-          'Erro ao realizar cadastro. Tente novamente.';
-        toast.error(errorMessage);
-      },
     },
   });
 

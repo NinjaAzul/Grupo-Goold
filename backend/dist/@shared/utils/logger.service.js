@@ -2,11 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoggerService = void 0;
 const log_model_1 = require("@modules/logs/model/log.model");
+const logger_1 = require("./logger");
 class LoggerService {
-    /**
-     * Cria um log de atividade
-     * @param params Parâmetros do log
-     */
     static async createLog(params) {
         try {
             await log_model_1.LogModel.create({
@@ -17,12 +14,9 @@ class LoggerService {
             });
         }
         catch (error) {
-            console.error('Error creating log:', error);
+            logger_1.logger.error('Error creating log:', error);
         }
     }
-    /**
-     * Helper para criar logs de forma mais simples
-     */
     static async log(activityType, module, userId, description) {
         await this.createLog({
             userId,

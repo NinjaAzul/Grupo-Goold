@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoomModel = exports.LogModel = exports.AppointmentModel = exports.CityModel = exports.StateModel = exports.UserPermissionModel = exports.PermissionModel = exports.RoleModel = exports.UserModel = void 0;
-// Centralized model exports and associations
 const user_model_1 = require("@modules/users/model/user.model");
 Object.defineProperty(exports, "UserModel", { enumerable: true, get: function () { return user_model_1.UserModel; } });
 const roles_1 = require("@modules/roles");

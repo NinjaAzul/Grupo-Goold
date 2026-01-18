@@ -1,1 +1,1 @@
-{"version":3,"file":"my-logs.routes.d.ts","sourceRoot":"","sources":["../../../../../src/modules/logs/use-cases/my-logs/my-logs.routes.ts"],"names":[],"mappings":"AAIA,QAAA,MAAM,MAAM,4CAAW,CAAC;AA0DxB,OAAO,EAAE,MAAM,IAAI,YAAY,EAAE,CAAC"}
+{"version":3,"file":"my-logs.routes.d.ts","sourceRoot":"","sources":["../../../../../src/modules/logs/use-cases/my-logs/my-logs.routes.ts"],"names":[],"mappings":"AAUA,QAAA,MAAM,MAAM,4CAAW,CAAC;AA4DxB,OAAO,EAAE,MAAM,IAAI,YAAY,EAAE,CAAC"}

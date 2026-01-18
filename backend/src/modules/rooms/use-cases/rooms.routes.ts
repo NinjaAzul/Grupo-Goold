@@ -127,7 +127,7 @@ roomsRoutes.post(
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Room not found
+ *         description: Sala não encontrada
  */
 roomsRoutes.patch(
   '/:id',
@@ -160,7 +160,7 @@ roomsRoutes.patch(
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Room not found
+ *         description: Sala não encontrada
  */
 roomsRoutes.delete(
   '/:id',

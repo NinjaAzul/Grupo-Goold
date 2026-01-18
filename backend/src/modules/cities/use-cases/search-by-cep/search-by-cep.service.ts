@@ -1,25 +1,25 @@
-import { SearchByCEPRepository } from './search-by-cep.repository';
+import { CityRepository } from '../../repositories/city.repository';
 import { ISearchByCEPResponse } from './search-by-cep.interface';
 import { viaCepApi } from '@shared/integrations';
 import { NotFoundError } from '@shared/errors';
 
 export class SearchByCEPService {
-  private searchByCEPRepository: SearchByCEPRepository;
+  private cityRepository: CityRepository;
 
   constructor() {
-    this.searchByCEPRepository = new SearchByCEPRepository();
+    this.cityRepository = new CityRepository();
   }
 
   async execute(cep: string): Promise<ISearchByCEPResponse> {
     const viaCEPData = await viaCepApi.getAddressByCEP(cep);
 
-    const cityWithState = await this.searchByCEPRepository.findCityByIBGECode(
+    const cityWithState = await this.cityRepository.findCityByIBGECode(
       Number(viaCEPData.ibge)
     );
 
     if (!cityWithState || !cityWithState.state) {
       throw new NotFoundError(
-        `City with IBGE code ${viaCEPData.ibge} or its state not found in database`
+        `Cidade com código IBGE ${viaCEPData.ibge} ou seu estado não encontrado no banco de dados`
       );
     }
 

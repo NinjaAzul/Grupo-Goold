@@ -1,26 +1,25 @@
 import { CreateRoomService } from './create.service';
-import { CreateRoomRepository } from './create.repository';
+import { RoomRepository } from '../../repositories/room.repository';
 import { RoomModel } from '@modules/rooms/model/room.model';
 import { BadRequestError } from '@shared/errors';
 import { ICreateRoomRequest } from './create.interface';
 import { IRoom } from '@modules/rooms/model/room.interface';
 
 // Mocks
-jest.mock('./create.repository');
+jest.mock('../../repositories/room.repository');
 jest.mock('@modules/rooms/model/room.model');
 
 describe('CreateRoomService', () => {
   let createRoomService: CreateRoomService;
-  let mockCreateRoomRepository: jest.Mocked<CreateRoomRepository>;
+  let mockRoomRepository: jest.Mocked<RoomRepository>;
   const mockRoomModel = RoomModel as jest.Mocked<typeof RoomModel>;
 
   beforeEach(() => {
-    mockCreateRoomRepository =
-      new CreateRoomRepository() as jest.Mocked<CreateRoomRepository>;
+    mockRoomRepository = new RoomRepository() as jest.Mocked<RoomRepository>;
     createRoomService = new CreateRoomService();
     (
-      createRoomService as unknown as { repository: CreateRoomRepository }
-    ).repository = mockCreateRoomRepository;
+      createRoomService as unknown as { roomRepository: RoomRepository }
+    ).roomRepository = mockRoomRepository;
     jest.clearAllMocks();
   });
 
@@ -53,46 +52,40 @@ describe('CreateRoomService', () => {
         BadRequestError
       );
       await expect(createRoomService.execute(validRoomRequest)).rejects.toThrow(
-        'Room with this name already exists'
+        'Já existe uma sala com este nome'
       );
 
       expect(mockRoomModel.findOne).toHaveBeenCalledWith({
         where: { name: 'Sala A' },
       });
-      expect(mockCreateRoomRepository.create).not.toHaveBeenCalled();
+      expect(mockRoomRepository.create).not.toHaveBeenCalled();
     });
 
     it('should create room successfully when name is unique', async () => {
       mockRoomModel.findOne = jest.fn().mockResolvedValue(null);
-      mockCreateRoomRepository.create = jest
-        .fn()
-        .mockResolvedValue(mockCreatedRoom);
+      mockRoomRepository.create = jest.fn().mockResolvedValue(mockCreatedRoom);
 
       const result = await createRoomService.execute(validRoomRequest);
 
       expect(mockRoomModel.findOne).toHaveBeenCalledWith({
         where: { name: 'Sala A' },
       });
-      expect(mockCreateRoomRepository.create).toHaveBeenCalledWith(
-        validRoomRequest
-      );
+      expect(mockRoomRepository.create).toHaveBeenCalledWith(validRoomRequest);
       expect(result.room).toEqual(mockCreatedRoom);
     });
 
     it('should throw error when repository create returns null', async () => {
       mockRoomModel.findOne = jest.fn().mockResolvedValue(null);
-      mockCreateRoomRepository.create = jest.fn().mockResolvedValue(null);
+      mockRoomRepository.create = jest.fn().mockResolvedValue(null);
 
       await expect(createRoomService.execute(validRoomRequest)).rejects.toThrow(
-        'Failed to create room'
+        'Falha ao criar sala'
       );
 
       expect(mockRoomModel.findOne).toHaveBeenCalledWith({
         where: { name: 'Sala A' },
       });
-      expect(mockCreateRoomRepository.create).toHaveBeenCalledWith(
-        validRoomRequest
-      );
+      expect(mockRoomRepository.create).toHaveBeenCalledWith(validRoomRequest);
     });
 
     it('should create room with different valid data', async () => {
@@ -112,7 +105,7 @@ describe('CreateRoomService', () => {
       };
 
       mockRoomModel.findOne = jest.fn().mockResolvedValue(null);
-      mockCreateRoomRepository.create = jest
+      mockRoomRepository.create = jest
         .fn()
         .mockResolvedValue(differentCreatedRoom);
 
@@ -121,7 +114,7 @@ describe('CreateRoomService', () => {
       expect(mockRoomModel.findOne).toHaveBeenCalledWith({
         where: { name: 'Sala B' },
       });
-      expect(mockCreateRoomRepository.create).toHaveBeenCalledWith(
+      expect(mockRoomRepository.create).toHaveBeenCalledWith(
         differentRoomRequest
       );
       expect(result.room).toEqual(differentCreatedRoom);

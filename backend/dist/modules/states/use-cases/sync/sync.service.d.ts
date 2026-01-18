@@ -1,6 +1,6 @@
 import { ISyncStatesResponse } from './sync.interface';
 export declare class SyncStatesService {
-    private syncStatesRepository;
+    private stateRepository;
     constructor();
     execute(): Promise<ISyncStatesResponse>;
 }

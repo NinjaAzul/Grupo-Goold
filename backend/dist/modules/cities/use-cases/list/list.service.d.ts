@@ -1,6 +1,6 @@
 import { IListCitiesResponse, IListCitiesQuery } from './list.interface';
 export declare class ListCitiesService {
-    private listCitiesRepository;
+    private cityRepository;
     constructor();
     execute(query: IListCitiesQuery): Promise<IListCitiesResponse>;
 }
