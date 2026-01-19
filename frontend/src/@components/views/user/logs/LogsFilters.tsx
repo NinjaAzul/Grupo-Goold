@@ -19,14 +19,14 @@ export function LogsFilters({
 }: LogsFiltersProps) {
   return (
     <div className="bg-background-white pb-4 flex flex-col lg:grid lg:grid-cols-[1fr_auto] gap-4 lg:gap-32 lg:items-end">
-      <div className="w-full min-w-0 flex flex-col lg:grid lg:grid-cols-[7fr_3fr] gap-4 lg:gap-2">
+      <div className="w-full min-w-0 flex flex-col lg:grid lg:grid-cols-[7fr_3fr] gap-4 lg:gap-2 lg:pr-[25%]">
         <div className="w-full min-w-0">
           <Input
             type="text"
             leftIcon={<SearchIcon className="w-5 h-5 !text-black" />}
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Filtre por tipo de atividade ou módulo"
+            placeholder="Filtre por tipo de atividade ou Módulo"
           />
         </div>
         <div className="w-full min-w-0">

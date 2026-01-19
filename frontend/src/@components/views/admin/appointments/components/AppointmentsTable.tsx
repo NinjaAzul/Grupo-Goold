@@ -56,13 +56,6 @@ export function AppointmentsTable({
               >
                 Data agendamento
               </TableHead>
-              <TableHead
-                sortable
-                sortDirection={sortField === 'name' ? sortDirection : null}
-                onSort={() => onSort('name')}
-              >
-                Nome
-              </TableHead>
               <TableHead>Sala de agendamento</TableHead>
               <TableHead>Status transação</TableHead>
               <TableHead className="text-right">Ação</TableHead>
@@ -74,12 +67,6 @@ export function AppointmentsTable({
                 <TableRow key={index}>
                   <TableCell className="whitespace-nowrap">
                     <Skeleton variant="text" className="w-32" />
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <div className="space-y-2">
-                      <Skeleton variant="text" className="w-24" />
-                      <Skeleton variant="text" className="w-16" />
-                    </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <Skeleton variant="badge" />
@@ -101,29 +88,19 @@ export function AppointmentsTable({
                   const baseClasses = 'border-b transition-colors';
                   switch (status) {
                     case 'scheduled':
-                      return `${baseClasses} bg-green-50 hover:bg-green-100/50`;
+                      return `${baseClasses} bg-success-light`;
                     case 'cancelled':
-                      return `${baseClasses} bg-red-50 hover:bg-red-100/50`;
+                      return `${baseClasses} bg-error-light`;
                     case 'pending':
-                      return `${baseClasses} bg-white hover:bg-gray-50/50`;
+                      return `${baseClasses} bg-pending-white`;
                     default:
-                      return `${baseClasses} bg-white hover:bg-gray-50/50`;
+                      return `${baseClasses} bg-pending-white`; 
                   }
                 };
                 return (
                 <TableRow key={appointment.id} className={getStatusRowClassName(appointment.status)}>
                   <TableCell className="whitespace-nowrap text-sm text-primary">
                     {appointment.date}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-primary">
-                        {appointment.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {appointment.type}
-                      </div>
-                    </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <Badge variant="primary" className="bg-primary text-white">
@@ -136,22 +113,22 @@ export function AppointmentsTable({
                         switch (status) {
                           case 'scheduled':
                             return {
-                              className: 'bg-green-100 text-green-700 border-green-300',
+                              className: 'bg-success-light text-success border-success',
                               label: 'Agendado',
                             };
                           case 'cancelled':
                             return {
-                              className: 'bg-red-100 text-red-700 border-red-300',
+                              className: 'bg-error-light text-error border-error',
                               label: 'Cancelado',
                             };
                           case 'pending':
                             return {
-                              className: 'bg-gray-200 text-gray-700 border-gray-300',
+                              className: 'bg-pending-light text-pending-text border-pending-border text-xs font-medium leading-[150%] tracking-[0px]',
                               label: 'Em análise',
                             };
                           default:
                             return {
-                              className: 'bg-gray-200 text-gray-700 border-gray-300',
+                              className: 'bg-pending-light text-pending-text border-pending-border text-xs font-medium leading-[150%] tracking-[0px]',
                               label: 'Em análise',
                             };
                         }
@@ -171,14 +148,14 @@ export function AppointmentsTable({
                           return (
                             <div className="flex items-center justify-end gap-2">
                               <ActionButton
-                                variant="check"
-                                onClick={() => onApprove?.(appointment.id)}
-                                aria-label="Aprovar agendamento"
-                              />
-                              <ActionButton
                                 variant="close"
                                 onClick={() => onCancel?.(appointment.id)}
                                 aria-label="Cancelar agendamento"
+                              />
+                                <ActionButton
+                                variant="check"
+                                onClick={() => onApprove?.(appointment.id)}
+                                aria-label="Aprovar agendamento"
                               />
                             </div>
                           );

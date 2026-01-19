@@ -99,16 +99,8 @@ export function AppointmentsView() {
     if (!sortField || !sortDirection) return appointments;
 
     return [...appointments].sort((a, b) => {
-      let aValue: string;
-      let bValue: string;
-
-      if (sortField === 'date') {
-        aValue = a.date;
-        bValue = b.date;
-      } else {
-        aValue = a.name;
-        bValue = b.name;
-      }
+      const aValue = a.date;
+      const bValue = b.date;
 
       if (sortDirection === 'asc') {
         return aValue.localeCompare(bValue);

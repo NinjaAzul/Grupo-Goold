@@ -58,9 +58,9 @@ const tableRowVariants = cva(
     variants: {
       variant: {
         default: 'bg-white hover:bg-gray-50/50',
-        agendado: 'bg-green-50 hover:bg-green-100/50',
-        cancelado: 'bg-red-50 hover:bg-red-100/50',
-        em_analise: 'bg-white hover:bg-gray-50/50',
+        agendado: 'bg-success-light hover:bg-green-100/50',
+        cancelado: 'bg-error-light hover:bg-red-100/50',
+        em_analise: 'bg-pending-light hover:bg-gray-50/50',
       },
     },
     defaultVariants: {
@@ -130,7 +130,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
         {...props}
       >
         {sortable ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-start">
             {children}
             <SortIcon
               className={cn(sortIconVariants({ isActive: isSortActive }))}

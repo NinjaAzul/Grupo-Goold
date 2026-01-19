@@ -89,7 +89,7 @@ export function LogsTable({
                       {log.module}
                     </Badge>
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-sm text-primary">
+                  <TableCell className="whitespace-nowrap">
                     {log.dateTime}
                   </TableCell>
                 </TableRow>

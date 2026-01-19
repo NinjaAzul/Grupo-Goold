@@ -15,6 +15,11 @@ export const colors = {
     DEFAULT: '#10C3A9',
     light: '#F2FFFD',
   },
+  pending: {
+    light: '#F5F5F5',
+    text: '#A4AAAD',
+    border: '#A4AAAD',
+  },
   border: {
     DEFAULT: '#D7D7D7',
     light: '#D1D5DB',

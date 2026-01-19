@@ -13,7 +13,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 registerLocale('pt-BR', ptBR);
 
 const datePickerButtonVariants = cva(
-  'w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors text-left flex items-center justify-between',
+  'w-full h-[44px] px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors text-left flex items-center justify-between',
   {
     variants: {
       hasError: {

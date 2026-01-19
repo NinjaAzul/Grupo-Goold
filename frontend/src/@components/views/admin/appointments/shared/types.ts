@@ -7,7 +7,7 @@ export interface Appointment {
   status: 'scheduled' | 'cancelled' | 'pending';
 }
 
-export type SortField = 'date' | 'name' | null;
+export type SortField = 'date' | null;
 export type SortDirection = 'asc' | 'desc' | null;
 
 export interface ApiAppointment {

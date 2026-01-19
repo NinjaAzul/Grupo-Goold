@@ -31,31 +31,31 @@ export function AppointmentsTable({
   onSort,
   onCancel,
 }: AppointmentsTableProps) {
-  const getStatusBadgeColor = (status: Appointment['status']) => {
+  const getStatusBadgeProps = (status: Appointment['status']) => {
     switch (status) {
       case 'scheduled':
-        return 'bg-green-100 text-green-700 border-green-300';
+        return {
+          className: 'bg-success-light text-success border-success',
+          label: 'Agendado',
+        };
       case 'cancelled':
-        return 'bg-red-100 text-red-700 border-red-300';
+        return {
+          className: 'bg-error-light text-error border-error',
+          label: 'Cancelado',
+        };
       case 'pending':
-        return 'bg-gray-100 text-gray-700 border-gray-300';
+        return {
+          className: 'bg-pending-light text-pending-text border-pending-border text-xs font-medium leading-[150%] tracking-[0px]',
+          label: 'Em análise',
+        };
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-300';
+        return {
+          className: 'bg-pending-light text-pending-text border-pending-border text-xs font-medium leading-[150%] tracking-[0px]',
+          label: 'Em análise',
+        };
     }
   };
 
-  const getStatusLabel = (status: Appointment['status']) => {
-    switch (status) {
-      case 'scheduled':
-        return 'Agendado';
-      case 'cancelled':
-        return 'Cancelado';
-      case 'pending':
-        return 'Em análise';
-      default:
-        return status;
-    }
-  };
 
   if (!isLoading && data.length === 0) {
     return (
@@ -81,9 +81,7 @@ export function AppointmentsTable({
                 Data agendamento
               </TableHead>
               <TableHead
-                sortable
-                sortDirection={sortField === 'name' ? sortDirection : null}
-                onSort={() => onSort('name')}
+            
               >
                 Nome
               </TableHead>
@@ -122,13 +120,13 @@ export function AppointmentsTable({
                   const baseClasses = 'border-b transition-colors';
                   switch (status) {
                     case 'scheduled':
-                      return `${baseClasses} bg-green-50 hover:bg-green-100/50`;
+                      return `${baseClasses} bg-success-light`;
                     case 'cancelled':
-                      return `${baseClasses} bg-red-50 hover:bg-red-100/50`;
+                      return `${baseClasses} bg-error-light`;
                     case 'pending':
-                      return `${baseClasses} bg-white hover:bg-gray-50/50`;
+                      return `${baseClasses} bg-pending-white`;
                     default:
-                      return `${baseClasses} bg-white hover:bg-gray-50/50`;
+                      return `${baseClasses} bg-pending-white`; 
                   }
                 };
                 return (
@@ -147,29 +145,33 @@ export function AppointmentsTable({
                     </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    <Badge variant="secondary" className="bg-black text-white border-black">
+                    <Badge variant="primary" className="bg-primary text-white">
                       {appointment.room}
                     </Badge>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    <Badge
-                      variant="secondary"
-                      className={getStatusBadgeColor(appointment.status)}
-                    >
-                      {getStatusLabel(appointment.status)}
-                    </Badge>
+                    {(() => {
+                      const badgeProps = getStatusBadgeProps(appointment.status);
+                      return (
+                        <Badge variant="secondary" className={badgeProps.className}>
+                          {badgeProps.label}
+                        </Badge>
+                      );
+                    })()}
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-right">
+                  <TableCell className="whitespace-nowrap text-sm font-medium text-right">
                     {(() => {
                       switch (appointment.status) {
                         case 'scheduled':
                         case 'pending':
                           return onCancel ? (
-                            <ActionButton
-                              variant="close"
-                              onClick={() => onCancel(appointment.id)}
-                              aria-label="Cancelar agendamento"
-                            />
+                            <div className="flex items-center justify-end gap-2">
+                              <ActionButton
+                                variant="close"
+                                onClick={() => onCancel(appointment.id)}
+                                aria-label="Cancelar agendamento"
+                              />
+                            </div>
                           ) : null;
                         case 'cancelled':
                           return null;

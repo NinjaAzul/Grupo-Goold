@@ -22,7 +22,6 @@ export function LogsFilters({
       <div className="w-full min-w-0 flex flex-col lg:grid lg:grid-cols-[7fr_3fr] gap-4 lg:gap-2 lg:pr-[25%]">
         <div className="w-full min-w-0">
           <Input
-            label="Filtre por cliente"
             type="text"
             leftIcon={<SearchIcon className="w-5 h-5 !text-black" />}
             value={searchTerm}
@@ -32,7 +31,6 @@ export function LogsFilters({
         </div>
         <div className="w-full min-w-0">
           <DatePicker
-            label="Data"
             value={selectedDate}
             onChange={onDateChange}
             placeholder="Selecione"
