@@ -12,6 +12,12 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - grupo-goold-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   backend:
     build:
@@ -36,7 +42,8 @@ services:
       - /app/node_modules
     entrypoint: sh -c "npm install && npm run dev"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - grupo-goold-network
 

@@ -15,7 +15,6 @@
     "format": "prettier --write \"src/**/*.{ts,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,json}\"",
     "dbml:generate": "node scripts/generate-dbml-dbdocs.js",
-    "dbml:generate:legacy": "node scripts/generate-dbml.js",
     "db:create": "sequelize-cli db:create",
     "db:drop": "sequelize-cli db:drop",
     "db:migrate": "sequelize-cli db:migrate",
