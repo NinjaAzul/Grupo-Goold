@@ -63,7 +63,7 @@ export function NewAppointmentModal({
   const rooms: Room[] =
     (roomsResponse as unknown as { data?: Room[] })?.data || [];
 
-  const dateString = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
+  const dateString = selectedDate ? DateHelper.extractDateOnly(selectedDate) : null;
   
   const slotsParams = useMemo(() => {
     if (!dateString || !selectedRoomId) {

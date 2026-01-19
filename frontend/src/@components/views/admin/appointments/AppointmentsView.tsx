@@ -73,12 +73,9 @@ export function AppointmentsView() {
     }
 
     if (selectedDate) {
-      const startOfDay = new Date(selectedDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(selectedDate);
-      endOfDay.setHours(23, 59, 59, 999);
-      params.startDate = startOfDay.toISOString().split('T')[0];
-      params.endDate = endOfDay.toISOString().split('T')[0];
+      // Usa DateHelper para extrair a data de forma segura no timezone local
+      params.startDate = DateHelper.extractDateOnly(selectedDate);
+      params.endDate = DateHelper.extractDateOnly(selectedDate);
     }
 
     return params;

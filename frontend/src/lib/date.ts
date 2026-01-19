@@ -114,27 +114,27 @@ export class DateHelper {
   }
 
   /**
-   * Extracts only the date (without time) from an ISO date
-   * @param isoDate - Date in ISO string format (UTC)
-   * @returns String in YYYY-MM-DD format
+   * Extracts only the date (without time) from a date in local timezone
+   * @param date - Date object or ISO string
+   * @returns String in YYYY-MM-DD format (local timezone)
    */
-  static extractDateOnly(isoDate: string | Date): string {
-    const date = typeof isoDate === 'string' ? parseISO(isoDate) : isoDate;
-    const year = date.getUTCFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = date.getUTCDate().toString().padStart(2, '0');
+  static extractDateOnly(date: string | Date): string {
+    const dateObj = typeof date === 'string' ? parseISO(date) : date;
+    const year = dateObj.getFullYear();
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const day = dateObj.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
   /**
-   * Extracts only the time (without date) from an ISO date
-   * @param isoDate - Date in ISO string format (UTC)
-   * @returns String in HH:mm format
+   * Extracts only the time (without date) from a date in local timezone
+   * @param date - Date object or ISO string
+   * @returns String in HH:mm format (local timezone)
    */
-  static extractTimeOnly(isoDate: string | Date): string {
-    const date = typeof isoDate === 'string' ? parseISO(isoDate) : isoDate;
-    const hours = date.getUTCHours().toString().padStart(2, '0');
-    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+  static extractTimeOnly(date: string | Date): string {
+    const dateObj = typeof date === 'string' ? parseISO(date) : date;
+    const hours = dateObj.getHours().toString().padStart(2, '0');
+    const minutes = dateObj.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   }
 
