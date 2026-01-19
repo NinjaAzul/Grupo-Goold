@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { TimeInput } from './index';
 import { ClockIcon } from '@/@components/icons';
 import { useState } from 'react';

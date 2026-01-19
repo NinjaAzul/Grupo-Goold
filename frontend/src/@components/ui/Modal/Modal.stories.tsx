@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Modal } from './index';
 import { Button } from '@/@components/ui/Button';
 import { useState } from 'react';
@@ -86,7 +86,7 @@ export const WithoutCloseButton: Story = {
           showCloseButton={false}
         >
           <div className="p-4">
-            <p>This modal doesn't have a close button.</p>
+            <p>This modal doesn&apos;t have a close button.</p>
             <Button onClick={() => setIsOpen(false)} className="mt-4">
               Close
             </Button>
