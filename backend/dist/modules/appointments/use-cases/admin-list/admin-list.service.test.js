@@ -20,13 +20,13 @@ describe('AdminListAppointmentsService', () => {
                 id: 1,
                 userId: 1,
                 appointmentDate: new Date('2024-01-20T10:00:00Z'),
-                room: 'Sala A',
+                roomId: 1,
             },
             {
                 id: 2,
                 userId: 2,
                 appointmentDate: new Date('2024-01-21T14:00:00Z'),
-                room: 'Sala B',
+                roomId: 2,
             },
         ];
         it('should return paginated appointments with default values', async () => {
@@ -37,7 +37,16 @@ describe('AdminListAppointmentsService', () => {
             const result = await adminListAppointmentsService.execute({});
             expect(mockAppointmentRepository.findAllAdmin).toHaveBeenCalledWith({});
             expect(result.success).toBe(true);
-            expect(result.data).toEqual(mockAppointments);
+            expect(result.data).toEqual([
+                {
+                    ...mockAppointments[0],
+                    appointmentDate: '2024-01-20T10:00:00.000Z',
+                },
+                {
+                    ...mockAppointments[1],
+                    appointmentDate: '2024-01-21T14:00:00.000Z',
+                },
+            ]);
             expect(result.pagination?.page).toBe(1);
             expect(result.pagination?.limit).toBe(10);
             expect(result.pagination?.total).toBe(2);

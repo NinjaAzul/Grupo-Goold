@@ -8,9 +8,7 @@ import { Modal } from '@/@components/ui/Modal';
 import { DatePicker } from '@/@components/ui/DatePicker';
 import { Select } from '@/@components/ui/Select';
 import { Button } from '@/@components/ui/Button';
-import { useGetRooms } from '@/api/generated/rooms/rooms';
-import { useGetAppointmentsAvailable, getGetAppointmentsAvailableQueryKey } from '@/api/generated/appointments/appointments';
-import { usePostAppointments } from '@/api/generated/appointments/appointments';
+import { usePostAppointments, useGetAppointmentsAvailableRooms, getGetAppointmentsAvailableRoomsQueryKey, useGetAppointmentsAvailable } from '@/api/generated/appointments/appointments';
 import toast from 'react-hot-toast';
 import { Room } from '../shared/types';
 import { DateHelper } from '@/lib/date';
@@ -41,7 +39,7 @@ export function NewAppointmentModal({
   });
 
   const selectedDate = watch('date');
-  const selectedRoomId = watch('roomId');
+  const selectedTime = watch('time');
 
   useEffect(() => {
     if (!isOpen) {
@@ -51,54 +49,80 @@ export function NewAppointmentModal({
 
   useEffect(() => {
     setValue('time', '');
-  }, [selectedDate, selectedRoomId, setValue]);
+    setValue('roomId', undefined as unknown as number);
+  }, [selectedDate, setValue]);
 
-  const { data: roomsResponse, isLoading: isLoadingRooms, error: roomsError } = useGetRooms({
-    query: {
-      enabled: isOpen,
-    },
-  });
-
-
-  const rooms: Room[] =
-    (roomsResponse as unknown as { data?: Room[] })?.data || [];
+  useEffect(() => {
+    setValue('roomId', undefined as unknown as number);
+  }, [selectedTime, setValue]);
 
   const dateString = selectedDate ? DateHelper.extractDateOnly(selectedDate) : null;
+
+  const { data: availableSlotsResponse, isLoading: isLoadingAvailableSlots } = useGetAppointmentsAvailable(
+    { date: dateString || '' },
+    {
+      query: {
+        enabled: !!dateString && isOpen,
+        staleTime: 0,
+        refetchOnMount: true,
+        refetchOnWindowFocus: false,
+      },
+    }
+  );
+
+  const timeOptions = useMemo(() => {
+    if (!availableSlotsResponse?.slots || availableSlotsResponse.slots.length === 0) {
+      return [];
+    }
+    return availableSlotsResponse.slots.map((slot) => ({
+      value: slot,
+      label: slot,
+    }));
+  }, [availableSlotsResponse]);
   
-  const slotsParams = useMemo(() => {
-    if (!dateString || !selectedRoomId) {
+  const availableRoomsParams = useMemo(() => {
+    if (!dateString || !selectedTime) {
       return null;
     }
-    const params = {
+    return {
       date: dateString,
-      roomId: selectedRoomId,
+      time: selectedTime,
     };
-    return params;
-  }, [dateString, selectedRoomId]);
+  }, [dateString, selectedTime]);
 
-  const { data: slotsResponse, isLoading: isLoadingSlots, error: slotsError } =
-    useGetAppointmentsAvailable(
-      slotsParams || { date: '', roomId: undefined },
-      {
-        query: {
-          enabled: !!slotsParams,
-          staleTime: 0, 
-          refetchOnMount: true,
-          refetchOnWindowFocus: false,
-        },
-      }
-    );
+  const { data: availableRoomsResponse, isLoading: isLoadingAvailableRooms } = useGetAppointmentsAvailableRooms(
+    availableRoomsParams || { date: '', time: '' },
+    {
+      query: {
+        enabled: !!availableRoomsParams && isOpen,
+        staleTime: 0,
+        refetchOnMount: true,
+        refetchOnWindowFocus: false,
+      },
+    }
+  );
 
-  const availableSlots: string[] =
-    (slotsResponse as unknown as { slots?: string[] })?.slots || [];
+  const availableRooms: Room[] =
+    availableRoomsResponse?.rooms
+      ?.filter(
+        (room): room is NonNullable<typeof room> =>
+          !!room.id && !!room.name && !!room.startTime && !!room.endTime && !!room.timeBlock
+      )
+      .map((room) => ({
+        id: room.id!,
+        name: room.name!,
+        startTime: room.startTime!,
+        endTime: room.endTime!,
+        timeBlock: room.timeBlock!,
+      })) || [];
 
   const createAppointment = usePostAppointments({
     mutation: {
       onSuccess: () => {
         toast.success('Agendamento criado com sucesso!');
-        if (slotsParams) {
+        if (availableRoomsParams) {
           queryClient.invalidateQueries({
-            queryKey: getGetAppointmentsAvailableQueryKey(slotsParams),
+            queryKey: getGetAppointmentsAvailableRoomsQueryKey(availableRoomsParams),
           });
         }
         reset();
@@ -106,6 +130,22 @@ export function NewAppointmentModal({
       }
     },
   });
+
+
+  const formatDuration = (timeBlock: number): string => {
+    if (timeBlock >= 60) {
+      const hours = timeBlock / 60;
+      return hours === 1 ? '1h' : `${hours}h`;
+    }
+    return `${timeBlock}min`;
+  };
+
+  const roomOptions = availableRooms.map((room) => ({
+    value: room.id,
+    label: `${room.name} (${formatDuration(room.timeBlock)})`,
+  }));
+
+  const selectedRoom = availableRooms.find((room) => room.id === watch('roomId'));
 
   const onSubmit = (data: NewAppointmentFormData) => {
     const [hours, minutes] = data.time.split(':');
@@ -116,25 +156,13 @@ export function NewAppointmentModal({
       `${hours}:${minutes}`
     );
 
-    const selectedRoom = rooms.find((r) => r.id === data.roomId);
-
     createAppointment.mutate({
       data: {
         appointmentDate: DateHelper.toISOString(appointmentDate),
-        room: selectedRoom?.name || '',
+        roomId: data.roomId,
       },
     });
   };
-
-  const timeOptions = availableSlots.map((slot) => ({
-    value: slot,
-    label: slot,
-  }));
-
-  const roomOptions = rooms.map((room) => ({
-    value: room.id,
-    label: room.name,
-  }));
 
   return (
     <Modal
@@ -162,28 +190,6 @@ export function NewAppointmentModal({
           />
 
           <Controller
-            name="roomId"
-            control={control}
-            render={({ field }) => {
-              return (
-                <Select
-                  label="Selecione uma Sala (Obrigatório)"
-                  options={roomOptions}
-                  placeholder="Selecione uma Sala"
-                  value={field.value}
-                  onChange={(value) => {
-                    const numValue = Number(value);
-                    field.onChange(numValue);
-                  }}
-                  error={errors.roomId?.message}
-                  required
-                  disabled={isLoadingRooms}
-                />
-              );
-            }}
-          />
-
-          <Controller
             name="time"
             control={control}
             render={({ field }) => (
@@ -191,29 +197,71 @@ export function NewAppointmentModal({
                 <Select
                   label="Selecione um horário (Obrigatório)"
                   options={timeOptions}
-                  placeholder="Selecione um horário"
-                  value={field.value}
-                  onChange={(value) => field.onChange(value)}
+                  placeholder={isLoadingAvailableSlots ? 'Carregando horários...' : 'Selecione um horário'}
+                  value={field.value || ''}
+                  onChange={(value) => field.onChange(value || '')}
                   error={errors.time?.message}
                   required
-                  disabled={!selectedDate || !selectedRoomId || isLoadingSlots}
+                  disabled={!selectedDate || isLoadingAvailableSlots}
                   type="hour"
                 />
-                {isLoadingSlots && (
+                {isLoadingAvailableSlots && selectedDate && (
                   <div className="mt-2 flex items-center gap-2">
                     <SpinnerIcon className="w-5 h-5 text-primary" />
+                    <span className="text-sm text-gray-500">Buscando horários disponíveis...</span>
                   </div>
                 )}
-                {!isLoadingSlots &&
+                {!isLoadingAvailableSlots &&
                   selectedDate &&
-                  selectedRoomId &&
-                  availableSlots.length === 0 && (
+                  timeOptions.length === 0 && (
                     <p className="mt-1 text-sm text-gray-500">
-                      Nenhum horário disponível para esta data e sala
+                      Nenhum horário disponível para esta data
                     </p>
                   )}
               </div>
             )}
+          />
+
+          <Controller
+            name="roomId"
+            control={control}
+            render={({ field }) => {
+              return (
+                <div>
+                  <Select
+                    label="Selecione uma Sala (Obrigatório)"
+                    options={roomOptions}
+                    placeholder="Selecione uma Sala"
+                    value={field.value}
+                    onChange={(value) => {
+                      const numValue = Number(value);
+                      field.onChange(numValue);
+                    }}
+                    error={errors.roomId?.message}
+                    required
+                    disabled={!selectedDate || !selectedTime || isLoadingAvailableRooms}
+                  />
+                  {isLoadingAvailableRooms && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <SpinnerIcon className="w-5 h-5 text-primary" />
+                    </div>
+                  )}
+                  {!isLoadingAvailableRooms &&
+                    selectedDate &&
+                    selectedTime &&
+                    availableRooms.length === 0 && (
+                      <p className="mt-1 text-sm text-gray-500">
+                        Nenhuma sala disponível para esta data e horário
+                      </p>
+                    )}
+                  {selectedRoom && (
+                    <p className="mt-2 text-xs text-gray-500">
+                      Duração do agendamento: {formatDuration(selectedRoom.timeBlock)}
+                    </p>
+                  )}
+                </div>
+              );
+            }}
           />
         </form>
       </Modal.Body>
@@ -223,7 +271,7 @@ export function NewAppointmentModal({
           form="appointment-form"
           variant="primary"
           isLoading={createAppointment.isPending}
-          disabled={isLoadingSlots || isLoadingRooms}
+          disabled={isLoadingAvailableRooms}
           className="w-full"
         >
           Confirmar Agendamento

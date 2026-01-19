@@ -1,0 +1,1 @@
+{"version":3,"file":"available-rooms.interface.d.ts","sourceRoot":"","sources":["../../../../../src/modules/appointments/use-cases/available-rooms/available-rooms.interface.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAM,qCAAqC,CAAC;AAE5D,MAAM,WAAW,sBAAsB;IACrC,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,EAAE,MAAM,CAAC;CACd;AAED,MAAM,WAAW,uBAAuB;IACtC,KAAK,EAAE,KAAK,EAAE,CAAC;CAChB"}

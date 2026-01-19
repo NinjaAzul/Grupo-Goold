@@ -8,6 +8,7 @@ const user_repository_1 = require("../../repositories/user.repository");
 const errors_1 = require("@shared/errors");
 const city_repository_1 = require("@modules/cities/repositories/city.repository");
 const logger_service_1 = require("@shared/utils/logger.service");
+const date_helper_1 = require("@shared/utils/date.helper");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 class CreateUserService {
     constructor() {
@@ -53,7 +54,7 @@ class CreateUserService {
         }
         const formattedUser = await this.formatUserPermissions(user);
         await logger_service_1.LoggerService.log('Criação de usuário', 'Minha Conta', formattedUser.id, `Usuário ${formattedUser.email} foi criado`);
-        return { user: formattedUser };
+        return { user: date_helper_1.DateHelper.normalizeDatesInObject(formattedUser) };
     }
 }
 exports.CreateUserService = CreateUserService;

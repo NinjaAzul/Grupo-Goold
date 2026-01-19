@@ -14,14 +14,14 @@ class AvailableSlotsService {
         const MINIMUM_APPOINTMENT_DURATION = 60;
         const [startHour, startMinute] = room.startTime.split(':');
         const [endHour, endMinute] = room.endTime.split(':');
-        const [year, month, day] = date.split('-');
-        const startDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(startHour), parseInt(startMinute), 0, 0));
-        const endDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(endHour), parseInt(endMinute), 0, 0));
+        const [year, month, day] = date.split('-').map(Number);
+        const startDate = date_helper_1.DateHelper.createUTCDate(year, month, day, parseInt(startHour), parseInt(startMinute));
+        const endDate = date_helper_1.DateHelper.createUTCDate(year, month, day, parseInt(endHour), parseInt(endMinute));
         const dayStartUTC = date_helper_1.DateHelper.getStartOfDayUTC(date);
         const dayEndUTC = date_helper_1.DateHelper.getEndOfDayUTC(date);
         const existingAppointments = await appointment_model_1.AppointmentModel.findAll({
             where: {
-                room: room.name,
+                roomId: room.id,
                 appointmentDate: {
                     [sequelize_1.Op.between]: [dayStartUTC, dayEndUTC],
                 },

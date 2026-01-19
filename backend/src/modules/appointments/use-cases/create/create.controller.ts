@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { CreateAppointmentService } from './create.service';
 import { CreateAppointmentDto } from './create.dto';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class CreateAppointmentController {
   private service: CreateAppointmentService;
@@ -17,12 +18,21 @@ export class CreateAppointmentController {
     try {
       const userId = req.user!.id;
       const dto: CreateAppointmentDto = req.body;
-      const appointmentDate = new Date(dto.appointmentDate);
+
+      const isoString = dto.appointmentDate.endsWith('Z')
+        ? dto.appointmentDate
+        : dto.appointmentDate + 'Z';
+
+      const appointmentDate = DateHelper.fromISOString(isoString);
+
+      if (isNaN(appointmentDate.getTime())) {
+        throw new Error('Data de agendamento inválida');
+      }
 
       const result = await this.service.execute({
         userId,
         appointmentDate,
-        room: dto.room,
+        roomId: dto.roomId,
       });
 
       return res.status(201).json(result);

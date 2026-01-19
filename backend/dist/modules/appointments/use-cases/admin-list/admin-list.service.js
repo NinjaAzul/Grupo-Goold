@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminListAppointmentsService = void 0;
 const appointment_repository_1 = require("../../repositories/appointment.repository");
+const date_helper_1 = require("@shared/utils/date.helper");
 class AdminListAppointmentsService {
     constructor() {
         this.appointmentRepository = new appointment_repository_1.AppointmentRepository();
@@ -13,7 +14,7 @@ class AdminListAppointmentsService {
         const totalPages = Math.ceil(total / limit);
         return {
             success: true,
-            data: appointments,
+            data: date_helper_1.DateHelper.normalizeDatesInObject(appointments),
             pagination: {
                 page,
                 limit,

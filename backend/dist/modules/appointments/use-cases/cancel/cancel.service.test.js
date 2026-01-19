@@ -27,7 +27,7 @@ describe('CancelAppointmentService', () => {
             id: 1,
             userId: 1,
             appointmentDate: new Date('2024-01-20T10:00:00Z'),
-            room: 'Sala A',
+            roomId: 1,
             status: appointment_interface_1.AppointmentStatus.SCHEDULED,
         };
         it('should throw NotFoundError when appointment does not exist', async () => {
@@ -93,7 +93,10 @@ describe('CancelAppointmentService', () => {
                 appointmentId: 1,
                 userId: 1,
             });
-            expect(result.appointment).toEqual(cancelledAppointment);
+            expect(result.appointment).toEqual({
+                ...cancelledAppointment,
+                appointmentDate: '2024-01-20T10:00:00.000Z',
+            });
             expect(result.appointment.status).toBe(appointment_interface_1.AppointmentStatus.CANCELLED);
             expect(mockLoggerService.log).toHaveBeenCalledWith('Cancelamento de agendamento', 'Agendamento', 1, 'Agendamento 1 cancelado pelo usuário');
         });

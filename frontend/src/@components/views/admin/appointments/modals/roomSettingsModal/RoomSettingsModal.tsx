@@ -99,7 +99,7 @@ export function RoomSettingsModal({ isOpen, onClose }: RoomSettingsModalProps) {
       isOpen={isOpen}
       onClose={onClose}
       title="Ajustes de agendamento"
-      size="xs"
+      size="sm"
     >
       <div className="space-y-6">
         {isLoadingRooms ? (

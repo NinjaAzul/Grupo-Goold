@@ -7,6 +7,7 @@ const sequelize = new sequelize_1.Sequelize(process.env.DB_NAME || 'grupo_goold'
     port: Number(process.env.DB_PORT) || 3306,
     dialect: 'mysql',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    timezone: '+00:00',
     define: {
         timestamps: true,
         underscored: true,

@@ -156,7 +156,7 @@ export function AccountForm({
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)} className="p-0">
-      <div className="space-y-[10px]">
+      <div className="space-y-[10px] px-4 py-6 sm:px-0 sm:py-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Controller
             name="firstName"

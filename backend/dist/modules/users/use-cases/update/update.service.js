@@ -10,6 +10,7 @@ const errors_1 = require("@shared/errors");
 const city_repository_1 = require("@modules/cities/repositories/city.repository");
 const role_repository_1 = require("@/modules/roles/repositories/role.repository");
 const user_model_1 = require("@modules/users/model/user.model");
+const date_helper_1 = require("@shared/utils/date.helper");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 class UpdateUserService {
     constructor() {
@@ -52,7 +53,7 @@ class UpdateUserService {
             throw new errors_1.NotFoundError('Usuário não encontrado');
         }
         await logger_service_1.LoggerService.log('Atualização de perfil', 'Minha Conta', user.id, `Usuário ${user.email} atualizou perfil`);
-        return { user };
+        return { user: date_helper_1.DateHelper.normalizeDatesInObject(user) };
     }
 }
 exports.UpdateUserService = UpdateUserService;

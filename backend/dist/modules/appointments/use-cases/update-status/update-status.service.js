@@ -5,6 +5,7 @@ const appointment_repository_1 = require("../../repositories/appointment.reposit
 const logger_service_1 = require("@shared/utils/logger.service");
 const appointment_interface_1 = require("@modules/appointments/model/appointment.interface");
 const errors_1 = require("@shared/errors");
+const date_helper_1 = require("@shared/utils/date.helper");
 class UpdateStatusService {
     constructor() {
         this.appointmentRepository = new appointment_repository_1.AppointmentRepository();
@@ -23,7 +24,7 @@ class UpdateStatusService {
         }
         const logUserId = request.adminUserId ?? appointment.userId;
         await logger_service_1.LoggerService.log(activityType, 'Agendamento', logUserId, `Agendamento ${appointment.id} - Status: ${request.status}${request.adminUserId ? ` (Ação realizada por admin)` : ''}`);
-        return { appointment };
+        return { appointment: date_helper_1.DateHelper.normalizeDatesInObject(appointment) };
     }
 }
 exports.UpdateStatusService = UpdateStatusService;

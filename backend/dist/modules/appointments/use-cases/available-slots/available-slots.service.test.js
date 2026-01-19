@@ -69,6 +69,9 @@ describe('AvailableSlotsService', () => {
             mockDateHelper.getEndOfDayUTC = jest
                 .fn()
                 .mockReturnValue(new Date('2024-01-20T23:59:59Z'));
+            mockDateHelper.createUTCDate = jest.fn((year, month, day, hour, minute) => {
+                return new Date(Date.UTC(year, month - 1, day, hour, minute));
+            });
             mockDateHelper.addMinutesUTC = jest.fn((date, minutes) => {
                 const result = new Date(date);
                 result.setUTCMinutes(result.getUTCMinutes() + minutes);
@@ -138,8 +141,6 @@ describe('AvailableSlotsService', () => {
             });
             const result = await availableSlotsService.execute({ date: dateString });
             expect(mockAppointmentModel.findAll).toHaveBeenCalled();
-            // O slot de 10:00 deve estar ocupado, mas a lógica de conflito é complexa
-            // Vamos apenas verificar que o service foi executado corretamente
             expect(result.slots).toBeDefined();
             expect(Array.isArray(result.slots)).toBe(true);
         });

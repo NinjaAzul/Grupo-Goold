@@ -46,7 +46,16 @@ async function startServer() {
         });
     }
     catch (error) {
-        utils_1.logger.error('Failed to start server:', error);
+        const errorId = (0, error_formatter_1.generateErrorId)();
+        const serverError = error instanceof Error
+            ? error
+            : new Error(String(error || 'Failed to start server'));
+        const formattedLog = (0, error_formatter_1.formatErrorForLog)(serverError, {
+            errorId,
+            path: 'server',
+            method: 'startServer',
+        });
+        utils_1.logger.error('Failed to start server', formattedLog);
         process.exit(1);
     }
 }

@@ -43,7 +43,7 @@ interface RoomFormItemProps {
   showCancel?: boolean;
 }
 
-const timeBlockOptions = [15, 30, 45, 60];
+const timeBlockOptions = [15, 30, 45, 60, 120];
 
 export function RoomFormItem({
   room,
@@ -87,7 +87,7 @@ export function RoomFormItem({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <Input
-        label="Nome da sala"
+        label="Nome da sala (Obrigatório)"
         {...register('name')}
         error={errors.name?.message}
         required
@@ -96,7 +96,7 @@ export function RoomFormItem({
       />
 
       <TimeRangeInput
-        label="Horário Inicial & Final da sala"
+        label="Horário Inicial & Final da sala (Obrigatório)"
         startTime={watch('startTime')}
         endTime={watch('endTime')}
         onChange={(start, end) => {
@@ -109,9 +109,9 @@ export function RoomFormItem({
       />
 
       <Select
-        label="Bloco de Horários de agendamento"
+        label="Bloco de Horários de agendamento (Obrigatório)"
         value={timeBlock}
-        onChange={(e) => handleTimeBlockChange(Number(e.target.value))}
+        onChange={(value) => handleTimeBlockChange(value !== undefined ? Number(value) : undefined)}
         disabled={isLoading}
         error={errors.timeBlock?.message}
         required
@@ -148,25 +148,29 @@ export function RoomFormItem({
         <div className="flex gap-4 pt-4">
           {onDelete && room ? (
             <>
-              <Tooltip content={`Deletar a sala "${room.name}"`}>
+              <div className="flex-1">
+                <Tooltip content={`Deletar a sala "${room.name}"`} className="w-full">
+                  <Button
+                    type="button"
+                    variant="error"
+                    onClick={onDelete}
+                    disabled={isLoading}
+                    className="w-full"
+                  >
+                    Deletar
+                  </Button>
+                </Tooltip>
+              </div>
+              <div className="flex-1">
                 <Button
-                  type="button"
-                  variant="error"
-                  onClick={onDelete}
-                  disabled={isLoading}
-                  className="flex-1"
+                  type="submit"
+                  variant="primary"
+                  isLoading={isLoading}
+                  className="w-full"
                 >
-                  Deletar
+                  Salvar
                 </Button>
-              </Tooltip>
-              <Button
-                type="submit"
-                variant="primary"
-                isLoading={isLoading}
-                className="flex-1"
-              >
-                Salvar
-              </Button>
+              </div>
             </>
           ) : (
             <div className="flex justify-end w-full">

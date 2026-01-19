@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateAppointmentDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 class CreateAppointmentDto {
 }
 exports.CreateAppointmentDto = CreateAppointmentDto;
@@ -20,8 +21,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateAppointmentDto.prototype, "appointmentDate", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreateAppointmentDto.prototype, "room", void 0);
+    (0, class_validator_1.IsNotEmpty)({ message: 'Room ID is required' }),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'Room ID must be a number' }),
+    (0, class_validator_1.Min)(1, { message: 'Room ID must be greater than 0' }),
+    __metadata("design:type", Number)
+], CreateAppointmentDto.prototype, "roomId", void 0);
 //# sourceMappingURL=create.dto.js.map

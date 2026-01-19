@@ -4,7 +4,7 @@ export declare class AppointmentModel extends Model<IAppointment> implements IAp
     id: number;
     userId: number;
     appointmentDate: Date;
-    room: string;
+    roomId: number;
     status: AppointmentStatus;
     readonly createdAt: Date;
     readonly updatedAt: Date;

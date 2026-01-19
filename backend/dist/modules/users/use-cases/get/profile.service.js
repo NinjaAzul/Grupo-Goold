@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetProfileService = void 0;
 const user_repository_1 = require("../../repositories/user.repository");
 const errors_1 = require("@shared/errors");
+const date_helper_1 = require("@shared/utils/date.helper");
 class GetProfileService {
     constructor() {
         this.repository = new user_repository_1.UserRepository();
@@ -17,7 +18,7 @@ class GetProfileService {
         if (!user) {
             throw new errors_1.NotFoundError('Usuário não encontrado');
         }
-        return { user };
+        return { user: date_helper_1.DateHelper.normalizeDatesInObject(user) };
     }
 }
 exports.GetProfileService = GetProfileService;

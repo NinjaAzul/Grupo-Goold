@@ -30,7 +30,7 @@ describe('UpdateStatusService', () => {
       id: 1,
       userId: 1,
       appointmentDate: new Date('2024-01-20T10:00:00Z'),
-      room: 'Sala A',
+      roomId: 1,
       status: AppointmentStatus.PENDING,
     };
 
@@ -53,7 +53,10 @@ describe('UpdateStatusService', () => {
         1,
         AppointmentStatus.SCHEDULED
       );
-      expect(result.appointment).toEqual(updatedAppointment);
+      expect(result.appointment).toEqual({
+        ...updatedAppointment,
+        appointmentDate: '2024-01-20T10:00:00.000Z',
+      });
       expect(mockLoggerService.log).toHaveBeenCalledWith(
         'Criação de agendamento',
         'Agendamento',
@@ -81,7 +84,10 @@ describe('UpdateStatusService', () => {
         1,
         AppointmentStatus.CANCELLED
       );
-      expect(result.appointment).toEqual(updatedAppointment);
+      expect(result.appointment).toEqual({
+        ...updatedAppointment,
+        appointmentDate: '2024-01-20T10:00:00.000Z',
+      });
       expect(mockLoggerService.log).toHaveBeenCalledWith(
         'Cancelamento de agendamento',
         'Agendamento',
@@ -109,7 +115,10 @@ describe('UpdateStatusService', () => {
         1,
         AppointmentStatus.PENDING
       );
-      expect(result.appointment).toEqual(updatedAppointment);
+      expect(result.appointment).toEqual({
+        ...updatedAppointment,
+        appointmentDate: '2024-01-20T10:00:00.000Z',
+      });
       expect(mockLoggerService.log).toHaveBeenCalledWith(
         'Atualização de agendamento',
         'Agendamento',
@@ -134,7 +143,10 @@ describe('UpdateStatusService', () => {
         adminUserId: 2,
       });
 
-      expect(result.appointment).toEqual(updatedAppointment);
+      expect(result.appointment).toEqual({
+        ...updatedAppointment,
+        appointmentDate: '2024-01-20T10:00:00.000Z',
+      });
       expect(mockLoggerService.log).toHaveBeenCalledWith(
         'Criação de agendamento',
         'Agendamento',

@@ -27,15 +27,17 @@ const createAppointmentController = new CreateAppointmentController();
  *             type: object
  *             required:
  *               - appointmentDate
- *               - room
+ *               - roomId
  *             properties:
  *               appointmentDate:
  *                 type: string
  *                 format: date-time
  *                 example: "2025-01-25T14:00:00Z"
- *               room:
- *                 type: string
- *                 example: "Sala 012"
+ *               roomId:
+ *                 type: number
+ *                 minimum: 1
+ *                 example: 1
+ *                 description: ID da sala de agendamento
  *     responses:
  *       201:
  *         description: Agendamento criado com sucesso

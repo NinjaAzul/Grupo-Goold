@@ -6,6 +6,7 @@ const logger_service_1 = require("@shared/utils/logger.service");
 const errors_1 = require("@shared/errors");
 const appointment_model_1 = require("@modules/appointments/model/appointment.model");
 const appointment_interface_1 = require("@modules/appointments/model/appointment.interface");
+const date_helper_1 = require("@shared/utils/date.helper");
 class CancelAppointmentService {
     constructor() {
         this.appointmentRepository = new appointment_repository_1.AppointmentRepository();
@@ -26,7 +27,9 @@ class CancelAppointmentService {
             throw new errors_1.NotFoundError('Agendamento não encontrado');
         }
         await logger_service_1.LoggerService.log('Cancelamento de agendamento', 'Agendamento', request.userId, `Agendamento ${cancelledAppointment.id} cancelado pelo usuário`);
-        return { appointment: cancelledAppointment };
+        return {
+            appointment: date_helper_1.DateHelper.normalizeDatesInObject(cancelledAppointment),
+        };
     }
 }
 exports.CancelAppointmentService = CancelAppointmentService;

@@ -1,4 +1,4 @@
-import { Op, WhereOptions } from 'sequelize';
+import { Op, WhereOptions, Sequelize } from 'sequelize';
 import { AppointmentModel } from '../model/appointment.model';
 import { UserModel } from '@modules/users/model/user.model';
 import { RoomModel } from '@modules/rooms/model/room.model';
@@ -13,14 +13,23 @@ import { ICancelAppointmentRequest } from '../use-cases/cancel/cancel.interface'
 
 export class AppointmentRepository {
   async create(data: ICreateAppointmentRequest): Promise<IAppointment | null> {
+    if (!data.roomId) {
+      throw new Error('roomId is required');
+    }
+
+    const mysqlDateTime = data.appointmentDate
+      .toISOString()
+      .replace('T', ' ')
+      .substring(0, 19);
+
     const appointment = await AppointmentModel.create({
       userId: data.userId,
-      appointmentDate: data.appointmentDate,
-      room: data.room,
+      appointmentDate: Sequelize.literal(`'${mysqlDateTime}'`),
+      roomId: data.roomId,
       status: AppointmentStatus.PENDING,
-    } as IAppointment);
+    } as unknown as IAppointment);
 
-    const appointmentWithUser = await AppointmentModel.findByPk(
+    const appointmentWithRelations = await AppointmentModel.findByPk(
       appointment.id,
       {
         include: [
@@ -31,15 +40,20 @@ export class AppointmentRepository {
               exclude: ['password'],
             },
           },
+          {
+            model: RoomModel,
+            as: 'room',
+            required: true,
+          },
         ],
       }
     );
 
-    if (!appointmentWithUser) {
+    if (!appointmentWithRelations) {
       return null;
     }
 
-    return appointmentWithUser.toJSON() as IAppointment;
+    return appointmentWithRelations.toJSON() as IAppointment;
   }
 
   async findAll(
@@ -93,6 +107,11 @@ export class AppointmentRepository {
             exclude: ['password'],
           },
         },
+        {
+          model: RoomModel,
+          as: 'room',
+          required: true,
+        },
       ],
       limit,
       offset,
@@ -100,7 +119,10 @@ export class AppointmentRepository {
     });
 
     return {
-      rows: rows.map((row) => row.toJSON() as IAppointment),
+      rows: rows.map((row) => {
+        const appointment = row.toJSON() as IAppointment;
+        return appointment;
+      }),
       count,
     };
   }
@@ -114,6 +136,7 @@ export class AppointmentRepository {
 
     const where: WhereOptions = {};
     let userWhere: WhereOptions | undefined;
+    let roomWhere: WhereOptions | undefined;
 
     if (filters.name) {
       userWhere = {
@@ -126,7 +149,9 @@ export class AppointmentRepository {
     }
 
     if (filters.room) {
-      where.room = { [Op.like]: `%${filters.room}%` };
+      roomWhere = {
+        name: { [Op.like]: `%${filters.room}%` },
+      };
     }
 
     if (filters.status) {
@@ -157,6 +182,12 @@ export class AppointmentRepository {
           },
           required: !!userWhere,
         },
+        {
+          model: RoomModel,
+          as: 'room',
+          where: roomWhere,
+          required: true,
+        },
       ],
       limit,
       offset,
@@ -164,9 +195,7 @@ export class AppointmentRepository {
     });
 
     return {
-      appointments: rows.map(
-        (appointment) => appointment.toJSON() as IAppointment
-      ),
+      appointments: rows.map((row) => row.toJSON() as IAppointment),
       total: count,
     };
   }
@@ -195,6 +224,11 @@ export class AppointmentRepository {
             exclude: ['password'],
           },
         },
+        {
+          model: RoomModel,
+          as: 'room',
+          required: true,
+        },
       ],
     });
 
@@ -219,6 +253,11 @@ export class AppointmentRepository {
           attributes: {
             exclude: ['password'],
           },
+        },
+        {
+          model: RoomModel,
+          as: 'room',
+          required: true,
         },
       ],
     });

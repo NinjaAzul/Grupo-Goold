@@ -30,8 +30,15 @@ describe('CreateAppointmentService', () => {
       id: 1,
       userId: 1,
       appointmentDate: new Date('2024-01-20T10:00:00Z'),
-      room: 'Sala A',
+      roomId: 1,
       status: AppointmentStatus.PENDING,
+      room: {
+        id: 1,
+        name: 'Sala A',
+        startTime: '08:00',
+        endTime: '18:00',
+        timeBlock: 30,
+      },
     };
 
     it('should successfully create appointment', async () => {
@@ -42,15 +49,18 @@ describe('CreateAppointmentService', () => {
       const result = await createAppointmentService.execute({
         userId: 1,
         appointmentDate: new Date('2024-01-20T10:00:00Z'),
-        room: 'Sala A',
+        roomId: 1,
       });
 
       expect(mockAppointmentRepository.create).toHaveBeenCalledWith({
         userId: 1,
         appointmentDate: new Date('2024-01-20T10:00:00Z'),
-        room: 'Sala A',
+        roomId: 1,
       });
-      expect(result.appointment).toEqual(mockAppointment);
+      expect(result.appointment).toEqual({
+        ...mockAppointment,
+        appointmentDate: '2024-01-20T10:00:00.000Z',
+      });
       expect(result.appointment.status).toBe(AppointmentStatus.PENDING);
       expect(mockLoggerService.log).toHaveBeenCalledWith(
         'Criação de agendamento',
@@ -67,7 +77,7 @@ describe('CreateAppointmentService', () => {
         createAppointmentService.execute({
           userId: 1,
           appointmentDate: new Date('2024-01-20T10:00:00Z'),
-          room: 'Sala A',
+          roomId: 1,
         })
       ).rejects.toThrow('Falha ao criar agendamento');
     });
@@ -76,7 +86,13 @@ describe('CreateAppointmentService', () => {
       const appointmentWithUser: Partial<IAppointment> = {
         ...mockAppointment,
         id: 2,
-        room: 'Sala B',
+        room: {
+          id: 2,
+          name: 'Sala B',
+          startTime: '08:00',
+          endTime: '18:00',
+          timeBlock: 30,
+        },
       };
 
       mockAppointmentRepository.create = jest
@@ -86,7 +102,7 @@ describe('CreateAppointmentService', () => {
       await createAppointmentService.execute({
         userId: 1,
         appointmentDate: new Date('2024-01-21T14:00:00Z'),
-        room: 'Sala B',
+        roomId: 2,
       });
 
       expect(mockLoggerService.log).toHaveBeenCalledWith(

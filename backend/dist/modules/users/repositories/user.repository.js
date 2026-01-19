@@ -88,10 +88,19 @@ class UserRepository {
         const offset = (page - 1) * limit;
         const where = {};
         if (filters.name) {
-            where[sequelize_1.Op.or] = [
-                { firstName: { [sequelize_1.Op.like]: `%${filters.name}%` } },
-                { lastName: { [sequelize_1.Op.like]: `%${filters.name}%` } },
-            ];
+            const searchWords = filters.name
+                .trim()
+                .split(/\s+/)
+                .filter((word) => word.length > 0);
+            if (searchWords.length > 0) {
+                const wordConditions = searchWords.map((word) => ({
+                    [sequelize_1.Op.or]: [
+                        { firstName: { [sequelize_1.Op.like]: `%${word}%` } },
+                        { lastName: { [sequelize_1.Op.like]: `%${word}%` } },
+                    ],
+                }));
+                where[sequelize_1.Op.and] = wordConditions;
+            }
         }
         if (filters.email) {
             where.email = { [sequelize_1.Op.like]: `%${filters.email}%` };

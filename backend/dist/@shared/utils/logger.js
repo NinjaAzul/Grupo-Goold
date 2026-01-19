@@ -45,8 +45,9 @@ exports.logger = {
         }
         if (error instanceof Error) {
             const formatted = (0, error_formatter_1.formatErrorForLog)(error);
-            // Substituir mensagem se fornecida
-            if (message && message !== '[AppError Handler]' && message !== '[Unexpected Error]') {
+            if (message &&
+                message !== '[AppError Handler]' &&
+                message !== '[Unexpected Error]') {
                 formatted.message = `${message}: ${formatted.message}`;
             }
             console.error(formatLog(formatted));

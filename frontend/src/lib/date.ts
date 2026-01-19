@@ -2,18 +2,18 @@ import { parseISO } from 'date-fns';
 
 export class DateHelper {
   /**
-   * Formats an ISO (UTC) date to Brazilian format in local timezone
+   * Formats an ISO (UTC) date to Brazilian format in UTC timezone
    * @param isoDate - Date in ISO string format (UTC)
    * @returns Formatted string: "dd/MM/yyyy às HH:mm"
    */
   static formatAppointmentDate(isoDate: string | Date): string {
     const date = typeof isoDate === 'string' ? parseISO(isoDate) : isoDate;
     
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const day = date.getUTCDate().toString().padStart(2, '0');
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
 
     return `${day}/${month}/${year} às ${hours}:${minutes}`;
   }
@@ -114,27 +114,27 @@ export class DateHelper {
   }
 
   /**
-   * Extracts only the date (without time) from a date in local timezone
+   * Extracts only the date (without time) from a date in UTC timezone
    * @param date - Date object or ISO string
-   * @returns String in YYYY-MM-DD format (local timezone)
+   * @returns String in YYYY-MM-DD format (UTC timezone)
    */
   static extractDateOnly(date: string | Date): string {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    const year = dateObj.getFullYear();
-    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-    const day = dateObj.getDate().toString().padStart(2, '0');
+    const year = dateObj.getUTCFullYear();
+    const month = (dateObj.getUTCMonth() + 1).toString().padStart(2, '0');
+    const day = dateObj.getUTCDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
   /**
-   * Extracts only the time (without date) from a date in local timezone
+   * Extracts only the time (without date) from a date in UTC timezone
    * @param date - Date object or ISO string
-   * @returns String in HH:mm format (local timezone)
+   * @returns String in HH:mm format (UTC timezone)
    */
   static extractTimeOnly(date: string | Date): string {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    const hours = dateObj.getHours().toString().padStart(2, '0');
-    const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+    const hours = dateObj.getUTCHours().toString().padStart(2, '0');
+    const minutes = dateObj.getUTCMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   }
 

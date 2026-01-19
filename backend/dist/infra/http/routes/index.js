@@ -7,6 +7,7 @@ const create_routes_1 = require("@modules/appointments/use-cases/create/create.r
 const list_routes_1 = require("@modules/appointments/use-cases/list/list.routes");
 const admin_list_routes_1 = require("@modules/appointments/use-cases/admin-list/admin-list.routes");
 const available_slots_routes_1 = require("@modules/appointments/use-cases/available-slots/available-slots.routes");
+const available_rooms_routes_1 = require("@modules/appointments/use-cases/available-rooms/available-rooms.routes");
 const cancel_routes_1 = require("@modules/appointments/use-cases/cancel/cancel.routes");
 const update_status_routes_1 = require("@modules/appointments/use-cases/update-status/update-status.routes");
 const rooms_routes_1 = require("@modules/rooms/use-cases/rooms.routes");
@@ -36,6 +37,7 @@ routes.use('/cities', routes_1.searchByCEPRoutes);
 routes.use('/appointments', create_routes_1.createAppointmentRoutes);
 routes.use('/appointments', list_routes_1.listAppointmentsRoutes);
 routes.use('/appointments', available_slots_routes_1.availableSlotsRoutes);
+routes.use('/appointments', available_rooms_routes_1.availableRoomsRoutes);
 routes.use('/appointments', cancel_routes_1.cancelAppointmentRoutes);
 //ROOMS ROUTES
 routes.use('/rooms', list_routes_2.listRoomsRoutes);

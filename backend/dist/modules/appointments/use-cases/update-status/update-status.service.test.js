@@ -23,7 +23,7 @@ describe('UpdateStatusService', () => {
             id: 1,
             userId: 1,
             appointmentDate: new Date('2024-01-20T10:00:00Z'),
-            room: 'Sala A',
+            roomId: 1,
             status: appointment_interface_1.AppointmentStatus.PENDING,
         };
         it('should update status to scheduled and log as creation', async () => {
@@ -39,7 +39,10 @@ describe('UpdateStatusService', () => {
                 status: appointment_interface_1.AppointmentStatus.SCHEDULED,
             });
             expect(mockAppointmentRepository.updateStatus).toHaveBeenCalledWith(1, appointment_interface_1.AppointmentStatus.SCHEDULED);
-            expect(result.appointment).toEqual(updatedAppointment);
+            expect(result.appointment).toEqual({
+                ...updatedAppointment,
+                appointmentDate: '2024-01-20T10:00:00.000Z',
+            });
             expect(mockLoggerService.log).toHaveBeenCalledWith('Criação de agendamento', 'Agendamento', 1, 'Agendamento 1 - Status: scheduled');
         });
         it('should update status to cancelled and log as cancellation', async () => {
@@ -55,7 +58,10 @@ describe('UpdateStatusService', () => {
                 status: appointment_interface_1.AppointmentStatus.CANCELLED,
             });
             expect(mockAppointmentRepository.updateStatus).toHaveBeenCalledWith(1, appointment_interface_1.AppointmentStatus.CANCELLED);
-            expect(result.appointment).toEqual(updatedAppointment);
+            expect(result.appointment).toEqual({
+                ...updatedAppointment,
+                appointmentDate: '2024-01-20T10:00:00.000Z',
+            });
             expect(mockLoggerService.log).toHaveBeenCalledWith('Cancelamento de agendamento', 'Agendamento', 1, 'Agendamento 1 - Status: cancelled');
         });
         it('should update status to pending and log as update', async () => {
@@ -71,7 +77,10 @@ describe('UpdateStatusService', () => {
                 status: appointment_interface_1.AppointmentStatus.PENDING,
             });
             expect(mockAppointmentRepository.updateStatus).toHaveBeenCalledWith(1, appointment_interface_1.AppointmentStatus.PENDING);
-            expect(result.appointment).toEqual(updatedAppointment);
+            expect(result.appointment).toEqual({
+                ...updatedAppointment,
+                appointmentDate: '2024-01-20T10:00:00.000Z',
+            });
             expect(mockLoggerService.log).toHaveBeenCalledWith('Atualização de agendamento', 'Agendamento', 1, 'Agendamento 1 - Status: pending');
         });
         it('should use adminUserId in log when provided', async () => {
@@ -87,7 +96,10 @@ describe('UpdateStatusService', () => {
                 status: appointment_interface_1.AppointmentStatus.SCHEDULED,
                 adminUserId: 2,
             });
-            expect(result.appointment).toEqual(updatedAppointment);
+            expect(result.appointment).toEqual({
+                ...updatedAppointment,
+                appointmentDate: '2024-01-20T10:00:00.000Z',
+            });
             expect(mockLoggerService.log).toHaveBeenCalledWith('Criação de agendamento', 'Agendamento', 2, 'Agendamento 1 - Status: scheduled (Ação realizada por admin)');
         });
         it('should use appointment userId when adminUserId is not provided', async () => {

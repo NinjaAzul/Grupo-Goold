@@ -21,6 +21,7 @@ import { createAppointmentRoutes } from '@modules/appointments/use-cases/create/
 import { listAppointmentsRoutes } from '@modules/appointments/use-cases/list/list.routes';
 import { adminListAppointmentsRoutes } from '@modules/appointments/use-cases/admin-list/admin-list.routes';
 import { availableSlotsRoutes } from '@modules/appointments/use-cases/available-slots/available-slots.routes';
+import { availableRoomsRoutes } from '@modules/appointments/use-cases/available-rooms/available-rooms.routes';
 import { cancelAppointmentRoutes } from '@modules/appointments/use-cases/cancel/cancel.routes';
 import { updateStatusRoutes } from '@modules/appointments/use-cases/update-status/update-status.routes';
 import { roomsRoutes } from '@modules/rooms/use-cases/rooms.routes';
@@ -55,6 +56,7 @@ routes.use('/cities', searchByCEPRoutes);
 routes.use('/appointments', createAppointmentRoutes);
 routes.use('/appointments', listAppointmentsRoutes);
 routes.use('/appointments', availableSlotsRoutes);
+routes.use('/appointments', availableRoomsRoutes);
 routes.use('/appointments', cancelAppointmentRoutes);
 
 //ROOMS ROUTES

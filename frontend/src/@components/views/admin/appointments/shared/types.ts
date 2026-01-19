@@ -14,13 +14,20 @@ export interface ApiAppointment {
   id: number;
   userId: number;
   appointmentDate: string;
-  room: string;
+  roomId?: number | null;
   status: 'pending' | 'scheduled' | 'cancelled';
   user?: {
     id: number;
     firstName: string;
     lastName: string;
     email: string;
+  };
+  room?: {
+    id: number;
+    name: string;
+    startTime: string;
+    endTime: string;
+    timeBlock: number;
   };
   createdAt?: string;
   updatedAt?: string;

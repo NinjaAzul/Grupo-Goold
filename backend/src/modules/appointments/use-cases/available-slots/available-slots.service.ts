@@ -46,7 +46,7 @@ export class AvailableSlotsService {
 
     const existingAppointments = await AppointmentModel.findAll({
       where: {
-        room: room.name,
+        roomId: room.id,
         appointmentDate: {
           [Op.between]: [dayStartUTC, dayEndUTC],
         },

@@ -6,6 +6,7 @@ export interface IListLogsRequest {
     userId?: number;
     activityType?: string;
     module?: string;
+    userName?: string;
     startDate?: string;
     endDate?: string;
 }

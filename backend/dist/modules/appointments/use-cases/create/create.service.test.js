@@ -23,8 +23,15 @@ describe('CreateAppointmentService', () => {
             id: 1,
             userId: 1,
             appointmentDate: new Date('2024-01-20T10:00:00Z'),
-            room: 'Sala A',
+            roomId: 1,
             status: appointment_interface_1.AppointmentStatus.PENDING,
+            room: {
+                id: 1,
+                name: 'Sala A',
+                startTime: '08:00',
+                endTime: '18:00',
+                timeBlock: 30,
+            },
         };
         it('should successfully create appointment', async () => {
             mockAppointmentRepository.create = jest
@@ -33,14 +40,17 @@ describe('CreateAppointmentService', () => {
             const result = await createAppointmentService.execute({
                 userId: 1,
                 appointmentDate: new Date('2024-01-20T10:00:00Z'),
-                room: 'Sala A',
+                roomId: 1,
             });
             expect(mockAppointmentRepository.create).toHaveBeenCalledWith({
                 userId: 1,
                 appointmentDate: new Date('2024-01-20T10:00:00Z'),
-                room: 'Sala A',
+                roomId: 1,
             });
-            expect(result.appointment).toEqual(mockAppointment);
+            expect(result.appointment).toEqual({
+                ...mockAppointment,
+                appointmentDate: '2024-01-20T10:00:00.000Z',
+            });
             expect(result.appointment.status).toBe(appointment_interface_1.AppointmentStatus.PENDING);
             expect(mockLoggerService.log).toHaveBeenCalledWith('Criação de agendamento', 'Agendamento', 1, expect.stringContaining('Agendamento 1 criado - Sala: Sala A'));
         });
@@ -49,14 +59,20 @@ describe('CreateAppointmentService', () => {
             await expect(createAppointmentService.execute({
                 userId: 1,
                 appointmentDate: new Date('2024-01-20T10:00:00Z'),
-                room: 'Sala A',
+                roomId: 1,
             })).rejects.toThrow('Falha ao criar agendamento');
         });
         it('should log appointment creation with correct details', async () => {
             const appointmentWithUser = {
                 ...mockAppointment,
                 id: 2,
-                room: 'Sala B',
+                room: {
+                    id: 2,
+                    name: 'Sala B',
+                    startTime: '08:00',
+                    endTime: '18:00',
+                    timeBlock: 30,
+                },
             };
             mockAppointmentRepository.create = jest
                 .fn()
@@ -64,7 +80,7 @@ describe('CreateAppointmentService', () => {
             await createAppointmentService.execute({
                 userId: 1,
                 appointmentDate: new Date('2024-01-21T14:00:00Z'),
-                room: 'Sala B',
+                roomId: 2,
             });
             expect(mockLoggerService.log).toHaveBeenCalledWith('Criação de agendamento', 'Agendamento', 1, expect.stringContaining('Agendamento 2 criado - Sala: Sala B'));
         });

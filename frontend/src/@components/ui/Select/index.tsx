@@ -128,7 +128,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               position="popper"
               sideOffset={4}
             >
-              <SelectPrimitive.Viewport className="p-1">
+              <SelectPrimitive.Viewport className="p-1 max-h-[300px] overflow-y-auto">
                 {options.map((option) => (
                   <SelectPrimitive.Item
                     key={option.value}

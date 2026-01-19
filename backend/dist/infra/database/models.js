@@ -59,6 +59,14 @@ log_model_1.LogModel.belongsTo(user_model_1.UserModel, {
     foreignKey: 'user_id',
     as: 'user',
 });
+room_model_1.RoomModel.hasMany(appointment_model_1.AppointmentModel, {
+    foreignKey: 'room_id',
+    as: 'appointments',
+});
+appointment_model_1.AppointmentModel.belongsTo(room_model_1.RoomModel, {
+    foreignKey: 'room_id',
+    as: 'room',
+});
 user_model_1.UserModel.belongsToMany(permissions_1.PermissionModel, {
     through: user_permissions_1.UserPermissionModel,
     foreignKey: 'user_id',

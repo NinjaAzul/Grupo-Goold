@@ -8,13 +8,16 @@ const room_model_1 = require("@modules/rooms/model/room.model");
 const appointment_interface_1 = require("../model/appointment.interface");
 class AppointmentRepository {
     async create(data) {
+        if (!data.roomId) {
+            throw new Error('roomId is required');
+        }
         const appointment = await appointment_model_1.AppointmentModel.create({
             userId: data.userId,
             appointmentDate: data.appointmentDate,
-            room: data.room,
+            roomId: data.roomId,
             status: appointment_interface_1.AppointmentStatus.PENDING,
         });
-        const appointmentWithUser = await appointment_model_1.AppointmentModel.findByPk(appointment.id, {
+        const appointmentWithRelations = await appointment_model_1.AppointmentModel.findByPk(appointment.id, {
             include: [
                 {
                     model: user_model_1.UserModel,
@@ -23,12 +26,17 @@ class AppointmentRepository {
                         exclude: ['password'],
                     },
                 },
+                {
+                    model: room_model_1.RoomModel,
+                    as: 'room',
+                    required: true,
+                },
             ],
         });
-        if (!appointmentWithUser) {
+        if (!appointmentWithRelations) {
             return null;
         }
-        return appointmentWithUser.toJSON();
+        return appointmentWithRelations.toJSON();
     }
     async findAll(filters) {
         const page = filters.page || 1;
@@ -74,13 +82,21 @@ class AppointmentRepository {
                         exclude: ['password'],
                     },
                 },
+                {
+                    model: room_model_1.RoomModel,
+                    as: 'room',
+                    required: true,
+                },
             ],
             limit,
             offset,
             order: [['appointmentDate', 'DESC']],
         });
         return {
-            rows: rows.map((row) => row.toJSON()),
+            rows: rows.map((row) => {
+                const appointment = row.toJSON();
+                return appointment;
+            }),
             count,
         };
     }
@@ -90,6 +106,7 @@ class AppointmentRepository {
         const offset = (page - 1) * limit;
         const where = {};
         let userWhere;
+        let roomWhere;
         if (filters.name) {
             userWhere = {
                 [sequelize_1.Op.or]: [
@@ -100,7 +117,10 @@ class AppointmentRepository {
             };
         }
         if (filters.room) {
-            where.room = { [sequelize_1.Op.like]: `%${filters.room}%` };
+            // Buscar pelo nome da sala através do relacionamento
+            roomWhere = {
+                name: { [sequelize_1.Op.like]: `%${filters.room}%` },
+            };
         }
         if (filters.status) {
             where.status = filters.status;
@@ -128,13 +148,19 @@ class AppointmentRepository {
                     },
                     required: !!userWhere,
                 },
+                {
+                    model: room_model_1.RoomModel,
+                    as: 'room',
+                    where: roomWhere,
+                    required: true,
+                },
             ],
             limit,
             offset,
             order: [['appointmentDate', 'DESC']],
         });
         return {
-            appointments: rows.map((appointment) => appointment.toJSON()),
+            appointments: rows.map((row) => row.toJSON()),
             total: count,
         };
     }
@@ -157,6 +183,11 @@ class AppointmentRepository {
                         exclude: ['password'],
                     },
                 },
+                {
+                    model: room_model_1.RoomModel,
+                    as: 'room',
+                    required: true,
+                },
             ],
         });
         if (!appointment) {
@@ -175,6 +206,11 @@ class AppointmentRepository {
                     attributes: {
                         exclude: ['password'],
                     },
+                },
+                {
+                    model: room_model_1.RoomModel,
+                    as: 'room',
+                    required: true,
                 },
             ],
         });

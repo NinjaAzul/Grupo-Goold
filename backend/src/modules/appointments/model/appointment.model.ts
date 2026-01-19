@@ -9,7 +9,7 @@ export class AppointmentModel
   public id!: number;
   public userId!: number;
   public appointmentDate!: Date;
-  public room!: string;
+  public roomId!: number;
   public status!: AppointmentStatus;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -32,10 +32,10 @@ AppointmentModel.init(
       allowNull: false,
       field: 'appointment_date',
     },
-    room: {
-      type: DataTypes.STRING(50),
+    roomId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'room',
+      field: 'room_id',
     },
     status: {
       type: DataTypes.ENUM('pending', 'scheduled', 'cancelled'),

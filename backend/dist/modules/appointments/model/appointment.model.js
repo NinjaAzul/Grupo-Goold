@@ -23,10 +23,10 @@ AppointmentModel.init({
         allowNull: false,
         field: 'appointment_date',
     },
-    room: {
-        type: sequelize_1.DataTypes.STRING(50),
+    roomId: {
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        field: 'room',
+        field: 'room_id',
     },
     status: {
         type: sequelize_1.DataTypes.ENUM('pending', 'scheduled', 'cancelled'),

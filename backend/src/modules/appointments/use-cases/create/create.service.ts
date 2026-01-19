@@ -22,11 +22,13 @@ export class CreateAppointmentService {
       throw new Error('Falha ao criar agendamento');
     }
 
+    const roomName = appointment.room?.name || 'Sala não encontrada';
+
     await LoggerService.log(
       'Criação de agendamento',
       'Agendamento',
       request.userId,
-      `Agendamento ${appointment.id} criado - Sala: ${request.room}, Data: ${request.appointmentDate}`
+      `Agendamento ${appointment.id} criado - Sala: ${roomName}, Data: ${request.appointmentDate}`
     );
 
     return { appointment: DateHelper.normalizeDatesInObject(appointment) };

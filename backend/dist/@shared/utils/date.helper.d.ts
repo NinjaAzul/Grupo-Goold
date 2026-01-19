@@ -1,7 +1,3 @@
-/**
- * Helper for working with dates in UTC/ISO format
- * Ensures consistency across the entire system
- */
 export declare class DateHelper {
     /**
      * Formats an ISO (UTC) date to Brazilian format
@@ -19,13 +15,6 @@ export declare class DateHelper {
      * @returns Date object in UTC
      */
     static createUTCDate(year: number, month: number, day: number, hours?: number, minutes?: number, seconds?: number, milliseconds?: number): Date;
-    /**
-     * Creates a UTC date from a date string (YYYY-MM-DD) and time string (HH:mm)
-     * @param dateString - Date in YYYY-MM-DD format
-     * @param timeString - Time in HH:mm format
-     * @returns Date object in UTC
-     */
-    static createUTCFromDateAndTime(dateString: string, timeString: string): Date;
     /**
      * Gets the start of the day in UTC
      * @param dateString - Date in YYYY-MM-DD format
@@ -53,28 +42,23 @@ export declare class DateHelper {
      */
     static addHoursUTC(date: Date, hours: number): Date;
     /**
-     * Formats a UTC date to ISO string
-     * @param date - Date object
-     * @returns ISO string (UTC)
-     */
-    static toISOString(date: Date): string;
-    /**
      * Converts an ISO string to Date object
      * @param isoString - ISO string
      * @returns Date object
      */
     static fromISOString(isoString: string): Date;
     /**
-     * Extracts only the date (without time) from an ISO date
-     * @param isoDate - Date in ISO string format (UTC)
-     * @returns String in YYYY-MM-DD format
-     */
-    static extractDateOnly(isoDate: string | Date): string;
-    /**
      * Extracts only the time (without date) from an ISO date
      * @param isoDate - Date in ISO string format (UTC)
      * @returns String in HH:mm format
      */
     static extractTimeOnly(isoDate: string | Date): string;
+    static normalizeToISOUTC(value: Date | string | null | undefined): string | null | undefined;
+    /**
+     * Recursively normalizes all date fields in an object to ISO UTC strings
+     * @param obj - Object to normalize
+     * @returns Object with all dates normalized to ISO UTC strings
+     */
+    static normalizeDatesInObject<T>(obj: T): T;
 }
 //# sourceMappingURL=date.helper.d.ts.map

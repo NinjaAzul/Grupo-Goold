@@ -4,6 +4,7 @@ export declare class ListLogsQueryDto {
     userId?: number;
     activityType?: string;
     module?: string;
+    userName?: string;
     startDate?: string;
     endDate?: string;
 }

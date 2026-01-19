@@ -48,6 +48,11 @@ __decorate([
 ], ListLogsQueryDto.prototype, "module", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'User name must be a string' }),
+    __metadata("design:type", String)
+], ListLogsQueryDto.prototype, "userName", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)({}, { message: 'Start date must be a valid date string' }),
     __metadata("design:type", String)
 ], ListLogsQueryDto.prototype, "startDate", void 0);

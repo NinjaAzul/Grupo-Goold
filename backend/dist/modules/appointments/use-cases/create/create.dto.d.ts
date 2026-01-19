@@ -1,5 +1,5 @@
 export declare class CreateAppointmentDto {
     appointmentDate: string;
-    room: string;
+    roomId: number;
 }
 //# sourceMappingURL=create.dto.d.ts.map

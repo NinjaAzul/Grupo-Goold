@@ -36,12 +36,15 @@ const mapApiAppointmentToAppointment = (appointment: ApiAppointment): Appointmen
     pending: 'pending',
   };
 
+
+  const roomName = appointment.room?.name || 'Sala não encontrada';
+
   return {
     id: String(appointment.id),
     date: DateHelper.formatAppointmentDate(appointmentDate),
     name: userName,
     type: userEmail,
-    room: appointment.room,
+    room: roomName,
     status: statusMap[appointment.status] || 'pending',
   };
 };
