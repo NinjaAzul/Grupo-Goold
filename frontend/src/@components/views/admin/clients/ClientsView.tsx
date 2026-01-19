@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/@components/ui/Divider';
 import { Pagination } from '@/@components/ui/Pagination';
 import { usePage } from '@/contexts/PageContext';
@@ -22,9 +20,10 @@ import {
   ApiUsersResponse,
   ApiUser,
 } from './types';
+import { DateHelper } from '@/lib/date';
 
 const mapApiUserToClient = (user: ApiUser): Client => {
-  const createdAt = user.createdAt ? new Date(user.createdAt) : new Date();
+  const createdAt = user.createdAt ? DateHelper.fromISOString(user.createdAt) : new Date();
   const fullName = `${user.firstName} ${user.lastName}`.trim();
   
   const addressParts = [
@@ -64,7 +63,7 @@ const mapApiUserToClient = (user: ApiUser): Client => {
 
   return {
     id: String(user.id),
-    registrationDate: format(createdAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+    registrationDate: DateHelper.formatAppointmentDate(createdAt),
     name: fullName,
     email: user.email,
     address,

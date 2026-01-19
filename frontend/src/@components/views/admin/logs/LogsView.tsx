@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/@components/ui/Divider';
 import { Pagination } from '@/@components/ui/Pagination';
 import { usePage } from '@/contexts/PageContext';
@@ -11,9 +9,10 @@ import { LogsTable } from './LogsTable';
 import { useGetLogs } from '@/api/generated/logs/logs';
 import { Log, SortField, SortDirection, ApiLog, ApiLogsResponse } from './types';
 import { GetLogsParams } from '@/api/generated/models';
+import { DateHelper } from '@/lib/date';
 
 const mapApiLogToLog = (apiLog: ApiLog): Log => {
-  const createdAt = apiLog.createdAt ? new Date(apiLog.createdAt) : new Date();
+  const createdAt = apiLog.createdAt ? DateHelper.fromISOString(apiLog.createdAt) : new Date();
   const clientName = apiLog.user
     ? `${apiLog.user.firstName} ${apiLog.user.lastName}`.trim()
     : 'Sistema';
@@ -25,7 +24,7 @@ const mapApiLogToLog = (apiLog: ApiLog): Log => {
     clientEmail,
     activityType: apiLog.activityType,
     module: apiLog.module,
-    dateTime: format(createdAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+    dateTime: DateHelper.formatAppointmentDate(createdAt),
   };
 };
 

@@ -1,6 +1,7 @@
 import { UserRepository } from '../../repositories/user.repository';
 import { IListUsersResponse } from './list.interface';
 import { ListUsersQueryDto } from './list-query.dto';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class ListUsersService {
   private repository: UserRepository;
@@ -19,7 +20,7 @@ export class ListUsersService {
 
     return {
       success: true,
-      data: users,
+      data: DateHelper.normalizeDatesInObject(users),
       pagination: {
         page,
         limit,

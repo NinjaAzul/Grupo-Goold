@@ -4,6 +4,7 @@ import {
   ICreateAppointmentResponse,
 } from './create.interface';
 import { LoggerService } from '@shared/utils/logger.service';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class CreateAppointmentService {
   private appointmentRepository: AppointmentRepository;
@@ -28,6 +29,6 @@ export class CreateAppointmentService {
       `Agendamento ${appointment.id} criado - Sala: ${request.room}, Data: ${request.appointmentDate}`
     );
 
-    return { appointment };
+    return { appointment: DateHelper.normalizeDatesInObject(appointment) };
   }
 }

@@ -4,6 +4,7 @@ import { UserRepository } from '../../repositories/user.repository';
 import { ILoginRequest, ILoginResponse } from './login.interface';
 import { UnauthorizedError } from '@shared/errors';
 import { LoggerService } from '@shared/utils/logger.service';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class LoginService {
   private userRepository: UserRepository;
@@ -22,6 +23,12 @@ export class LoginService {
       throw new UnauthorizedError('E-mail ou senha incorretos');
     }
 
+    if (!user.active) {
+      throw new UnauthorizedError(
+        'Sua conta está desativada. Entre em contato com o administrador.'
+      );
+    }
+
     const passwordMatch = await compare(password, user.password);
 
     if (!passwordMatch) {
@@ -36,7 +43,7 @@ export class LoginService {
     });
 
     const tokenReturn: ILoginResponse = {
-      user: userWithoutPassword,
+      user: DateHelper.normalizeDatesInObject(userWithoutPassword),
       token,
     };
 

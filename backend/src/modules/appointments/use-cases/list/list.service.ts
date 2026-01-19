@@ -3,6 +3,7 @@ import {
   IListAppointmentsRequest,
   IListAppointmentsResponse,
 } from './list.interface';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class ListAppointmentsService {
   private appointmentRepository: AppointmentRepository;
@@ -22,7 +23,7 @@ export class ListAppointmentsService {
 
     return {
       success: true,
-      data: rows,
+      data: DateHelper.normalizeDatesInObject(rows),
       pagination: {
         page,
         limit,

@@ -65,6 +65,41 @@ describe('LoginService', () => {
       expect(mockBcrypt.compare).not.toHaveBeenCalled();
     });
 
+    it('should throw UnauthorizedError when user is inactive', async () => {
+      const inactiveUser: IUser = {
+        ...mockUser,
+        active: false,
+      };
+
+      mockUserRepository.findByEmail = jest
+        .fn()
+        .mockResolvedValue(inactiveUser);
+
+      await expect(
+        loginService.execute({
+          email: 'user@test.com',
+          password: 'password123',
+        })
+      ).rejects.toThrow(UnauthorizedError);
+      await expect(
+        loginService.execute({
+          email: 'user@test.com',
+          password: 'password123',
+        })
+      ).rejects.toThrow(
+        'Sua conta está desativada. Entre em contato com o administrador.'
+      );
+
+      expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(
+        'user@test.com',
+        {
+          includePermissions: true,
+          excludePassword: false,
+        }
+      );
+      expect(mockBcrypt.compare).not.toHaveBeenCalled();
+    });
+
     it('should throw UnauthorizedError when password is incorrect', async () => {
       mockUserRepository.findByEmail = jest.fn().mockResolvedValue(mockUser);
       mockBcrypt.compare = jest.fn().mockResolvedValue(false);

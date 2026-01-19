@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
 import { Divider } from '@/@components/ui/Divider';
 import { Pagination } from '@/@components/ui/Pagination';
 import { usePage } from '@/contexts/PageContext';
@@ -23,9 +21,10 @@ import {
   ApiAppointment,
 } from './shared/types';
 import type { GetAdminAppointmentsParams } from '@/api/generated/models';
+import { DateHelper } from '@/lib/date';
 
 const mapApiAppointmentToAppointment = (appointment: ApiAppointment): Appointment => {
-  const appointmentDate = new Date(appointment.appointmentDate);
+  const appointmentDate = DateHelper.fromISOString(appointment.appointmentDate);
   const userName = appointment.user
     ? `${appointment.user.firstName} ${appointment.user.lastName}`.trim()
     : 'Usuário não encontrado'; 
@@ -39,7 +38,7 @@ const mapApiAppointmentToAppointment = (appointment: ApiAppointment): Appointmen
 
   return {
     id: String(appointment.id),
-    date: format(appointmentDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+    date: DateHelper.formatAppointmentDate(appointmentDate),
     name: userName,
     type: userEmail,
     room: appointment.room,

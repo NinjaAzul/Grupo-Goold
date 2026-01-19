@@ -3,6 +3,7 @@ import {
   IAdminListAppointmentsRequest,
   IAdminListAppointmentsResponse,
 } from './admin-list.interface';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class AdminListAppointmentsService {
   private appointmentRepository: AppointmentRepository;
@@ -28,7 +29,7 @@ export class AdminListAppointmentsService {
 
     return {
       success: true,
-      data: appointments,
+      data: DateHelper.normalizeDatesInObject(appointments),
       pagination: {
         page,
         limit,

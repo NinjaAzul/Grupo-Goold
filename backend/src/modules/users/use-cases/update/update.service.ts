@@ -5,6 +5,7 @@ import { NotFoundError, BadRequestError } from '@shared/errors';
 import { CityRepository } from '@modules/cities/repositories/city.repository';
 import { RoleRepository } from '@/modules/roles/repositories/role.repository';
 import { UserModel } from '@modules/users/model/user.model';
+import { DateHelper } from '@shared/utils/date.helper';
 import bcrypt from 'bcrypt';
 
 export class UpdateUserService {
@@ -69,6 +70,6 @@ export class UpdateUserService {
       `Usuário ${user.email} atualizou perfil`
     );
 
-    return { user };
+    return { user: DateHelper.normalizeDatesInObject(user) };
   }
 }

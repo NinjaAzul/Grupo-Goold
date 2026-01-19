@@ -6,6 +6,7 @@ import {
 import { LoggerService } from '@shared/utils/logger.service';
 import { AppointmentStatus } from '@modules/appointments/model/appointment.interface';
 import { NotFoundError } from '@shared/errors';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class UpdateStatusService {
   private appointmentRepository: AppointmentRepository;
@@ -39,6 +40,6 @@ export class UpdateStatusService {
       `Agendamento ${appointment.id} - Status: ${request.status}${request.adminUserId ? ` (Ação realizada por admin)` : ''}`
     );
 
-    return { appointment };
+    return { appointment: DateHelper.normalizeDatesInObject(appointment) };
   }
 }

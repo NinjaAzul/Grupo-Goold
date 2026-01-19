@@ -24,29 +24,21 @@ export class AvailableSlotsService {
 
     const [startHour, startMinute] = room.startTime.split(':');
     const [endHour, endMinute] = room.endTime.split(':');
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = date.split('-').map(Number);
 
-    const startDate = new Date(
-      Date.UTC(
-        parseInt(year),
-        parseInt(month) - 1,
-        parseInt(day),
-        parseInt(startHour),
-        parseInt(startMinute),
-        0,
-        0
-      )
+    const startDate = DateHelper.createUTCDate(
+      year,
+      month,
+      day,
+      parseInt(startHour),
+      parseInt(startMinute)
     );
-    const endDate = new Date(
-      Date.UTC(
-        parseInt(year),
-        parseInt(month) - 1,
-        parseInt(day),
-        parseInt(endHour),
-        parseInt(endMinute),
-        0,
-        0
-      )
+    const endDate = DateHelper.createUTCDate(
+      year,
+      month,
+      day,
+      parseInt(endHour),
+      parseInt(endMinute)
     );
 
     const dayStartUTC = DateHelper.getStartOfDayUTC(date);

@@ -35,6 +35,16 @@ export function ClientsTable({
   onToggleStatus,
   onTogglePermission,
 }: ClientsTableProps) {
+  if (!isLoading && data.length === 0) {
+    return (
+      <div className="bg-background-white mt-4">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <NotFound />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background-white mt-4">
       <div className="overflow-x-auto -mx-4 lg:-mx-8 px-4 lg:px-8">
@@ -81,12 +91,6 @@ export function ClientsTable({
                   </TableCell>
                 </TableRow>
               ))
-            ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="p-0">
-                  <NotFound />
-                </TableCell>
-              </TableRow>
             ) : (
               data.map((client) => (
                 <TableRow key={client.id}>

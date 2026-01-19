@@ -4,12 +4,12 @@ import { cn } from '@/lib/utils';
 import { SpinnerIcon } from '@/@components/icons';
 
 const inputVariants = cva(
-  'w-full h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors flex items-center',
+  'w-full h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors flex items-center disabled:cursor-not-allowed disabled:bg-background-light',
   {
     variants: {
       hasError: {
         true: 'border-error',
-        false: 'border-gray-300',
+        false: 'border-border',
       },
       hasLeftIcon: {
         true: 'pl-10',

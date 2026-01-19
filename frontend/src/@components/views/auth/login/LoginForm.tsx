@@ -31,7 +31,7 @@ const STEP_CONFIG = {
   },
   [LoginStep.PASSWORD]: {
     title: 'Senha',
-    canGoBack: false,
+    canGoBack: true,
   },
 } as const;
 
@@ -89,6 +89,9 @@ export function LoginForm({
           toast.success('Login realizado com sucesso!');
         }
       },
+      onError: () => {
+        toast.error('Erro ao fazer login. Verifique suas credenciais.');
+      },
     },
   });
 
@@ -111,7 +114,15 @@ export function LoginForm({
     setCurrentStep((prev) => {
       const currentIndex = STEP_ORDER.indexOf(prev);
       const previousIndex = Math.max(currentIndex - 1, 0);
-      return STEP_ORDER[previousIndex];
+      const newStep = STEP_ORDER[previousIndex];
+      
+      // Se voltar para o passo de email, limpa o email do formulário de login
+      if (newStep === LoginStep.EMAIL) {
+        loginForm.setValue('email', '');
+        setEmail('');
+      }
+      
+      return newStep;
     });
   };
 
@@ -193,6 +204,11 @@ export function LoginForm({
                     type="email"
                     error={fieldState.error?.message}
                     required
+                    disabled={isLoggingIn}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setEmail(e.target.value);
+                    }}
                   />
                 )}
               />

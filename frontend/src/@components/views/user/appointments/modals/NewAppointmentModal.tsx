@@ -140,91 +140,95 @@ export function NewAppointmentModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Novo Agendamento"
       size="sm"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Controller
-          name="date"
-          control={control}
-          render={({ field }) => (
-            <DatePicker
-              label="Selecione uma data (Obrigatório)"
-              value={field.value}
-              onChange={(date) => field.onChange(date || new Date())}
-              placeholder="Selecione uma data"
-              minDate={new Date()}
-              error={errors.date?.message}
-              required
-            />
-          )}
-        />
-
-        <Controller
-          name="roomId"
-          control={control}
-          render={({ field }) => {
-            return (
-              <Select
-                label="Selecione uma Sala (Obrigatório)"
-                options={roomOptions}
-                placeholder="Selecione uma Sala"
+      <Modal.Header title="Novo Agendamento" />
+      <Modal.Body>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" id="appointment-form">
+          <Controller
+            name="date"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                label="Selecione uma data (Obrigatório)"
                 value={field.value}
-                onChange={(value) => {
-                  const numValue = Number(value);
-                  field.onChange(numValue);
-                }}
-                error={errors.roomId?.message}
+                onChange={(date) => field.onChange(date || new Date())}
+                placeholder="Selecione uma data"
+                minDate={new Date()}
+                error={errors.date?.message}
                 required
-                disabled={isLoadingRooms}
               />
-            );
-          }}
-        />
+            )}
+          />
 
-        <Controller
-          name="time"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <Select
-                label="Selecione um horário (Obrigatório)"
-                options={timeOptions}
-                placeholder="Selecione um horário"
-                value={field.value}
-                onChange={(value) => field.onChange(value)}
-                error={errors.time?.message}
-                required
-                disabled={!selectedDate || !selectedRoomId || isLoadingSlots}
-                type="hour"
-              />
-              {isLoadingSlots && (
-                <div className="mt-2 flex items-center gap-2">
-                  <SpinnerIcon className="w-5 h-5 text-primary" />
-                </div>
-              )}
-              {!isLoadingSlots &&
-                selectedDate &&
-                selectedRoomId &&
-                availableSlots.length === 0 && (
-                  <p className="mt-1 text-sm text-gray-500">
-                    Nenhum horário disponível para esta data e sala
-                  </p>
+          <Controller
+            name="roomId"
+            control={control}
+            render={({ field }) => {
+              return (
+                <Select
+                  label="Selecione uma Sala (Obrigatório)"
+                  options={roomOptions}
+                  placeholder="Selecione uma Sala"
+                  value={field.value}
+                  onChange={(value) => {
+                    const numValue = Number(value);
+                    field.onChange(numValue);
+                  }}
+                  error={errors.roomId?.message}
+                  required
+                  disabled={isLoadingRooms}
+                />
+              );
+            }}
+          />
+
+          <Controller
+            name="time"
+            control={control}
+            render={({ field }) => (
+              <div>
+                <Select
+                  label="Selecione um horário (Obrigatório)"
+                  options={timeOptions}
+                  placeholder="Selecione um horário"
+                  value={field.value}
+                  onChange={(value) => field.onChange(value)}
+                  error={errors.time?.message}
+                  required
+                  disabled={!selectedDate || !selectedRoomId || isLoadingSlots}
+                  type="hour"
+                />
+                {isLoadingSlots && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <SpinnerIcon className="w-5 h-5 text-primary" />
+                  </div>
                 )}
-            </div>
-          )}
-        />
-
+                {!isLoadingSlots &&
+                  selectedDate &&
+                  selectedRoomId &&
+                  availableSlots.length === 0 && (
+                    <p className="mt-1 text-sm text-gray-500">
+                      Nenhum horário disponível para esta data e sala
+                    </p>
+                  )}
+              </div>
+            )}
+          />
+        </form>
+      </Modal.Body>
+      <Modal.Footer>
         <Button
           type="submit"
+          form="appointment-form"
           variant="primary"
           isLoading={createAppointment.isPending}
-          className="w-full"
           disabled={isLoadingSlots || isLoadingRooms}
+          className="w-full"
         >
           Confirmar Agendamento
         </Button>
-      </form>
+      </Modal.Footer>
     </Modal>
   );
 }

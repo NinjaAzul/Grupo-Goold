@@ -1,6 +1,7 @@
 import { UserRepository } from '../../repositories/user.repository';
 import { IGetProfileResponse } from './profile.interface';
 import { NotFoundError } from '@shared/errors';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class GetProfileService {
   private repository: UserRepository;
@@ -21,6 +22,6 @@ export class GetProfileService {
       throw new NotFoundError('Usuário não encontrado');
     }
 
-    return { user };
+    return { user: DateHelper.normalizeDatesInObject(user) };
   }
 }

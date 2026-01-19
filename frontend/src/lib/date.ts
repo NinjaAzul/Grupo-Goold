@@ -1,23 +1,19 @@
 import { parseISO } from 'date-fns';
 
-/**
- * Helper for working with dates in UTC/ISO format
- * Ensures consistency across the entire system
- */
 export class DateHelper {
   /**
-   * Formats an ISO (UTC) date to Brazilian format
+   * Formats an ISO (UTC) date to Brazilian format in local timezone
    * @param isoDate - Date in ISO string format (UTC)
    * @returns Formatted string: "dd/MM/yyyy às HH:mm"
    */
   static formatAppointmentDate(isoDate: string | Date): string {
     const date = typeof isoDate === 'string' ? parseISO(isoDate) : isoDate;
-
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const year = date.getUTCFullYear();
-    const hours = date.getUTCHours().toString().padStart(2, '0');
-    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
 
     return `${day}/${month}/${year} às ${hours}:${minutes}`;
   }

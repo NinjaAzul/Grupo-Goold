@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, createContext, useContext } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import { XIcon } from '@/@components/icons'; 
+import { XIcon } from '@/@components/icons';
 
 const modalOverlayVariants = cva(
   'fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity',
@@ -44,6 +44,20 @@ const modalContentVariants = cva(
   }
 );
 
+interface ModalContextType {
+  onClose: () => void;
+}
+
+const ModalContext = createContext<ModalContextType | undefined>(undefined);
+
+const useModalContext = () => {
+  const context = useContext(ModalContext);
+  if (!context) {
+    throw new Error('Modal components must be used within Modal');
+  }
+  return context;
+};
+
 export interface ModalProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof modalContentVariants> {
@@ -54,7 +68,7 @@ export interface ModalProps
   showCloseButton?: boolean;
 }
 
-export const Modal: React.FC<ModalProps> = ({
+const ModalRoot: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   title,
@@ -89,50 +103,173 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div
-      className={cn(modalOverlayVariants({ isOpen }))}
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={title ? 'modal-title' : undefined}
-    >
-      <div
-        className={cn(modalContentVariants({ size, isOpen }), className)}
-        onClick={(e) => e.stopPropagation()}
-        {...props}
-      >
-        {/* Header */}
-        {(title || showCloseButton) && (
+  const contextValue: ModalContextType = { onClose };
+
+  const childrenArray = React.Children.toArray(children);
+  const hasCustomHeader = childrenArray.some(
+    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'Modal.Header'
+  );
+  const hasCustomFooter = childrenArray.some(
+    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'Modal.Footer'
+  );
+  const hasCustomBody = childrenArray.some(
+    (child) => React.isValidElement(child) && (child.type as any)?.displayName === 'Modal.Body'
+  );
+
+  if (hasCustomHeader || hasCustomFooter || hasCustomBody) {
+    return (
+      <ModalContext.Provider value={contextValue}>
+        <div
+          className={cn(modalOverlayVariants({ isOpen }))}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+        >
           <div
-            className="flex items-center justify-between p-6 border-b border-border flex-shrink-0"
-            style={{ borderBottomColor: 'var(--color-border)' }}
+            className={cn(modalContentVariants({ size, isOpen }), className)}
+            onClick={(e) => e.stopPropagation()}
+            {...props}
           >
-            <div className="flex items-center gap-2">
-              {title && (
-                <h2 id="modal-title" className="text-xl font-bold text-primary">
-                  {title}
-                </h2>
+            {children}
+          </div>
+        </div>
+      </ModalContext.Provider>
+    );
+  }
+
+  return (
+    <ModalContext.Provider value={contextValue}>
+      <div
+        className={cn(modalOverlayVariants({ isOpen }))}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? 'modal-title' : undefined}
+      >
+        <div
+          className={cn(modalContentVariants({ size, isOpen }), className)}
+          onClick={(e) => e.stopPropagation()}
+          {...props}
+        >
+          {(title || showCloseButton) && (
+            <div
+              className="flex items-center justify-between p-6 flex-shrink-0"
+              style={{ borderBottom: '1px solid #D7D7D7' }}
+            >
+              <div className="flex items-center gap-2">
+                {title && (
+                  <h2
+                    id="modal-title"
+                    className="text-[18px] font-medium text-primary leading-none tracking-normal"
+            
+                  >
+                    {title}
+                  </h2>
+                )}
+              </div>
+              {showCloseButton && (
+                <button
+                  onClick={onClose}
+                  className="text-black hover:text-black transition-colors"
+                  aria-label="Fechar modal"
+                >
+                  <XIcon
+                    className="w-[12.72px] h-[12.74px]"
+                    style={{ width: '12.719970703125px', height: '12.735342025756836px' }}
+                    strokeWidth={0.5}
+                  />
+                </button>
               )}
             </div>
-            {showCloseButton && (
-              <button
-                onClick={onClose}
-                className="text-black hover:text-black transition-colors"
-                aria-label="Fechar modal"
-              >
-                <XIcon className="w-[12.72px] h-[12.74px]" strokeWidth={0.5} />
-              </button>
-            )}
-          </div>
-        )}
+          )}
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6">{children}</div>
+          <div className="flex-1 overflow-y-auto p-6">{children}</div>
+        </div>
+      </div>
+    </ModalContext.Provider>
+  );
+};
+
+const ModalHeader: React.FC<React.HTMLAttributes<HTMLDivElement> & { title?: string }> = ({
+  title,
+  children,
+  className,
+  ...props
+}) => {
+  const { onClose } = useModalContext();
+
+  return (
+    <div
+      className={cn('flex items-center justify-between p-6 flex-shrink-0', className)}
+      style={{ borderBottom: '1px solid #D7D7D7' }}
+      {...props}
+    >
+      <div className="flex items-center gap-2">
+        {title && (
+          <h2
+            id="modal-title"
+            className="text-[18px] font-medium text-primary leading-none tracking-normal"
+            style={{ fontFamily: 'Montserrat' }}
+          >
+            {title}
+          </h2>
+        )}
+        {children}
+      </div>
+      <button
+        onClick={onClose}
+        className="text-black hover:text-black transition-colors"
+        aria-label="Fechar modal"
+      >
+        <XIcon
+          className="w-[12.72px] h-[12.74px]"
+          style={{ width: '12.719970703125px', height: '12.735342025756836px' }}
+          strokeWidth={0.5}
+        />
+      </button>
+    </div>
+  );
+};
+ModalHeader.displayName = 'Modal.Header';
+
+const ModalBody: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <div className={cn('flex-1 overflow-y-auto p-6', className)} {...props}>
+      {children}
+    </div>
+  );
+};
+ModalBody.displayName = 'Modal.Body';
+
+const ModalFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <div
+      className={cn(
+        'flex-shrink-0 w-full h-[90px] border-t border-[#D7D7D7] shadow-[0px_0px_13px_0px_rgba(0,0,0,0.15)]',
+        className
+      )}
+      {...props}
+    >
+      <div className="h-full flex items-center gap-3 px-6 w-full">
+        {children}
       </div>
     </div>
   );
 };
+ModalFooter.displayName = 'Modal.Footer';
+
+export const Modal = Object.assign(ModalRoot, {
+  Header: ModalHeader,
+  Body: ModalBody,
+  Footer: ModalFooter,
+});
 
 Modal.displayName = 'Modal';
-

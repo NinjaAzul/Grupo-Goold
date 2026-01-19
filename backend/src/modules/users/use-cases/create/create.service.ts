@@ -4,6 +4,7 @@ import { NotFoundError, ConflictError } from '@shared/errors';
 import { CityRepository } from '@modules/cities/repositories/city.repository';
 import { CreateUserDto } from './create.dto';
 import { LoggerService } from '@shared/utils/logger.service';
+import { DateHelper } from '@shared/utils/date.helper';
 import bcrypt from 'bcrypt';
 import { IUser } from '../../model/user.interface';
 
@@ -72,6 +73,6 @@ export class CreateUserService {
       `Usuário ${formattedUser.email} foi criado`
     );
 
-    return { user: formattedUser };
+    return { user: DateHelper.normalizeDatesInObject(formattedUser) };
   }
 }

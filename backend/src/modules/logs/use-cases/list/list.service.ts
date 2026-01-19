@@ -1,5 +1,6 @@
 import { LogRepository } from '../../repositories/log.repository';
 import { IListLogsRequest, IListLogsResponse } from './list.interface';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class ListLogsService {
   private logRepository: LogRepository;
@@ -18,7 +19,7 @@ export class ListLogsService {
 
     return {
       success: true,
-      data: logs,
+      data: DateHelper.normalizeDatesInObject(logs),
       pagination: {
         page,
         limit,

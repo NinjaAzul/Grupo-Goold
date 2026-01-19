@@ -11,6 +11,7 @@ import {
 } from '@shared/errors';
 import { AppointmentModel } from '@modules/appointments/model/appointment.model';
 import { AppointmentStatus } from '@modules/appointments/model/appointment.interface';
+import { DateHelper } from '@shared/utils/date.helper';
 
 export class CancelAppointmentService {
   private appointmentRepository: AppointmentRepository;
@@ -52,6 +53,8 @@ export class CancelAppointmentService {
       `Agendamento ${cancelledAppointment.id} cancelado pelo usuário`
     );
 
-    return { appointment: cancelledAppointment };
+    return {
+      appointment: DateHelper.normalizeDatesInObject(cancelledAppointment),
+    };
   }
 }
