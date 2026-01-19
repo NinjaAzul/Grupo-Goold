@@ -1,36 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import * as path from 'path';
-
-const tsConfigPaths = require('tsconfig-paths');
-
-const projectRoot = path.resolve(__dirname, '..');
-const tsConfig = require(path.join(projectRoot, 'tsconfig.json'));
-
-const baseUrlRelative = tsConfig.compilerOptions.baseUrl || './src';
-const baseUrl = path.resolve(projectRoot, baseUrlRelative);
-const paths = tsConfig.compilerOptions.paths || {};
-  
-const resolvedPaths: Record<string, string[]> = {};
-for (const [alias, pathArray] of Object.entries(paths)) {
-  const aliasKey = alias.replace('/*', '');
-  resolvedPaths[aliasKey] = (pathArray as string[]).map((p: string) => {
-    const cleanPath = p.replace('/*', '');
-    return path.resolve(baseUrl, cleanPath);
-  });
-}
-
-console.log('Registering tsconfig-paths:', {
-  baseUrl,
-  aliases: Object.keys(resolvedPaths),
-});
-
-tsConfigPaths.register({
-  baseUrl: baseUrl,
-  paths: resolvedPaths,
-});
 
 require('reflect-metadata');
 require('dotenv/config');
+
+
+try {
+  require('mysql2');
+  console.log('mysql2 module loaded successfully');
+} catch (error: any) {
+  console.error('Error loading mysql2:', error.message);
+  throw new Error('mysql2 package is required but not found. Please ensure it is installed.');
+}
 
 let app: any;
 let sequelize: any;
@@ -40,22 +20,35 @@ function initializeApp() {
   if (!app) {
     try {
       console.log('Initializing app...');
+      console.log('Current working directory:', process.cwd());
+      console.log('__dirname:', __dirname);
       
-      const appModule = require('../src/infra/app');
+      const fs = require('fs');
+      const path = require('path');
+      const distPath = path.join(__dirname, '../dist');
+      console.log('Checking dist path:', distPath);
+      console.log('Dist exists:', fs.existsSync(distPath));
+      
+      if (!fs.existsSync(distPath)) {
+        throw new Error(`Dist folder not found at ${distPath}. Make sure 'npm run build' was executed.`);
+      }
+      
+      const appModule = require('../dist/infra/app');
       app = appModule.app;
       console.log('App imported successfully');
       
-      const dbModule = require('../src/@shared/config/database');
+      const dbModule = require('../dist/@shared/config/database');
       sequelize = dbModule.default;
       console.log('Database module imported successfully');
       
-      require('../src/infra/database/models');
+      require('../dist/infra/database/models');
       console.log('Models imported successfully');
     } catch (error: any) {
       console.error('Error initializing app:', {
         message: error?.message,
         stack: error?.stack,
         name: error?.name,
+        code: error?.code,
       });
       throw error;
     }
@@ -90,12 +83,13 @@ export default async (req: VercelRequest, res: VercelResponse) => {
     
     return new Promise((resolve, reject) => {
       try {
-        const result = app(req, res);
-        if (result && typeof result.then === 'function') {
-          result.then(resolve).catch(reject);
-        } else {
-          resolve(result);
-        }
+        app.handle(req, res, (err?: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(undefined);
+          }
+        });
       } catch (error) {
         reject(error);
       }

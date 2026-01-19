@@ -25,7 +25,7 @@
       "@infra/*": ["./infra/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/@shared/types/**/*.d.ts"],
   "exclude": ["node_modules", "dist", "api"],
   "types": ["jest", "node"]
 }

@@ -82,7 +82,7 @@ describe('UpdateUserPermissionService', () => {
     });
 
     it('should propagate NotFoundError when user does not exist', async () => {
-      const { NotFoundError } = await import('@shared/errors');
+      const { NotFoundError } = await import('../../../../@shared/errors');
       mockUserPermissionRepository.findUserById = jest
         .fn()
         .mockResolvedValue(null);
@@ -112,7 +112,7 @@ describe('UpdateUserPermissionService', () => {
     });
 
     it('should propagate NotFoundError when permission does not exist', async () => {
-      const { NotFoundError } = await import('@shared/errors');
+      const { NotFoundError } = await import('../../../../@shared/errors');
       mockUserPermissionRepository.findUserById = jest
         .fn()
         .mockResolvedValue({ id: 1 });

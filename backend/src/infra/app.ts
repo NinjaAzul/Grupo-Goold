@@ -1,3 +1,4 @@
+/// <reference path="../@shared/types/express.d.ts" />
 import cors from 'cors';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import swaggerUi from 'swagger-ui-express';

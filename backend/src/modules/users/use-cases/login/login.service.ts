@@ -1,5 +1,5 @@
 import { compare } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
+import { sign, SignOptions } from 'jsonwebtoken';
 import { UserRepository } from '../../repositories/user.repository';
 import { ILoginRequest, ILoginResponse } from './login.interface';
 import { UnauthorizedError } from '@shared/errors';
@@ -37,10 +37,16 @@ export class LoginService {
 
     const { password: _, ...userWithoutPassword } = user;
 
-    const token = sign({}, process.env.JWT_SECRET, {
+    if (!process.env.JWT_SECRET || !process.env.JWT_EXPIRES_IN) {
+      throw new Error('JWT_SECRET and JWT_EXPIRES_IN must be set');
+    }
+
+    const signOptions: SignOptions = {
       subject: String(user.id),
       expiresIn: process.env.JWT_EXPIRES_IN,
-    });
+    };
+
+    const token = sign({}, process.env.JWT_SECRET, signOptions);
 
     const tokenReturn: ILoginResponse = {
       user: DateHelper.normalizeDatesInObject(userWithoutPassword),
