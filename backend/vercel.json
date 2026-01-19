@@ -6,12 +6,20 @@
       "src": "api/index.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": "dist/**",
+        "includeFiles": "dist/**,src/infra/database/**",
         "maxLambdaSize": "50mb"
       }
     }
   ],
   "routes": [
+    {
+      "src": "/api-docs(.*)",
+      "dest": "api/index.ts"
+    },
+    {
+      "src": "/api-docs.json",
+      "dest": "api/index.ts"
+    },
     {
       "src": "/(.*)",
       "dest": "api/index.ts"

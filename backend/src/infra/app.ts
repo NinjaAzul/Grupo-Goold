@@ -14,6 +14,7 @@ const corsOptions = {
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean) => void
   ) => {
+   
     if (!origin) {
       return callback(null, true);
     }
@@ -27,14 +28,28 @@ const corsOptions = {
     ];
 
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      if (process.env.NODE_ENV !== 'production') {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
+    }
+
+    if (process.env.NODE_ENV === 'production') {
+      if (origin.includes('.vercel.app')) {
+        return callback(null, true);
+      }
+      if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
+        return callback(null, true);
+      }
+      if (process.env.FRONTEND_VERCEL_URL && origin === process.env.FRONTEND_VERCEL_URL) {
+        return callback(null, true);
       }
     }
+
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    // Log the rejected origin for debugging
+    console.warn('CORS blocked origin:', origin);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -76,10 +91,10 @@ app.get('/api-docs.json', (_req, res) => {
 app.use(
   '/api-docs',
   swaggerUi.serve,
-  (req: Request, res: Response, next: NextFunction) => {
-    const swaggerSpec = getSwaggerSpec();
-    swaggerUi.setup(swaggerSpec)(req, res, next);
-  }
+  swaggerUi.setup(getSwaggerSpec(), {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Grupo Goold API Documentation',
+  })
 );
 
 app.use('/api', routes);

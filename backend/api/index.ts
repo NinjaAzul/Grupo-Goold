@@ -15,6 +15,7 @@ try {
 let app: any;
 let sequelize: any;
 let dbInitialized = false;
+let migrationsRun = false;
 
 function initializeApp() {
   if (!app) {
@@ -72,10 +73,107 @@ async function ensureDbConnection() {
   }
 }
 
+async function runMigrationsAndSeeds() {
+  if (migrationsRun) {
+    return;
+  }
+
+  try {
+    console.log('Checking if migrations need to be run...');
+    
+    const path = require('path');
+    const { exec } = require('child_process');
+    const { promisify } = require('util');
+    const execAsync = promisify(exec);
+    const { existsSync } = require('fs');
+
+    const possiblePaths = [
+      path.resolve(__dirname, '../node_modules/.bin/sequelize-cli'),
+      path.resolve(process.cwd(), 'node_modules/.bin/sequelize-cli'),
+      'npx sequelize-cli',
+    ];
+
+    let sequelizeCliCommand = 'npx sequelize-cli';
+    
+    for (const cliPath of possiblePaths) {
+      if (cliPath.includes('npx')) {
+        sequelizeCliCommand = cliPath;
+        break;
+      }
+      if (existsSync(cliPath)) {
+        sequelizeCliCommand = cliPath;
+        break;
+      }
+    }
+
+    const projectRoot = path.resolve(__dirname, '..');
+    const env: any = {
+      ...Object.fromEntries(
+        Object.entries(process.env).map(([key, value]) => [
+          key,
+          value ? String(value) : undefined,
+        ])
+      ),
+      NODE_ENV: process.env.NODE_ENV || 'production',
+    };
+
+    console.log('Running database migrations...');
+    try {
+      const { stdout: migrateStdout, stderr: migrateStderr } = await execAsync(
+        `${sequelizeCliCommand} db:migrate`,
+        {
+          cwd: projectRoot,
+          env,
+        }
+      );
+      console.log('Migrations completed:', migrateStdout);
+      if (migrateStderr) {
+        console.warn('Migration warnings:', migrateStderr);
+      }
+    } catch (migrateError: any) {
+      if (migrateError.message?.includes('No migrations were executed')) {
+        console.log('No new migrations to run');
+      } else {
+        console.error('Migration error (non-fatal):', migrateError.message);
+      }
+    }
+
+    console.log('Running database seeds...');
+    try {
+      const { stdout: seedStdout, stderr: seedStderr } = await execAsync(
+        `${sequelizeCliCommand} db:seed:all`,
+        {
+          cwd: projectRoot,
+          env,
+        }
+      );
+      console.log('Seeds completed:', seedStdout);
+      if (seedStderr) {
+        console.warn('Seed warnings:', seedStderr);
+      }
+    } catch (seedError: any) {
+      if (seedError.message?.includes('already exists') || seedError.message?.includes('duplicate')) {
+        console.log('Seeds already executed or no new seeds to run');
+      } else {
+        console.error('Seed error (non-fatal):', seedError.message);
+      }
+    }
+
+    migrationsRun = true;
+    console.log('Database setup completed');
+  } catch (error: any) {
+    console.error('Error running migrations/seeds:', error.message);
+  }
+}
+
 export default async (req: VercelRequest, res: VercelResponse) => {
   try {
     initializeApp();
     await ensureDbConnection();
+    
+    if (dbInitialized && !migrationsRun) {
+      await runMigrationsAndSeeds();
+    }
     
     if (!app) {
       throw new Error('App not initialized');

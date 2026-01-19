@@ -5,3 +5,4 @@ export { queryValidationMiddleware } from './query-validation.middleware';
 export { ensureAuthenticated } from './auth.middleware';
 export { ensureAdmin } from './authorization.middleware';
 export { ensurePermission } from './permission.middleware';
+export { validateApiKey } from './api-key.middleware';

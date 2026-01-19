@@ -27,11 +27,19 @@ import { updateStatusRoutes } from '@modules/appointments/use-cases/update-statu
 import { roomsRoutes } from '@modules/rooms/use-cases/rooms.routes';
 import { listRoomsRoutes } from '@modules/rooms/use-cases/list/list.routes';
 import { updateUserPermissionRoutes } from '@modules/users/use-cases/update-permission/update-permission.routes';
+import { migrateRoutes } from '@modules/database/use-cases/migrate/migrate.routes';
+import { seedRoutes } from '@modules/database/use-cases/seed/seed.routes';
+import { migrateApiKeyRoutes } from '@modules/database/use-cases/migrate/migrate-api-key.routes';
+import { seedApiKeyRoutes } from '@modules/database/use-cases/seed/seed-api-key.routes';
+import { setupRoutes } from '@modules/database/use-cases/setup/setup.routes';
 
 const routes = Router();
 
 //HEALTH CHECK ROUTES
 routes.use('/health', healthCheckRoutes);
+
+//SETUP ROUTES (Public - for initial database setup)
+routes.use('/setup', setupRoutes);
 
 //USERS ROUTES
 routes.use('/users', createUserRoutes);
@@ -66,6 +74,12 @@ routes.use('/rooms', listRoomsRoutes);
 routes.use('/admin/appointments', adminListAppointmentsRoutes);
 routes.use('/admin/appointments', updateStatusRoutes);
 routes.use('/admin/rooms', roomsRoutes);
+routes.use('/admin/database/migrate', migrateRoutes);
+routes.use('/admin/database/seed', seedRoutes);
+
+
+routes.use('/database/migrate', migrateApiKeyRoutes);
+routes.use('/database/seed', seedApiKeyRoutes);
 
 //LOGS ROUTES
 routes.use('/logs', listLogsRoutes);

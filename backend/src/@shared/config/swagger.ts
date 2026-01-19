@@ -3,6 +3,16 @@ import { SwaggerDefinition, OAS3Definition } from 'swagger-jsdoc';
 import path from 'path';
 import { logger } from '../utils/logger';
 
+const getServerUrl = () => {
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/api`;
+  }
+  if (process.env.API_URL) {
+    return `${process.env.API_URL}/api`;
+  }
+  return 'http://localhost:3001/api';
+};
+
 const swaggerDefinition: SwaggerDefinition = {
   openapi: '3.0.0',
   info: {
@@ -15,8 +25,8 @@ const swaggerDefinition: SwaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3001/api',
-      description: 'Development server',
+      url: getServerUrl(),
+      description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server',
     },
   ],
   components: {
