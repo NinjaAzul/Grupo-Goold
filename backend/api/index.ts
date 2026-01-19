@@ -1,27 +1,55 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import 'reflect-metadata';
-import 'dotenv/config';
+import * as path from 'path';
 
-import 'tsconfig-paths/register';
+const tsConfigPaths = require('tsconfig-paths');
+
+const projectRoot = path.resolve(__dirname, '..');
+const tsConfig = require(path.join(projectRoot, 'tsconfig.json'));
+
+const baseUrlRelative = tsConfig.compilerOptions.baseUrl || './src';
+const baseUrl = path.resolve(projectRoot, baseUrlRelative);
+const paths = tsConfig.compilerOptions.paths || {};
+  
+const resolvedPaths: Record<string, string[]> = {};
+for (const [alias, pathArray] of Object.entries(paths)) {
+  const aliasKey = alias.replace('/*', '');
+  resolvedPaths[aliasKey] = (pathArray as string[]).map((p: string) => {
+    const cleanPath = p.replace('/*', '');
+    return path.resolve(baseUrl, cleanPath);
+  });
+}
+
+console.log('Registering tsconfig-paths:', {
+  baseUrl,
+  aliases: Object.keys(resolvedPaths),
+});
+
+tsConfigPaths.register({
+  baseUrl: baseUrl,
+  paths: resolvedPaths,
+});
+
+require('reflect-metadata');
+require('dotenv/config');
 
 let app: any;
 let sequelize: any;
 let dbInitialized = false;
 
-async function initializeApp() {
+function initializeApp() {
   if (!app) {
     try {
       console.log('Initializing app...');
       
-      const appModule = await import('../src/infra/app.js');
+      const appModule = require('../src/infra/app');
       app = appModule.app;
       console.log('App imported successfully');
       
-      const dbModule = await import('../src/@shared/config/database.js');
+      const dbModule = require('../src/@shared/config/database');
       sequelize = dbModule.default;
       console.log('Database module imported successfully');
       
-      await import('../src/infra/database/models.js');
+      require('../src/infra/database/models');
       console.log('Models imported successfully');
     } catch (error: any) {
       console.error('Error initializing app:', {
@@ -53,7 +81,7 @@ async function ensureDbConnection() {
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   try {
-    await initializeApp();
+    initializeApp();
     await ensureDbConnection();
     
     if (!app) {
