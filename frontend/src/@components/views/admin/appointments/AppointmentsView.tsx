@@ -62,6 +62,10 @@ export function AppointmentsView() {
     );
   }, [setPageInfo]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedDate]);
+
   const queryParams = useMemo((): GetAdminAppointmentsParams => {
     const params: GetAdminAppointmentsParams = {
       page: currentPage,
@@ -73,7 +77,6 @@ export function AppointmentsView() {
     }
 
     if (selectedDate) {
-      // Usa DateHelper para extrair a data de forma segura no timezone local
       params.startDate = DateHelper.extractDateOnly(selectedDate);
       params.endDate = DateHelper.extractDateOnly(selectedDate);
     }

@@ -121,7 +121,6 @@ export function LoginForm({
       const previousIndex = Math.max(currentIndex - 1, 0);
       const newStep = STEP_ORDER[previousIndex];
       
-      // Se voltar para o passo de email, limpa o email do formulário de login
       if (newStep === LoginStep.EMAIL) {
         loginForm.setValue('email', '');
         setEmail('');

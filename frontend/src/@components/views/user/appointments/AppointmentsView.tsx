@@ -62,6 +62,10 @@ export function AppointmentsView() {
     );
   }, [setPageInfo]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedDate]);
+
   const queryParams = useMemo(() => {
     const params: GetAppointmentsParams = {
       page: currentPage,

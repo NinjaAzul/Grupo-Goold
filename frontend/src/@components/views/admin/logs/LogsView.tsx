@@ -44,8 +44,8 @@ export function LogsView() {
     setCurrentPage(1);
   }, [searchTerm, selectedDate]);
 
-  const queryParams = useMemo((): GetLogsParams => {
-    const params: GetLogsParams = {
+  const queryParams = useMemo((): GetLogsParams & { userName?: string } => {
+    const params: GetLogsParams & { userName?: string } = {
       page: currentPage,
       limit: 10,
     };
@@ -53,6 +53,7 @@ export function LogsView() {
     if (searchTerm) {
       params.activityType = searchTerm;
       params.module = searchTerm;
+      params.userName = searchTerm;
     }
 
     if (selectedDate) {

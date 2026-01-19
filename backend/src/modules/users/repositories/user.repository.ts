@@ -126,10 +126,23 @@ export class UserRepository {
     const where: WhereOptions = {};
 
     if (filters.name) {
-      where[Op.or as unknown as keyof typeof Op] = [
-        { firstName: { [Op.like]: `%${filters.name}%` } },
-        { lastName: { [Op.like]: `%${filters.name}%` } },
-      ];
+      const searchWords = filters.name
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0);
+
+      if (searchWords.length > 0) {
+        const wordConditions = searchWords.map((word) => ({
+          [Op.or]: [
+            { firstName: { [Op.like]: `%${word}%` } },
+            { lastName: { [Op.like]: `%${word}%` } },
+          ],
+        }));
+
+        (where as unknown as Record<string, unknown>)[
+          Op.and as unknown as keyof typeof Op
+        ] = wordConditions;
+      }
     }
 
     if (filters.email) {

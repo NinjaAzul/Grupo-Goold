@@ -35,6 +35,10 @@ export class ListLogsQueryDto {
   module?: string;
 
   @IsOptional()
+  @IsString({ message: 'User name must be a string' })
+  userName?: string;
+
+  @IsOptional()
   @IsDateString({}, { message: 'Start date must be a valid date string' })
   startDate?: string;
 

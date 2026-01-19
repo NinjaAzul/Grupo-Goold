@@ -56,6 +56,7 @@ export function AppointmentsTable({
               >
                 Data agendamento
               </TableHead>
+              <TableHead>Nome</TableHead>
               <TableHead>Sala de agendamento</TableHead>
               <TableHead>Status transação</TableHead>
               <TableHead className="text-right">Ação</TableHead>
@@ -65,6 +66,9 @@ export function AppointmentsTable({
             {isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
+                  <TableCell className="whitespace-nowrap">
+                    <Skeleton variant="text" className="w-32" />
+                  </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <Skeleton variant="text" className="w-32" />
                   </TableCell>
@@ -101,6 +105,16 @@ export function AppointmentsTable({
                 <TableRow key={appointment.id} className={getStatusRowClassName(appointment.status)}>
                   <TableCell className="whitespace-nowrap text-sm text-primary">
                     {appointment.date}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-primary">
+                        {appointment.name}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {appointment.type}
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <Badge variant="primary" className="bg-primary text-white">
