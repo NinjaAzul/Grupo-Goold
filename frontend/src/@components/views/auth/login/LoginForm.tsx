@@ -11,6 +11,7 @@ import { emailSchema, loginSchema, type EmailFormData, type LoginFormData } from
 import { usePostUsersCheckEmail, usePostUsersLogin } from '@/api/generated/users/users';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
 
 interface LoginFormProps {
   defaultValues?: Partial<LoginFormData>;
@@ -89,8 +90,12 @@ export function LoginForm({
           toast.success('Login realizado com sucesso!');
         }
       },
-      onError: () => {
-        toast.error('Erro ao fazer login. Verifique suas credenciais.');
+      onError: (error: AxiosError<{ error?: { message?: string } }>) => {
+        console.error(error);
+
+        if (error.response?.data?.error?.message) {
+          toast.error(error.response.data.error.message);
+        }
       },
     },
   });

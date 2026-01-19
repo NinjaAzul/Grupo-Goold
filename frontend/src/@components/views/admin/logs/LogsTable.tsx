@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/@components/ui/Badge';
 import { Skeleton } from '@/@components/ui/Skeleton';
 import { NotFound } from '@/@components/ui/NotFound';
-import { UserIcon, CalendarIcon } from '@/@components/icons';
+import { UserIcon, CalendarIcon2 } from '@/@components/icons';
 import { Log, SortField, SortDirection } from './types';
 
 interface LogsTableProps {
@@ -99,7 +99,7 @@ export function LogsTable({
                       {log.module === 'Minha Conta' ? (
                         <UserIcon className="w-4 h-4" />
                       ) : log.module === 'Agendamento' ? (
-                        <CalendarIcon className="w-4 h-4" />
+                        <CalendarIcon2 className="w-4 h-4" />
                       ) : null}
                       {log.module}
                     </Badge>

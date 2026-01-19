@@ -6,6 +6,7 @@ export { MenuIcon } from './MenuIcon';
 export { XIcon } from './XIcon';
 export { SearchIcon } from './SearchIcon';
 export { CalendarIcon } from './CalendarIcon';
+export { CalendarIcon2 } from './CalendarIcon2';
 export { UsersIcon } from './UsersIcon';
 export { LogsIcon } from './LogsIcon';
 export { ChevronLeftIcon } from './ChevronLeftIcon';
