@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import 'reflect-metadata';
 import 'dotenv/config';
 
+import 'tsconfig-paths/register';
+
 let app: any;
 let sequelize: any;
 let dbInitialized = false;
@@ -11,15 +13,15 @@ async function initializeApp() {
     try {
       console.log('Initializing app...');
       
-      const appModule = await import('../src/infra/app');
+      const appModule = await import('../src/infra/app.js');
       app = appModule.app;
       console.log('App imported successfully');
       
-      const dbModule = await import('../src/@shared/config/database');
+      const dbModule = await import('../src/@shared/config/database.js');
       sequelize = dbModule.default;
       console.log('Database module imported successfully');
       
-      await import('../src/infra/database/models');
+      await import('../src/infra/database/models.js');
       console.log('Models imported successfully');
     } catch (error: any) {
       console.error('Error initializing app:', {

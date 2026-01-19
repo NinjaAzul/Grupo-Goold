@@ -117,7 +117,6 @@ class AppointmentRepository {
             };
         }
         if (filters.room) {
-            // Buscar pelo nome da sala através do relacionamento
             roomWhere = {
                 name: { [sequelize_1.Op.like]: `%${filters.room}%` },
             };

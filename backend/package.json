@@ -50,7 +50,8 @@
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.35.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
@@ -75,7 +76,6 @@
     "sequelize-cli": "^6.6.2",
     "ts-jest": "^29.1.2",
     "ts-node-dev": "^2.0.0",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3",
     "@dbml/cli": "^5.4.1",
     "@dbml/connector": "^5.4.1"

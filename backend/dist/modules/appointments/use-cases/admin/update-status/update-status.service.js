@@ -10,7 +10,6 @@ class UpdateStatusService {
     }
     async execute(request) {
         const appointment = await this.repository.updateStatus(request.appointmentId, request.status);
-        // Determinar tipo de atividade baseado no status
         let activityType = 'Atualização de agendamento';
         if (request.status === appointment_interface_1.AppointmentStatus.SCHEDULED) {
             activityType = 'Criação de agendamento';
@@ -18,8 +17,6 @@ class UpdateStatusService {
         else if (request.status === appointment_interface_1.AppointmentStatus.CANCELLED) {
             activityType = 'Cancelamento de agendamento';
         }
-        // Registrar log
-        // Quando um admin realiza a ação, usar o ID do admin, senão usar o ID do dono do agendamento
         const logUserId = request.adminUserId ?? appointment.userId;
         await logger_service_1.LoggerService.log(activityType, 'Agendamento', logUserId, `Agendamento ${appointment.id} - Status: ${request.status}${request.adminUserId ? ` (Ação realizada por admin)` : ''}`);
         return { appointment };
