@@ -89,9 +89,6 @@ export function NewAppointmentModal({
       }
     );
 
-  // Erros de query são interceptados automaticamente pelo interceptor do Axios
-  // useEffect removido - toast já é exibido automaticamente
-
   const availableSlots: string[] =
     (slotsResponse as unknown as { slots?: string[] })?.slots || [];
 

@@ -32,8 +32,8 @@ export interface TimeRangeInputProps
   label: string;
   error?: string;
   required?: boolean;
-  startTime?: string; // Formato HH:mm
-  endTime?: string; // Formato HH:mm
+  startTime?: string;
+  endTime?: string;
   onChange?: (startTime: string, endTime: string) => void;
 }
 

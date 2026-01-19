@@ -27,6 +27,11 @@ AXIOS_INSTANCE.interceptors.request.use((config) => {
 AXIOS_INSTANCE.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    
+    if (Axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       localStorage.removeItem(TOKEN_KEY);
 
@@ -38,21 +43,28 @@ AXIOS_INSTANCE.interceptors.response.use(
       if (!currentPath.includes('/auth/login') && !currentPath.includes('/admin/login')) {
         window.location.href = loginRoute;
       }
+      return Promise.reject(error);
     }
 
-    const errorData = error.response?.data as
-      | {
-          error?: { message?: string; statusCode?: number };
-          message?: string;
-        }
-      | undefined;
+    if (error.response?.data) {
+      const errorData = error.response.data as
+        | {
+            error?: { message?: string; statusCode?: number };
+            message?: string;
+          }
+        | undefined;
 
-    const errorMessage =
-      errorData?.error?.message ||
-      errorData?.message ||
-      'Erro ao processar requisição';
+      const errorMessage =
+        errorData?.error?.message ||
+        errorData?.message ||
+        undefined;
 
-    toast.error(errorMessage);
+      if (errorMessage) {
+        toast.error(errorMessage);
+      }
+    } else if (error.request && !error.response) {
+      console.error('Network error:', error.message);
+    }
 
     return Promise.reject(error);
   }

@@ -37,7 +37,7 @@ export interface TimeInputProps
   required?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  value?: string; // Formato HH:mm
+  value?: string;
   onChange?: (value: string) => void;
 }
 

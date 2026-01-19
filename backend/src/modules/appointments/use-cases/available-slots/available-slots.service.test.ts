@@ -172,8 +172,6 @@ describe('AvailableSlotsService', () => {
       const result = await availableSlotsService.execute({ date: dateString });
 
       expect(mockAppointmentModel.findAll).toHaveBeenCalled();
-      // O slot de 10:00 deve estar ocupado, mas a lógica de conflito é complexa
-      // Vamos apenas verificar que o service foi executado corretamente
       expect(result.slots).toBeDefined();
       expect(Array.isArray(result.slots)).toBe(true);
     });

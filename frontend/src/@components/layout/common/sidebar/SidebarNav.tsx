@@ -29,7 +29,7 @@ export function SidebarNav({ items, onLinkClick }: SidebarNavProps) {
               href={item.href}
               onClick={onLinkClick}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer',
+                'flex items-center gap-3 px-4 py-[14px] rounded-md transition-colors cursor-pointer',
                 isActive
                   ? 'bg-primary text-white hover:bg-primary/90'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-primary'

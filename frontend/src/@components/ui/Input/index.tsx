@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { SpinnerIcon } from '@/@components/icons';
 
 const inputVariants = cva(
-  'w-full py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors',
+  'w-full h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors flex items-center',
   {
     variants: {
       hasError: {

@@ -19,9 +19,15 @@ export function ToasterProvider() {
           },
         },
         error: {
+          style: {
+            background: '#DC2626',
+            color: '#FFFFFF',
+            fontFamily: 'Montserrat, sans-serif',
+            border: '1px solid #B91C1C',
+          },
           iconTheme: {
             primary: '#FFFFFF',
-            secondary: '#000000',
+            secondary: '#DC2626',
           },
         },
       }}

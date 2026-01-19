@@ -10,7 +10,7 @@ export function HeaderDesktop({ title, description }: HeaderDesktopProps) {
 
   return (
     <div className="hidden lg:block bg-background-white border-b border-border">
-      <div className="p-6 h-[96px] flex items-center">
+      <div className="px-8 py-6 h-[96px] flex items-center">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-primary mb-2">{title}</h1>
           {description && (
