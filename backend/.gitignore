@@ -1,2 +1,6 @@
 .vercel
 dist
+api/*.js
+api/*.d.ts
+api/*.js.map
+api/*.d.ts.map
