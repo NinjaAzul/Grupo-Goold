@@ -1,1 +1,0 @@
-{"version":3,"file":"cancel.repository.d.ts","sourceRoot":"","sources":["../../../../../src/modules/appointments/use-cases/cancel/cancel.repository.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,YAAY,EAAE,MAAM,mDAAmD,CAAC;AAGjF,OAAO,EAAE,yBAAyB,EAAE,MAAM,oBAAoB,CAAC;AAE/D,qBAAa,2BAA2B;IAChC,MAAM,CACV,OAAO,EAAE,yBAAyB,GACjC,OAAO,CAAC,YAAY,CAAC;CAqCzB"}

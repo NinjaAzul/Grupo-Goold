@@ -1,1 +1,0 @@
-{"version":3,"file":"role.repository.d.ts","sourceRoot":"","sources":["../../../../src/modules/roles/repositories/role.repository.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,KAAK,EAAE,MAAM,qCAAqC,CAAC;AAE5D,qBAAa,cAAc;IACnB,QAAQ,CAAC,MAAM,EAAE,MAAM,GAAG,OAAO,CAAC,KAAK,GAAG,IAAI,CAAC;CAItD"}

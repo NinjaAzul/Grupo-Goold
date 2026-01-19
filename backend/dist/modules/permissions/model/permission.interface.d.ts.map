@@ -1,1 +1,0 @@
-{"version":3,"file":"permission.interface.d.ts","sourceRoot":"","sources":["../../../../src/modules/permissions/model/permission.interface.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,WAAW;IAC1B,EAAE,EAAE,MAAM,CAAC;IACX,IAAI,EAAE,MAAM,CAAC;IACb,QAAQ,CAAC,SAAS,CAAC,EAAE,IAAI,CAAC;IAC1B,QAAQ,CAAC,SAAS,CAAC,EAAE,IAAI,CAAC;CAC3B"}
