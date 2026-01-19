@@ -108,4 +108,3 @@ cp backend/.env.example backend/.env
 - Desenvolvimento: `npm run dev`
 - Build: `npm run build`
 - Produção: `npm start`
-
