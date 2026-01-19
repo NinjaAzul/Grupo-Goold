@@ -29,7 +29,7 @@ const timeRangeInputVariants = cva(
 export interface TimeRangeInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange'>,
     Omit<VariantProps<typeof timeRangeInputVariants>, 'hasError' | 'hasRightIcon'> {
-  label: string;
+  label?: string;
   error?: string;
   required?: boolean;
   startTime?: string;

@@ -20,6 +20,7 @@ export const Default: Story = {
     const [endTime, setEndTime] = useState('');
     return (
       <TimeRangeInput
+        label="Time Range"
         startTime={startTime}
         endTime={endTime}
         onChange={(start, end) => {
