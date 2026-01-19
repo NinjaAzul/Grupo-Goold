@@ -67,7 +67,7 @@ export function LogsTable({
                     <Skeleton variant="badge" />
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    <Skeleton variant="text" className="w-32" />
+                    <Skeleton variant="badge" />
                   </TableCell>
                 </TableRow>
               ))
@@ -90,7 +90,9 @@ export function LogsTable({
                     </Badge>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    {log.dateTime}
+                    <Badge variant="secondary" className="bg-background text-black border-border inline-flex items-center gap-1 w-auto">
+                      {log.dateTime}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))
