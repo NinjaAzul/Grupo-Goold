@@ -1,73 +1,152 @@
-// Generated DBML from database schema
+// Generated DBML from database schema using @dbml/cli
 // Database: grupo_goold
-// Generated at: 2026-01-08T03:49:25.031Z
+// Generated at: 2026-01-19T05:43:28.220Z
 
-Table SequelizeMeta {
-  name varchar(255) [pk, not null]
+Enum "appointments_status_enum" {
+  "pending"
+  "scheduled"
+  "cancelled"
 }
 
-Table appointments {
-  id int(10) [pk, not null]
-  user_id int(10) [not null]
-  appointment_date datetime [not null]
-  room varchar(50) [not null]
-  status varchar(50) [not null, default: 'pending']
-  created_at datetime [not null]
-  updated_at datetime [not null]
+Table "SequelizeMeta" {
+  "name" varchar(255) [unique, pk, not null]
 }
 
-Table cities {
-  id int(10) [pk, not null]
-  name varchar(100) [not null]
-  state_id int(10) [not null]
-  created_at datetime [not null]
-  updated_at datetime [not null]
+Table "appointments" {
+  "id" int [pk, not null, increment]
+  "user_id" int [not null]
+  "appointment_date" datetime [not null, note: 'Data e hora do agendamento']
+  "status" appointments_status_enum [not null, default: 'pending', note: 'Status: pending (Em análise), scheduled (Agendado), cancelled (Cancelado)']
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
+  "room_id" int [not null, note: 'ID da sala de agendamento']
+
+  Indexes {
+    appointment_date [type: btree, name: "appointments_date_index"]
+    room_id [type: btree, name: "appointments_room_id_index"]
+    status [type: btree, name: "appointments_status_index"]
+    user_id [type: btree, name: "appointments_user_id_index"]
+  }
 }
 
-Table logs {
-  id int(10) [pk, not null]
-  user_id int(10)
-  activity_type varchar(100) [not null]
-  module varchar(50) [not null]
-  description text(65535)
-  created_at datetime [not null]
+Table "cities" {
+  "id" int [pk, not null]
+  "name" varchar(100) [not null]
+  "state_id" int [not null]
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    state_id [type: btree, name: "cities_state_id_index"]
+  }
 }
 
-Table roles {
-  id int(10) [pk, not null]
-  name varchar(50) [unique, not null]
-  created_at datetime [not null]
-  updated_at datetime [not null]
+Table "logs" {
+  "id" int [pk, not null, increment]
+  "user_id" int [note: 'ID do usuário. NULL se for log do sistema']
+  "activity_type" varchar(100) [not null, note: 'Tipo de atividade: Login, Logout, Criação de agendamento, Cancelamento de agendamento, Atualização de e-mail, etc.']
+  "module" varchar(50) [not null, note: 'Módulo onde ocorreu a atividade: Agendamento, Minha Conta, etc.']
+  "description" text [note: 'Descrição detalhada da atividade']
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    activity_type [type: btree, name: "logs_activity_type_index"]
+    created_at [type: btree, name: "logs_created_at_index"]
+    module [type: btree, name: "logs_module_index"]
+    user_id [type: btree, name: "logs_user_id_index"]
+  }
 }
 
-Table states {
-  id int(10) [pk, not null]
-  name varchar(100) [not null]
-  uf varchar(2) [unique, not null]
-  created_at datetime [not null]
-  updated_at datetime [not null]
+Table "permissions" {
+  "id" int [pk, not null]
+  "name" varchar(100) [unique, not null, note: 'Nome da permissão (ex: users.create, users.update, etc.)']
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    name [type: btree, name: "permissions_name_index"]
+  }
 }
 
-Table users {
-  id int(10) [pk, not null]
-  first_name varchar(100) [not null]
-  last_name varchar(100) [not null]
-  password varchar(255) [not null]
-  zip_code varchar(10)
-  street varchar(255)
-  number varchar(20)
-  complement varchar(255)
-  neighborhood varchar(100)
-  city_id int(10)
-  created_at datetime [not null]
-  updated_at datetime [not null]
-  role_id int(10) [not null, default: 2]
+Table "roles" {
+  "id" int [pk, not null]
+  "name" varchar(50) [unique, not null]
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
 }
 
-// Relationships
+Table "rooms" {
+  "id" int [pk, not null, increment]
+  "name" varchar(100) [unique, not null, note: 'Nome da sala']
+  "start_time" varchar(5) [not null, note: 'Horário inicial (formato HH:mm, ex: 08:00)']
+  "end_time" varchar(5) [not null, note: 'Horário final (formato HH:mm, ex: 18:00)']
+  "time_block" int [not null, note: 'Bloco de horários em minutos (ex: 30, 60)']
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
 
-Ref: appointments.user_id > users.id
-Ref: cities.state_id > states.id
-Ref: logs.user_id > users.id
-Ref: users.city_id > cities.id
-Ref: users.role_id > roles.id
+  Indexes {
+    name [type: btree, name: "rooms_name_index"]
+  }
+}
+
+Table "states" {
+  "id" int [pk, not null]
+  "name" varchar(100) [not null]
+  "uf" varchar(2) [unique, not null]
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
+}
+
+Table "user_permissions" {
+  "user_id" int [not null, note: 'ID do usuário']
+  "permission_id" int [not null, note: 'ID da permissão']
+  "granted" tinyint(1) [not null, default: 0, note: 'Se a permissão está concedida (true) ou negada (false)']
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    permission_id [type: btree, name: "user_permissions_permission_id_index"]
+    user_id [type: btree, name: "user_permissions_user_id_index"]
+    (user_id, permission_id) [pk, name: "PRIMARY"]
+    (user_id, permission_id) [unique, name: "user_permissions_user_id_permission_id_unique"]
+  }
+}
+
+Table "users" {
+  "id" int [pk, not null, increment]
+  "first_name" varchar(100) [not null]
+  "last_name" varchar(100) [not null]
+  "email" varchar(255) [unique, not null]
+  "password" varchar(255) [not null]
+  "zip_code" varchar(10)
+  "street" varchar(255)
+  "number" varchar(20)
+  "complement" varchar(255)
+  "neighborhood" varchar(100)
+  "city_id" int
+  "created_at" datetime [not null, default: `CURRENT_TIMESTAMP`]
+  "updated_at" "datetime on update CURRENT_TIMESTAMP" [not null, default: `CURRENT_TIMESTAMP`]
+  "role_id" int [not null, default: 2]
+  "active" tinyint(1) [not null, default: 1, note: 'Status do usuário (ativo/inativo)']
+
+  Indexes {
+    role_id [type: btree, name: "users_role_id_index"]
+  }
+}
+
+Ref "appointments_ibfk_1":"users"."id" < "appointments"."user_id" [update: cascade, delete: cascade]
+
+Ref "appointments_room_id_foreign_idx":"rooms"."id" < "appointments"."room_id" [update: cascade, delete: restrict]
+
+Ref "cities_ibfk_1":"states"."id" < "cities"."state_id" [update: cascade, delete: restrict]
+
+Ref "logs_ibfk_1":"users"."id" < "logs"."user_id" [update: cascade, delete: set null]
+
+Ref "user_permissions_ibfk_1":"users"."id" < "user_permissions"."user_id" [update: cascade, delete: cascade]
+
+Ref "user_permissions_ibfk_2":"permissions"."id" < "user_permissions"."permission_id" [update: cascade, delete: cascade]
+
+Ref "users_city_id_foreign":"cities"."id" < "users"."city_id" [update: cascade, delete: set null]
+
+Ref "users_role_id_foreign_idx":"roles"."id" < "users"."role_id" [update: cascade, delete: restrict]
+
